@@ -1,0 +1,12 @@
+{
+  "name": "jobhub",
+  "version": "0.1.0",
+  "description": "Manages running jobs in child processes",
+  "main": "lib/index.js",
+  "author": "Andre Mekkawi <github@andremekkawi.com>",
+  "license": "MIT",
+  "dependencies": {
+    "shell-escape": "^0.2.0",
+    "uuid": "^2.0.0"
+  }
+}
