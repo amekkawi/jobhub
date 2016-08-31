@@ -5,8 +5,19 @@
   "main": "lib/index.js",
   "author": "Andre Mekkawi <github@andremekkawi.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "mocha --bail --recursive --require ./test/setup.js ./test/index.js",
+    "lint": "eslint lib"
+  },
   "dependencies": {
-    "shell-escape": "^0.2.0",
+    "minimist": "^1.2.0",
     "uuid": "^2.0.0"
+  },
+  "devDependencies": {
+    "eslint-plugin-jsdoc": "^2.3.1",
+    "eslint": "^3.4.0",
+    "expect": "^1.20.2",
+    "mocha": "^3.0.2",
+    "object-inspect": "^1.2.1"
   }
 }
