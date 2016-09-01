@@ -5,6 +5,14 @@
   "main": "lib/index.js",
   "author": "Andre Mekkawi <github@andremekkawi.com>",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amekkawi/jobhub/issues"
+  },
+  "homepage": "https://github.com/amekkawi/jobhub",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amekkawi/jobhub.git"
+  },
   "scripts": {
     "test": "mocha --bail --recursive --require ./test/setup.js ./test/index.js",
     "lint": "eslint lib"

@@ -10,7 +10,7 @@ Manages running jobs in child processes
 
 ## Usage ##
 
-See [./examples](./examples) directory.
+See [examples](examples) directory.
 
 ## License ##
 
