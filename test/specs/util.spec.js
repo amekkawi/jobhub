@@ -182,7 +182,8 @@ describe('util', function() {
 			'validate',
 			'onProgress',
 			'onResolve',
-			'onReject'
+			'onReject',
+			'meta'
 		].sort();
 
 		it('should normalize the props', function() {
@@ -194,7 +195,8 @@ describe('util', function() {
 				validate: function() {},
 				onResolve: function() {},
 				onReject: function() {},
-				onProgress: function() {}
+				onProgress: function() {},
+				meta: {}
 			};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
 			expect(parsed).toBeA(Object);
@@ -208,6 +210,7 @@ describe('util', function() {
 			expect(parsed.onResolve).toBe(jobConfig.onResolve);
 			expect(parsed.onReject).toBe(jobConfig.onReject);
 			expect(parsed.onProgress).toBe(jobConfig.onProgress);
+			expect(parsed.meta).toBe(jobConfig.meta);
 		});
 
 		it('should only require "run"', function() {
@@ -226,6 +229,8 @@ describe('util', function() {
 			expect(parsed.onResolve).toBe(null);
 			expect(parsed.onReject).toBe(null);
 			expect(parsed.onProgress).toBe(null);
+			expect(parsed.meta).toBeA(Object);
+			expect(parsed.meta).toEqual({});
 		});
 
 		it('should coerce "unique" to a boolean', function() {
@@ -269,6 +274,8 @@ describe('util', function() {
 			expect(parsed.onResolve).toBe(null);
 			expect(parsed.onReject).toBe(null);
 			expect(parsed.onProgress).toBe(null);
+			expect(parsed.meta).toBeA(Object);
+			expect(parsed.meta).toEqual({});
 		});
 
 		it('should throw a InvalidJobConfigError if jobConfig is not a function or object', function() {
@@ -361,6 +368,15 @@ describe('util', function() {
 			}).toThrowWithProps(errors.InvalidJobConfigError, {
 				jobName: 'FOO',
 				propName: 'onProgress'
+			});
+		});
+
+		it('should throw a InvalidJobConfigError if "meta" is specified and not an object', function() {
+			expect(function() {
+				util.parseJobConfig('FOO', { run: function() {}, meta: 5 });
+			}).toThrowWithProps(errors.InvalidJobConfigError, {
+				jobName: 'FOO',
+				propName: 'meta'
 			});
 		});
 	});
