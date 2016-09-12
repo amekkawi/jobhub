@@ -69,7 +69,6 @@ describe('TrackedJob', function() {
 		var trackedJob = new TrackedJob({}, 'FOO', {}, {});
 		expect(trackedJob.promise).toBe(null);
 		return trackedJob.then(function() {
-			console.log('-');
 			throw new Error('should fail if not started');
 		}, function(err) {
 			expect(err).toBeA(Error);
@@ -90,7 +89,10 @@ describe('TrackedJob', function() {
 		var paramError = new errors.InvalidJobParamError('nope!', 'foo', void 0);
 		var manager = createManagerFixture({
 			validateJobParams: expect.createSpy()
-				.andThrow(paramError)
+				.andCall(function() {
+					expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob stage %s to be %s');
+					throw paramError;
+				})
 		});
 		var jobConfig = {
 			quickRun: function() {
@@ -197,6 +199,7 @@ describe('TrackedJob', function() {
 
 		var jobConfig = {
 			quickRun: function(job, next) {
+				expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob stage %s to be %s');
 				expect(job).toBeA(Object, 'Expected quickRun job arg type of %s to be an object');
 				expect(job.jobId).toBe('FOO', 'Expected quickRun job.jobId %s to be %s');
 				expect(job.params).toBeA(Object, 'Expected quickRun job.params type %s to be an object');
