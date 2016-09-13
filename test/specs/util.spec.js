@@ -28,7 +28,8 @@ describe('util', function() {
 		'forkInitModulePath',
 		'terminationSIGTERMTimeout',
 		'terminationSIGKILLTimeout',
-		'workerStartupTimeout'
+		'workerStartupTimeout',
+		'createId'
 	].sort();
 
 	describe('getDefaultManagerOptions', function() {
@@ -55,6 +56,10 @@ describe('util', function() {
 
 		it('should have "workerStartupTimeout" default to 20000', function() {
 			expect(util.getDefaultManagerOptions().workerStartupTimeout).toBe(20000);
+		});
+
+		it('should have "createId" default to uuid\'s v4 method', function() {
+			expect(util.getDefaultManagerOptions().createId).toBe(require('uuid').v4);
 		});
 	});
 
@@ -167,6 +172,19 @@ describe('util', function() {
 					}, util.getDefaultManagerOptions());
 				}).toThrowWithProps(errors.InvalidManagerOptionsError, {
 					propName: 'workerStartupTimeout'
+				});
+			});
+		});
+
+		it('should throw a InvalidManagerOptionsError if "createId" is not a function', function() {
+			[0, 1, -1, void 0, null, '0', '1', Infinity, NaN, -Infinity, true, false, [], {}].forEach(function(val) {
+				expect(function() {
+					util.parseManagerOptions({
+						jobsModulePath: 'path/to/module',
+						createId: val
+					}, util.getDefaultManagerOptions());
+				}).toThrowWithProps(errors.InvalidManagerOptionsError, {
+					propName: 'createId'
 				});
 			});
 		});
