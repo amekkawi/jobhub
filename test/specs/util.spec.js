@@ -138,7 +138,7 @@ describe('util', function() {
 		});
 
 		it('should throw a InvalidManagerOptionsError if "terminationSIGTERMTimeout" is not a number or less than 0', function() {
-			[-1, void 0, null, '0', '1', Infinity, NaN, -Infinity, true, false, [], {}].forEach(function(val) {
+			[function(){}, -1, void 0, null, '0', '1', Infinity, NaN, -Infinity, true, false, [], {}].forEach(function(val) {
 				expect(function() {
 					util.parseManagerOptions({
 						jobsModulePath: 'path/to/module',
@@ -151,7 +151,7 @@ describe('util', function() {
 		});
 
 		it('should throw a InvalidManagerOptionsError if "terminationSIGKILLTimeout" is not a number or less than 0', function() {
-			[-1, void 0, null, '0', '1', Infinity, NaN, -Infinity, true, false, [], {}].forEach(function(val) {
+			[function(){}, -1, void 0, null, '0', '1', Infinity, NaN, -Infinity, true, false, [], {}].forEach(function(val) {
 				expect(function() {
 					util.parseManagerOptions({
 						jobsModulePath: 'path/to/module',
@@ -164,7 +164,7 @@ describe('util', function() {
 		});
 
 		it('should throw a InvalidManagerOptionsError if "workerStartupTimeout" is not a number or less than 0', function() {
-			[-1, void 0, null, '0', '1', Infinity, NaN, -Infinity, true, false, [], {}].forEach(function(val) {
+			[function(){}, -1, void 0, null, '0', '1', Infinity, NaN, -Infinity, true, false, [], {}].forEach(function(val) {
 				expect(function() {
 					util.parseManagerOptions({
 						jobsModulePath: 'path/to/module',
