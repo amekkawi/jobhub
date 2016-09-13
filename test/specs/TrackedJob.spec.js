@@ -69,7 +69,7 @@ describe('TrackedJob', function() {
 		var trackedJob = new TrackedJob({}, 'FOO', {}, {});
 		expect(trackedJob.promise).toBe(null);
 		return trackedJob.then(function() {
-			throw new Error('should fail if not started');
+			throw new Error('Expected to not resolve successfully');
 		}, function(err) {
 			expect(err).toBeA(Error);
 			expect(err.message).toBe('Cannot use TackedJob#then as Promise until TrackedJob#run is called');
@@ -114,7 +114,7 @@ describe('TrackedJob', function() {
 		expect(trackedJob.promise).toBe(promise, 'Expected trackedJob.promise %s to still be same instance');
 
 		return trackedJob.then(function() {
-			throw new Error('Expected to fail validation');
+			throw new Error('Expected to not resolve successfully');
 		}, function(err) {
 			// Rethrow error if not the expected one
 			if (err !== paramError) {
@@ -248,7 +248,7 @@ describe('TrackedJob', function() {
 		};
 		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
 		return trackedJob.run().then(function() {
-			throw new Error('Expected to fail quickRun');
+			throw new Error('Expected to not resolve successfully');
 		}, function(err) {
 			// Rethrow error if not the expected one
 			if (err !== quickRunError) {
@@ -272,7 +272,7 @@ describe('TrackedJob', function() {
 		};
 		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
 		return trackedJob.run().then(function() {
-			throw new Error('Expected to fail quickRun');
+			throw new Error('Expected to not resolve successfully');
 		}, function(err) {
 			// Rethrow error if not the expected one
 			if (err !== quickRunError) {
@@ -723,8 +723,9 @@ describe('TrackedJob', function() {
 		var trackedJob = new TrackedJob(manager, 'BAR', jobConfig, {});
 		return trackedJob.run()
 			.then(function() {
-				throw new Error('Expected to throw error while forking');
+				throw new Error('Expected to not resolve successfully');
 			}, function(err) {
+				// Rethrow error if not the expected one
 				if (err !== observeError) {
 					throw err;
 				}
