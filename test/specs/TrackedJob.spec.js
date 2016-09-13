@@ -283,6 +283,38 @@ describe('TrackedJob', function() {
 		});
 	});
 
+	it('should call jobConfig.onFailure', function() {
+		var expectedError = new Error();
+		var manager = createManagerFixture();
+		var jobConfig = {
+			onFailure: expect.createSpy().andCall(function() {
+				expect(trackedJob.isRunning).toBe(false);
+				expect(this).toBe(jobConfig, 'Expected context %s to be jobConfig');
+				expect(arguments.length).toBe(2, 'Expected arguments count %s to be %s');
+				expect(arguments[0]).toBe(expectedError, 'Expected arguments[0] %s to be thrown error');
+				expect(arguments[1]).toBe(trackedJob, 'Expected arguments[0] %s to be trackedJob');
+			}),
+			quickRun: function() {
+				throw expectedError;
+			},
+			run: function() {
+				throw new Error('Expected jobCofig.run to not be called');
+			}
+		};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+		return trackedJob.run()
+			.then(function() {
+				throw new Error('Expected to not resolve successfully');
+			}, function(err) {
+				// Rethrow error if not the expected one
+				if (err !== expectedError) {
+					throw err;
+				}
+
+				expect(jobConfig.onFailure.calls.length).toBe(1, 'Expected onFailure call count %s to be %s');
+			});
+	});
+
 	it('should emit EVENT_JOB_FAILURE', function(done) {
 		var valErr = new Error('FOO');
 		var manager = createManagerFixture({
@@ -331,6 +363,30 @@ describe('TrackedJob', function() {
 		var trackedJob = new TrackedJob(manager, 'FOO', { run: function() {} }, {});
 		trackedJob.reEmitTo(emitter);
 		trackedJob.run();
+	});
+
+	it('should call jobConfig.onSuccess for quickRun', function() {
+		var manager = createManagerFixture();
+		var jobConfig = {
+			onSuccess: expect.createSpy().andCall(function() {
+				expect(trackedJob.isRunning).toBe(false);
+				expect(this).toBe(jobConfig, 'Expected context %s to be jobConfig');
+				expect(arguments.length).toBe(2, 'Expected arguments count %s to be %s');
+				expect(arguments[0]).toBe(500, 'Expected arguments[0] %s to be %s');
+				expect(arguments[1]).toBe(trackedJob, 'Expected arguments[0] %s to be trackedJob');
+			}),
+			quickRun: function(job) {
+				job.resolve(500);
+			},
+			run: function() {
+				throw new Error('Expected jobCofig.run to not be called');
+			}
+		};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+		return trackedJob.run()
+			.then(function() {
+				expect(jobConfig.onSuccess.calls.length).toBe(1, 'Expected onSuccess call count %s to be %s');
+			});
 	});
 
 	it('should emit EVENT_JOB_SUCCESS for quickRun', function(done) {
@@ -391,6 +447,51 @@ describe('TrackedJob', function() {
 
 	it('should emit EVENT_JOB_SUCCESS for run');
 	it('should re-emit EVENT_JOB_SUCCESS for run');
+
+	it('should call jobConfig.onProgress for quickRun', function() {
+		var progressObj = {
+			boolT: true,
+			boolF: false,
+			num0: 0,
+			num1: 1,
+			inf: Infinity,
+			infNeg: -Infinity,
+			nan: NaN,
+			undef: void 0,
+			arr: [],
+			func: function(){},
+			obj: {},
+			regex: /^$/
+		};
+
+		var progressObjCleaned = JSON.parse(JSON.stringify(progressObj));
+
+		var manager = createManagerFixture();
+		var jobConfig = {
+			onProgress: expect.createSpy().andCall(function() {
+				expect(trackedJob.isRunning).toBe(true);
+				expect(this).toBe(jobConfig, 'Expected context %s to be jobConfig');
+				expect(arguments.length).toBe(2, 'Expected arguments count %s to be %s');
+				expect(arguments[0]).toBeA(Object, 'Expected arguments[0] type %s to be an object');
+				expect(Object.keys(arguments[0])).toEqual(Object.keys(progressObjCleaned), 'Expected arguments[0] keys %s to equal %s');
+				expect(arguments[0]).toEqual(progressObjCleaned, 'Expected arguments[0] %s to equal %s');
+				expect(arguments[0]).toBe(trackedJob.progress, 'Expected arguments[0] %s to be TrackedJob#progress');
+				expect(arguments[1]).toBe(trackedJob, 'Expected arguments[1] %s to be TrackedJob');
+			}),
+			quickRun: function(job) {
+				job.sendProgress(progressObj);
+				job.resolve(500);
+			},
+			run: function() {
+				throw new Error('Expected jobCofig.run to not be called');
+			}
+		};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+		return trackedJob.run()
+			.then(function() {
+				expect(jobConfig.onProgress.calls.length).toBe(1, 'Expected onProgress call count %s to be %s');
+			});
+	});
 
 	it('should emit EVENT_JOB_PROGRESS for quickRun', function(done) {
 		var progressObj = {
@@ -636,6 +737,7 @@ describe('TrackedJob', function() {
 			});
 	});
 
+	it('should call jobConfig.onProgress for run');
 	it('should emit EVENT_JOB_PROGRESS for run');
 	it('should re-emit EVENT_JOB_PROGRESS for run');
 
