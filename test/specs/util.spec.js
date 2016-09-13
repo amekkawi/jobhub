@@ -181,8 +181,8 @@ describe('util', function() {
 			'uniqueKey',
 			'validate',
 			'onProgress',
-			'onResolve',
-			'onReject',
+			'onSuccess',
+			'onFailure',
 			'meta'
 		].sort();
 
@@ -193,8 +193,8 @@ describe('util', function() {
 				unique: false,
 				uniqueKey: function() {},
 				validate: function() {},
-				onResolve: function() {},
-				onReject: function() {},
+				onSuccess: function() {},
+				onFailure: function() {},
 				onProgress: function() {},
 				meta: {}
 			};
@@ -207,8 +207,8 @@ describe('util', function() {
 			expect(parsed.unique).toBe(true);
 			expect(parsed.uniqueKey).toBe(jobConfig.uniqueKey);
 			expect(parsed.validate).toBe(jobConfig.validate);
-			expect(parsed.onResolve).toBe(jobConfig.onResolve);
-			expect(parsed.onReject).toBe(jobConfig.onReject);
+			expect(parsed.onSuccess).toBe(jobConfig.onSuccess);
+			expect(parsed.onFailure).toBe(jobConfig.onFailure);
 			expect(parsed.onProgress).toBe(jobConfig.onProgress);
 			expect(parsed.meta).toBe(jobConfig.meta);
 		});
@@ -226,8 +226,8 @@ describe('util', function() {
 			expect(parsed.unique).toBe(false);
 			expect(parsed.uniqueKey).toBe(null);
 			expect(parsed.validate).toBe(null);
-			expect(parsed.onResolve).toBe(null);
-			expect(parsed.onReject).toBe(null);
+			expect(parsed.onSuccess).toBe(null);
+			expect(parsed.onFailure).toBe(null);
 			expect(parsed.onProgress).toBe(null);
 			expect(parsed.meta).toBeA(Object);
 			expect(parsed.meta).toEqual({});
@@ -271,8 +271,8 @@ describe('util', function() {
 			expect(parsed.unique).toBe(false);
 			expect(parsed.uniqueKey).toBe(null);
 			expect(parsed.validate).toBe(null);
-			expect(parsed.onResolve).toBe(null);
-			expect(parsed.onReject).toBe(null);
+			expect(parsed.onSuccess).toBe(null);
+			expect(parsed.onFailure).toBe(null);
 			expect(parsed.onProgress).toBe(null);
 			expect(parsed.meta).toBeA(Object);
 			expect(parsed.meta).toEqual({});
@@ -344,21 +344,21 @@ describe('util', function() {
 			});
 		});
 
-		it('should throw a InvalidJobConfigError if "onResolve" is specified and not a function', function() {
+		it('should throw a InvalidJobConfigError if "onSuccess" is specified and not a function', function() {
 			expect(function() {
-				util.parseJobConfig('FOO', { run: function() {}, onResolve: {} });
+				util.parseJobConfig('FOO', { run: function() {}, onSuccess: {} });
 			}).toThrowWithProps(errors.InvalidJobConfigError, {
 				jobName: 'FOO',
-				propName: 'onResolve'
+				propName: 'onSuccess'
 			});
 		});
 
-		it('should throw a InvalidJobConfigError if "onReject" is specified and not a function', function() {
+		it('should throw a InvalidJobConfigError if "onFailure" is specified and not a function', function() {
 			expect(function() {
-				util.parseJobConfig('FOO', { run: function() {}, onReject: {} });
+				util.parseJobConfig('FOO', { run: function() {}, onFailure: {} });
 			}).toThrowWithProps(errors.InvalidJobConfigError, {
 				jobName: 'FOO',
-				propName: 'onReject'
+				propName: 'onFailure'
 			});
 		});
 

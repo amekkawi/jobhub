@@ -429,6 +429,7 @@ describe('TrackedJob', function() {
 				expect(arguments[0]).toBeA(Object, 'Expected arguments[0] type %s to be an object');
 				expect(Object.keys(arguments[0])).toEqual(Object.keys(progressObjCleaned), 'Expected arguments[0] keys %s to equal %s');
 				expect(arguments[0]).toEqual(progressObjCleaned, 'Expected arguments[0] %s to equal %s');
+				expect(arguments[0]).toBe(trackedJob.progress, 'Expected arguments[0] %s to be TrackedJob#progress');
 				done();
 			}
 			catch (err) {
