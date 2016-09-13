@@ -1,6 +1,6 @@
 {
   "name": "jobhub",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Manages running jobs in child processes",
   "main": "lib/index.js",
   "author": "Andre Mekkawi <github@andremekkawi.com>",
