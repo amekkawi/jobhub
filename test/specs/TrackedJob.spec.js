@@ -85,51 +85,6 @@ describe('TrackedJob', function() {
 		});
 	});
 
-	it('should validate the job params', function() {
-		var paramError = new errors.InvalidJobParamError('nope!', 'foo', void 0);
-		var manager = createManagerFixture({
-			validateJobParams: expect.createSpy()
-				.andCall(function() {
-					expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob stage %s to be %s');
-					throw paramError;
-				})
-		});
-		var jobConfig = {
-			quickRun: function() {
-				throw new Error('Expected jobConfig.quickRun to not be called');
-			},
-			run: function() {
-				throw new Error('Expected jobCofig.run to not be called');
-			}
-		};
-		var params = {};
-		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
-		expect(trackedJob.isRunning).toBe(false, 'Expected trackedJob.isRunning %s to be %s');
-		expect(trackedJob.run()).toBe(trackedJob, 'Expected return of trackedJob.run() %s to be trackedJob (i.e. this)');
-		expect(trackedJob.isRunning).toBe(true, 'Expected trackedJob.isRunning %s to now be %s');
-		expect(trackedJob.promise).toBeA(Promise, 'Expected trackedJob.promise %s to be a Promise');
-
-		var promise = trackedJob.promise;
-		trackedJob.run();
-		expect(trackedJob.promise).toBe(promise, 'Expected trackedJob.promise %s to still be same instance');
-
-		return trackedJob.then(function() {
-			throw new Error('Expected to not resolve successfully');
-		}, function(err) {
-			// Rethrow error if not the expected one
-			if (err !== paramError) {
-				throw err;
-			}
-
-			expect(trackedJob.isRunning).toBe(false);
-			expect(manager.validateJobParams.calls.length).toBe(1, 'Expected validateJobParams call count %s to be %s');
-			expect(manager.validateJobParams.calls[0].context).toBe(manager, 'Expected validateJobParams context %s to be manager');
-			expect(manager.validateJobParams.calls[0].arguments.length).toBe(2, 'Expected validateJobParams arguments length %s to be %s');
-			expect(manager.validateJobParams.calls[0].arguments[0]).toBe(jobConfig, 'Expected validateJobParams arguments[0] %s to be jobConfig');
-			expect(manager.validateJobParams.calls[0].arguments[1]).toBe(params, 'Expected validateJobParams arguments[1] %s to be params');
-		});
-	});
-
 	it('should emit EVENT_JOB_STARTED', function(done) {
 		var manager = createManagerFixture({
 			validateJobParams: function() {
@@ -175,6 +130,51 @@ describe('TrackedJob', function() {
 		var trackedJob = new TrackedJob(manager, 'FOO', { run: function() {} }, {});
 		trackedJob.reEmitTo(emitter);
 		trackedJob.run();
+	});
+
+	it('should validate the job params', function() {
+		var paramError = new errors.InvalidJobParamError('nope!', 'foo', void 0);
+		var manager = createManagerFixture({
+			validateJobParams: expect.createSpy()
+				.andCall(function() {
+					expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob stage %s to be %s');
+					throw paramError;
+				})
+		});
+		var jobConfig = {
+			quickRun: function() {
+				throw new Error('Expected jobConfig.quickRun to not be called');
+			},
+			run: function() {
+				throw new Error('Expected jobCofig.run to not be called');
+			}
+		};
+		var params = {};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
+		expect(trackedJob.isRunning).toBe(false, 'Expected trackedJob.isRunning %s to be %s');
+		expect(trackedJob.run()).toBe(trackedJob, 'Expected return of trackedJob.run() %s to be trackedJob (i.e. this)');
+		expect(trackedJob.isRunning).toBe(true, 'Expected trackedJob.isRunning %s to now be %s');
+		expect(trackedJob.promise).toBeA(Promise, 'Expected trackedJob.promise %s to be a Promise');
+
+		var promise = trackedJob.promise;
+		trackedJob.run();
+		expect(trackedJob.promise).toBe(promise, 'Expected trackedJob.promise %s to still be same instance');
+
+		return trackedJob.then(function() {
+			throw new Error('Expected to not resolve successfully');
+		}, function(err) {
+			// Rethrow error if not the expected one
+			if (err !== paramError) {
+				throw err;
+			}
+
+			expect(trackedJob.isRunning).toBe(false);
+			expect(manager.validateJobParams.calls.length).toBe(1, 'Expected validateJobParams call count %s to be %s');
+			expect(manager.validateJobParams.calls[0].context).toBe(manager, 'Expected validateJobParams context %s to be manager');
+			expect(manager.validateJobParams.calls[0].arguments.length).toBe(2, 'Expected validateJobParams arguments length %s to be %s');
+			expect(manager.validateJobParams.calls[0].arguments[0]).toBe(jobConfig, 'Expected validateJobParams arguments[0] %s to be jobConfig');
+			expect(manager.validateJobParams.calls[0].arguments[1]).toBe(params, 'Expected validateJobParams arguments[1] %s to be params');
+		});
 	});
 
 	it('should call quickRun and allow it to resolve', function() {
