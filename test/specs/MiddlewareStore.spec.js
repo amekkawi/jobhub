@@ -10,7 +10,7 @@ describe('MiddlewareStore', function() {
 		expect(store.addSupportedAsyncTypes(['BAR'])).toBe(store);
 	});
 
-	it('should call middleware', function() {
+	it('should call sync middleware', function() {
 		var store = new MiddlewareStore();
 
 		var ctx = {};
@@ -50,7 +50,9 @@ describe('MiddlewareStore', function() {
 		expect(spyLast.calls[0].arguments[2]).toBe(args[2]);
 	});
 
-	it('should allow middleware to intercept', function() {
+	it('should call async middleware');
+
+	it('should allow sync middleware to intercept', function() {
 		var store = new MiddlewareStore();
 
 		var ctx = {};
@@ -78,7 +80,9 @@ describe('MiddlewareStore', function() {
 		expect(spyLast.calls.length).toBe(0);
 	});
 
-	it('should call middleware in order added', function() {
+	it('should allow async middleware to intercept');
+
+	it('should call sync middleware in order added', function() {
 		var store = new MiddlewareStore();
 
 		var ctx = {};
@@ -135,6 +139,8 @@ describe('MiddlewareStore', function() {
 		expect(spyLast.calls[0].arguments[1]).toBe(args[1]);
 		expect(spyLast.calls[0].arguments[2]).toBe(args[2]);
 	});
+
+	it('should call async middleware in order added');
 
 	it('should remove sync middleware', function() {
 		var store = new MiddlewareStore();
