@@ -12,6 +12,10 @@ Manages running jobs in child processes
 
 See [examples](examples) directory.
 
+## Change Log ##
+
+See [CHANGELOG.md](CHANGELOG.md)
+
 ## License ##
 
 The MIT License (MIT)
