@@ -523,23 +523,85 @@ describe('util', function() {
 	});
 
 	describe('validateJobParams', function() {
-		it('should return undefined if jobConfig has no validate', function() {
-			expect(util.validateJobParams({}, {})).toBe(void 0);
+		it('should return Promise if jobConfig has no validate', function() {
+			var ret = util.validateJobParams({}, {});
+			expect(ret).toBeA(Promise);
+			return ret.then(function(v) {
+				expect(v).toBe(void 0);
+			});
 		});
 
 		it('should call validate with correct arguments', function() {
-			var ret = {};
-			var spy = expect.createSpy().andReturn(ret);
+			var expectedRet = {};
+			var spy = expect.createSpy().andReturn(expectedRet);
 			var jobConfig = {
 				validate: spy
 			};
 			var params = {};
-			expect(util.validateJobParams(jobConfig, params)).toBe(ret);
+			var ret = util.validateJobParams(jobConfig, params);
+			expect(ret).toBeA(Promise);
 			expect(spy.calls.length).toBe(1);
 			expect(spy.calls[0].context).toBe(jobConfig);
 			expect(spy.calls[0].arguments.length).toBe(2);
 			expect(spy.calls[0].arguments[0]).toBe(params);
 			expect(spy.calls[0].arguments[1]).toBe(errors.InvalidJobParamError);
+			return ret.then(function(v) {
+				expect(v).toBe(expectedRet);
+			});
+		});
+
+		it('should catch error thrown by validate', function() {
+			var expectedErr;
+			var jobConfig = {
+				validate: function(params, InvalidJobParamError) {
+					expectedErr = new InvalidJobParamError('Nope');
+					throw expectedErr;
+				}
+			};
+			var ret = util.validateJobParams(jobConfig, {});
+			expect(ret).toBeA(Promise);
+			return ret.then(function() {
+				throw new Error('should not have resolved');
+			}, function(err) {
+				expect(err).toBe(expectedErr);
+			});
+		});
+
+		it('should handle Promise returned by validate', function() {
+			var expectedRet = {};
+			var jobConfig = {
+				validate: function() {
+					return Promise.resolve()
+						.then(function() {
+							return expectedRet;
+						});
+				}
+			};
+			var ret = util.validateJobParams(jobConfig, {});
+			expect(ret).toBeA(Promise);
+			return ret.then(function(v) {
+				expect(v).toBe(expectedRet);
+			});
+		});
+
+		it('should catch error thrown by validate', function() {
+			var expectedErr;
+			var jobConfig = {
+				validate: function(params, InvalidJobParamError) {
+					return Promise.resolve()
+						.then(function() {
+							expectedErr = new InvalidJobParamError('Nope');
+							throw expectedErr;
+						});
+				}
+			};
+			var ret = util.validateJobParams(jobConfig, {});
+			expect(ret).toBeA(Promise);
+			return ret.then(function() {
+				throw new Error('should not have resolved');
+			}, function(err) {
+				expect(err).toBe(expectedErr);
+			});
 		});
 	});
 
