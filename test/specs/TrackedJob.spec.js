@@ -20,7 +20,6 @@ describe('TrackedJob', function() {
 				forkModulePath: badWorkerPath,
 				workerStartupTimeout: 1
 			}, overrides.options || {}),
-			validateJobParams: overrides.validateJobParams || function() {},
 			middleware: new MiddlewareStore()
 				.addSupportedSyncTypes([
 					constants.MIDDLEWARE_FORK_JOB_PROCESS,
@@ -86,12 +85,16 @@ describe('TrackedJob', function() {
 	});
 
 	it('should emit EVENT_JOB_STARTED', function(done) {
-		var manager = createManagerFixture({
-			validateJobParams: function() {
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			run: function() {},
+			validate: function() {
 				throw new Error();
 			}
-		});
-		var trackedJob = new TrackedJob(manager, 'FOO', { run: function() {} }, {});
+		};
+
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
 		trackedJob.on(constants.EVENT_JOB_STARTED, function() {
 			try {
 				expect(trackedJob.isRunning).toBe(true);
@@ -107,11 +110,7 @@ describe('TrackedJob', function() {
 	});
 
 	it('should re-emit EVENT_JOB_STARTED', function(done) {
-		var manager = createManagerFixture({
-			validateJobParams: function() {
-				throw new Error();
-			}
-		});
+		var manager = createManagerFixture();
 
 		var emitter = new EventEmitter();
 		emitter.on(constants.EVENT_JOB_STARTED, function() {
@@ -127,21 +126,28 @@ describe('TrackedJob', function() {
 			}
 		});
 
-		var trackedJob = new TrackedJob(manager, 'FOO', { run: function() {} }, {});
+		var jobConfig = {
+			run: function() {},
+			validate: function() {
+				throw new Error();
+			}
+		};
+
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
 		trackedJob.reEmitTo(emitter);
 		trackedJob.run();
 	});
 
 	it('should validate the job params', function() {
 		var paramError = new errors.InvalidJobParamError('nope!', 'foo', void 0);
-		var manager = createManagerFixture({
-			validateJobParams: expect.createSpy()
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			validate: expect.createSpy()
 				.andCall(function() {
 					expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob stage %s to be %s');
 					throw paramError;
-				})
-		});
-		var jobConfig = {
+				}),
 			quickRun: function() {
 				throw new Error('Expected jobConfig.quickRun to not be called');
 			},
@@ -149,6 +155,7 @@ describe('TrackedJob', function() {
 				throw new Error('Expected jobCofig.run to not be called');
 			}
 		};
+
 		var params = {};
 		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
 		expect(trackedJob.isRunning).toBe(false, 'Expected trackedJob.isRunning %s to be %s');
@@ -169,11 +176,11 @@ describe('TrackedJob', function() {
 			}
 
 			expect(trackedJob.isRunning).toBe(false);
-			expect(manager.validateJobParams.calls.length).toBe(1, 'Expected validateJobParams call count %s to be %s');
-			expect(manager.validateJobParams.calls[0].context).toBe(manager, 'Expected validateJobParams context %s to be manager');
-			expect(manager.validateJobParams.calls[0].arguments.length).toBe(2, 'Expected validateJobParams arguments length %s to be %s');
-			expect(manager.validateJobParams.calls[0].arguments[0]).toBe(jobConfig, 'Expected validateJobParams arguments[0] %s to be jobConfig');
-			expect(manager.validateJobParams.calls[0].arguments[1]).toBe(params, 'Expected validateJobParams arguments[1] %s to be params');
+			expect(jobConfig.validate.calls.length).toBe(1, 'Expected validate call count %s to be %s');
+			expect(jobConfig.validate.calls[0].context).toBe(jobConfig, 'Expected validate context %s to be jobConfig');
+			expect(jobConfig.validate.calls[0].arguments.length).toBe(2, 'Expected validate arguments length %s to be %s');
+			expect(jobConfig.validate.calls[0].arguments[0]).toBe(params, 'Expected validate arguments[0] %s to be params');
+			expect(jobConfig.validate.calls[0].arguments[1]).toBe(errors.InvalidJobParamError, 'Expected validate arguments[1] %s to be InvalidJobParamError');
 		});
 	});
 
@@ -317,12 +324,16 @@ describe('TrackedJob', function() {
 
 	it('should emit EVENT_JOB_FAILURE', function(done) {
 		var valErr = new Error('FOO');
-		var manager = createManagerFixture({
-			validateJobParams: function() {
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			run: function() {},
+			validate: function() {
 				throw valErr;
 			}
-		});
-		var trackedJob = new TrackedJob(manager, 'FOO', { run: function() {} }, {});
+		};
+
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
 		trackedJob.on(constants.EVENT_JOB_FAILURE, function() {
 			try {
 				expect(trackedJob.isRunning).toBe(false);
@@ -340,11 +351,7 @@ describe('TrackedJob', function() {
 
 	it('should re-emit EVENT_JOB_FAILURE', function(done) {
 		var valErr = new Error('FOO');
-		var manager = createManagerFixture({
-			validateJobParams: function() {
-				throw valErr;
-			}
-		});
+		var manager = createManagerFixture();
 
 		var emitter = new EventEmitter();
 		emitter.on(constants.EVENT_JOB_FAILURE, function() {
@@ -360,7 +367,14 @@ describe('TrackedJob', function() {
 			}
 		});
 
-		var trackedJob = new TrackedJob(manager, 'FOO', { run: function() {} }, {});
+		var jobConfig = {
+			run: function() {},
+			validate: function() {
+				throw valErr;
+			}
+		};
+
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
 		trackedJob.reEmitTo(emitter);
 		trackedJob.run();
 	});
