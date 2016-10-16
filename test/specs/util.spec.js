@@ -753,6 +753,13 @@ describe('util', function() {
 				expect(err).toBe(err);
 			});
 		});
+
+		it('should run the fn synchronously', function() {
+			var fn = expect.createSpy();
+			var promise = util.promiseTry(fn);
+			expect(fn.calls.length).toBe(1);
+			return promise;
+		});
 	});
 
 	describe('dehydrateError', function() {
