@@ -7,7 +7,7 @@ describe('errors', function() {
 		'JobAlreadyExistsError',
 		'JobNotFoundError',
 		'InvalidJobConfigError',
-		'InvalidWorkerPayloadError',
+		//'InvalidWorkerPayloadError',
 		'InvalidUniqueKeyError',
 		'JobForkError',
 		'InvalidJobParamError',
@@ -29,7 +29,7 @@ describe('errors', function() {
 	it('should instantiate "JobAlreadyExistsError');
 	it('should instantiate "JobNotFoundError');
 	it('should instantiate "InvalidJobConfigError');
-	it('should instantiate "InvalidWorkerPayloadError');
+	//it('should instantiate "InvalidWorkerPayloadError');
 	it('should instantiate "InvalidUniqueKeyError');
 	it('should instantiate "JobForkError');
 	it('should instantiate "InvalidJobParamError');
