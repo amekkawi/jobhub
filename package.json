@@ -15,6 +15,7 @@
   },
   "scripts": {
     "test": "mocha --bail --recursive --require ./test/setup.js ./test/index.js",
+    "jsdoc": "jsdoc -r lib -d docs/api -a undefined",
     "lint": "eslint lib"
   },
   "dependencies": {
@@ -22,9 +23,10 @@
     "uuid": "^2.0.0"
   },
   "devDependencies": {
-    "eslint-plugin-jsdoc": "^2.3.1",
     "eslint": "^3.4.0",
+    "eslint-plugin-jsdoc": "^2.3.1",
     "expect": "^1.20.2",
+    "jsdoc": "^3.4.2",
     "mocha": "^3.0.2",
     "object-inspect": "^1.2.1"
   }
