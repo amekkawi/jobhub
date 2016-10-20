@@ -1,30 +1,18 @@
-var path = require('path');
-var ChildProcess = require('child_process').ChildProcess;
-var fork = require('child_process').fork;
 var constants = require('../../lib/constants');
 var errors = require('../../lib/errors');
 var expect = require('expect');
-var util = require('../../lib/util');
 var MiddlewareStore = require('../../lib/MiddlewareStore');
 var TrackedJob = require('../../lib/TrackedJob');
 var EventEmitter = require('events').EventEmitter;
 var JobWorkerIPCMediator = require('../../lib/JobWorkerIPCMediator');
 
 describe('TrackedJob', function() {
-	var badWorkerPath = path.join(__dirname, '..', 'fixtures', 'bad-worker.js');
-
 	function createManagerFixture(overrides) {
 		overrides = overrides || {};
 		return {
-			options: Object.assign({
-				forkModulePath: badWorkerPath,
-				workerStartupTimeout: 1
-			}, overrides.options || {}),
+			options: Object.assign({}, overrides.options || {}),
 			middleware: new MiddlewareStore()
 				.addSupportedSyncTypes([
-					constants.MIDDLEWARE_FORK_JOB_PROCESS,
-					constants.MIDDLEWARE_BUILD_FORK_ARGS,
-					constants.MIDDLEWARE_BUILD_FORK_OPTS,
 					constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR
 				])
 		};
