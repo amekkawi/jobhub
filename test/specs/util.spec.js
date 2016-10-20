@@ -198,9 +198,6 @@ describe('util', function() {
 			'unique',
 			'uniqueKey',
 			'validate',
-			'onProgress',
-			'onSuccess',
-			'onFailure',
 			'meta'
 		].sort();
 
@@ -211,9 +208,6 @@ describe('util', function() {
 				unique: false,
 				uniqueKey: function() {},
 				validate: function() {},
-				onSuccess: function() {},
-				onFailure: function() {},
-				onProgress: function() {},
 				meta: {}
 			};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
@@ -225,9 +219,6 @@ describe('util', function() {
 			expect(parsed.unique).toBe(true);
 			expect(parsed.uniqueKey).toBe(jobConfig.uniqueKey);
 			expect(parsed.validate).toBe(jobConfig.validate);
-			expect(parsed.onSuccess).toBe(jobConfig.onSuccess);
-			expect(parsed.onFailure).toBe(jobConfig.onFailure);
-			expect(parsed.onProgress).toBe(jobConfig.onProgress);
 			expect(parsed.meta).toBe(jobConfig.meta);
 		});
 
@@ -244,9 +235,6 @@ describe('util', function() {
 			expect(parsed.unique).toBe(false);
 			expect(parsed.uniqueKey).toBe(null);
 			expect(parsed.validate).toBe(null);
-			expect(parsed.onSuccess).toBe(null);
-			expect(parsed.onFailure).toBe(null);
-			expect(parsed.onProgress).toBe(null);
 			expect(parsed.meta).toBeA(Object);
 			expect(parsed.meta).toEqual({});
 		});
@@ -289,9 +277,6 @@ describe('util', function() {
 			expect(parsed.unique).toBe(false);
 			expect(parsed.uniqueKey).toBe(null);
 			expect(parsed.validate).toBe(null);
-			expect(parsed.onSuccess).toBe(null);
-			expect(parsed.onFailure).toBe(null);
-			expect(parsed.onProgress).toBe(null);
 			expect(parsed.meta).toBeA(Object);
 			expect(parsed.meta).toEqual({});
 		});
@@ -359,33 +344,6 @@ describe('util', function() {
 			}).toThrowWithProps(errors.InvalidJobConfigError, {
 				jobName: 'FOO',
 				propName: 'validate'
-			});
-		});
-
-		it('should throw a InvalidJobConfigError if "onSuccess" is specified and not a function', function() {
-			expect(function() {
-				util.parseJobConfig('FOO', { run: function() {}, onSuccess: {} });
-			}).toThrowWithProps(errors.InvalidJobConfigError, {
-				jobName: 'FOO',
-				propName: 'onSuccess'
-			});
-		});
-
-		it('should throw a InvalidJobConfigError if "onFailure" is specified and not a function', function() {
-			expect(function() {
-				util.parseJobConfig('FOO', { run: function() {}, onFailure: {} });
-			}).toThrowWithProps(errors.InvalidJobConfigError, {
-				jobName: 'FOO',
-				propName: 'onFailure'
-			});
-		});
-
-		it('should throw a InvalidJobConfigError if "onProgress" is specified and not a function', function() {
-			expect(function() {
-				util.parseJobConfig('FOO', { run: function() {}, onProgress: {} });
-			}).toThrowWithProps(errors.InvalidJobConfigError, {
-				jobName: 'FOO',
-				propName: 'onProgress'
 			});
 		});
 
