@@ -61,7 +61,7 @@ describe('TrackedJob', function() {
 		expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
 		expect(trackedJob.promise).toBe(null, 'Expected TrackedJob#promise %s to be %s');
 		expect(trackedJob.workerMediator).toBe(null, 'Expected TrackedJob#workerMediator %s to be %s');
-		expect(trackedJob instanceof EventEmitter).toBe(true, 'Expected TrackedJob#trackedJob to be instance of EventEmitter');
+		expect(trackedJob instanceof EventEmitter).toBe(true, 'Expected TrackedJob to be instance of EventEmitter');
 	});
 
 	it('should return a rejected promise from TrackedJob#then if not yet started', function() {
