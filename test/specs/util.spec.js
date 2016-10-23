@@ -198,6 +198,7 @@ describe('util', function() {
 			'unique',
 			'uniqueKey',
 			'validate',
+			'onCreate',
 			'meta'
 		].sort();
 
@@ -208,6 +209,7 @@ describe('util', function() {
 				unique: false,
 				uniqueKey: function() {},
 				validate: function() {},
+				onCreate: function() {},
 				meta: {}
 			};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
@@ -219,6 +221,7 @@ describe('util', function() {
 			expect(parsed.unique).toBe(true);
 			expect(parsed.uniqueKey).toBe(jobConfig.uniqueKey);
 			expect(parsed.validate).toBe(jobConfig.validate);
+			expect(parsed.onCreate).toBe(jobConfig.onCreate);
 			expect(parsed.meta).toBe(jobConfig.meta);
 		});
 
@@ -235,6 +238,7 @@ describe('util', function() {
 			expect(parsed.unique).toBe(false);
 			expect(parsed.uniqueKey).toBe(null);
 			expect(parsed.validate).toBe(null);
+			expect(parsed.onCreate).toBe(null);
 			expect(parsed.meta).toBeA(Object);
 			expect(parsed.meta).toEqual({});
 		});
@@ -277,6 +281,7 @@ describe('util', function() {
 			expect(parsed.unique).toBe(false);
 			expect(parsed.uniqueKey).toBe(null);
 			expect(parsed.validate).toBe(null);
+			expect(parsed.onCreate).toBe(null);
 			expect(parsed.meta).toBeA(Object);
 			expect(parsed.meta).toEqual({});
 		});
@@ -344,6 +349,15 @@ describe('util', function() {
 			}).toThrowWithProps(errors.InvalidJobConfigError, {
 				jobName: 'FOO',
 				propName: 'validate'
+			});
+		});
+
+		it('should throw a InvalidJobConfigError if "onCreate" is specified and not a function', function() {
+			expect(function() {
+				util.parseJobConfig('FOO', { run: function() {}, onCreate: {} });
+			}).toThrowWithProps(errors.InvalidJobConfigError, {
+				jobName: 'FOO',
+				propName: 'onCreate'
 			});
 		});
 
