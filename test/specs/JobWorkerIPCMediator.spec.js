@@ -54,6 +54,7 @@ describe('JobWorkerIPCMediator', function() {
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect(mediator.trackedJob).toBe(trackedJob, 'Expected JobWorkerIPCMediator#trackedJob %s to be the tracked job');
 		expect(mediator.started).toBe(false, 'Expected JobWorkerIPCMediator#started %s to be %s');
+		expect(mediator.exited).toBe(false, 'Expected JobWorkerIPCMediator#exited %s to be %s');
 		expect(mediator.childProcess).toBe(null, 'Expected JobWorkerIPCMediator#childProcess %s to be %s');
 	});
 
@@ -177,7 +178,7 @@ describe('JobWorkerIPCMediator', function() {
 		expect.spyOn(childProcess, 'removeListener').andCallThrough();
 
 		mediator.addListeners();
-		expect(childProcess.on.calls.length).toBe(4);
+		expect(childProcess.on.calls.length).toBe(5);
 		expect(childProcess.on.calls[0].arguments.length).toBe(2);
 		expect(childProcess.on.calls[0].arguments[0]).toBe('message');
 		expect(childProcess.on.calls[0].arguments[1]).toBe(mediator.handleChildMessage);
@@ -190,9 +191,12 @@ describe('JobWorkerIPCMediator', function() {
 		expect(childProcess.on.calls[3].arguments.length).toBe(2);
 		expect(childProcess.on.calls[3].arguments[0]).toBe('close');
 		expect(childProcess.on.calls[3].arguments[1]).toBe(mediator.handleChildClose);
+		expect(childProcess.on.calls[4].arguments.length).toBe(2);
+		expect(childProcess.on.calls[4].arguments[0]).toBe('exit');
+		expect(childProcess.on.calls[4].arguments[1]).toBe(mediator.handleChildExit);
 
 		mediator.removeListeners();
-		expect(childProcess.removeListener.calls.length).toBe(4);
+		expect(childProcess.removeListener.calls.length).toBe(5);
 		expect(childProcess.removeListener.calls[0].arguments.length).toBe(2);
 		expect(childProcess.removeListener.calls[0].arguments[0]).toBe('message');
 		expect(childProcess.removeListener.calls[0].arguments[1]).toBe(mediator.handleChildMessage);
@@ -205,6 +209,9 @@ describe('JobWorkerIPCMediator', function() {
 		expect(childProcess.removeListener.calls[3].arguments.length).toBe(2);
 		expect(childProcess.removeListener.calls[3].arguments[0]).toBe('close');
 		expect(childProcess.removeListener.calls[3].arguments[1]).toBe(mediator.handleChildClose);
+		expect(childProcess.removeListener.calls[4].arguments.length).toBe(2);
+		expect(childProcess.removeListener.calls[4].arguments[0]).toBe('exit');
+		expect(childProcess.removeListener.calls[4].arguments[1]).toBe(mediator.handleChildExit);
 	});
 
 	it('should call handlers on childProcess events', function() {
@@ -243,6 +250,8 @@ describe('JobWorkerIPCMediator', function() {
 			expect(arguments[1]).toBe('SIG', 'Expected arguments[1] %s to be %s');
 		});
 
+		expect.spyOn(mediator, 'handleChildExit');
+
 		mediator.addListeners();
 
 		childProcess.emit('message', expectedMessage);
@@ -256,6 +265,9 @@ describe('JobWorkerIPCMediator', function() {
 
 		childProcess.emit('close', 50, 'SIG');
 		expect(mediator.handleChildClose.calls.length).toBe(1, 'Expected JobWorkerIPCMediator#handleChildClose call count %s to be %s');
+
+		childProcess.emit('exit');
+		expect(mediator.handleChildExit.calls.length).toBe(1, 'Expected JobWorkerIPCMediator#handleChildExit call count %s to be %s');
 	});
 
 	it('should call handleStartupConfirmation on JOB_MESSAGE_STARTUP message and then send payload', function() {
@@ -512,5 +524,24 @@ describe('JobWorkerIPCMediator', function() {
 		expect(mediator.handleError.calls[0].arguments[0].jobName).toBe(trackedJob.jobConfig.jobName);
 		expect(mediator.handleError.calls[0].arguments[0].code).toBe(50);
 		expect(mediator.handleError.calls[0].arguments[0].signal).toBe('SIG');
+	});
+
+	it('should handle "exit" childProcess event', function() {
+		var trackedJob = {
+			jobId: 'BAR',
+			jobConfig: {
+				jobName: 'FOO'
+			},
+			params: {},
+			manager: createManagerFixture()
+		};
+
+		var mediator = new JobWorkerIPCMediator(trackedJob);
+		expect.spyOn(mediator, 'handleExit');
+
+		mediator.handleChildExit();
+
+		expect(mediator.handleExit.calls.length).toBe(1, 'Expected JobWorkerMediator#handleExit call count %s to be %s');
+		expect(mediator.handleExit.calls[0].arguments.length).toBe(0);
 	});
 });

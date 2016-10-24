@@ -7,10 +7,6 @@ var JobWorkerMediator = require('../../lib/JobWorkerMediator');
 var MiddlewareStore = require('../../lib/MiddlewareStore');
 
 describe('JobWorkerMediator', function() {
-	function noCall() {
-		throw new Error('Expected not to be called');
-	}
-
 	function createManagerFixture(overrides) {
 		overrides = overrides || {};
 		return {
@@ -38,6 +34,7 @@ describe('JobWorkerMediator', function() {
 		var mediator = new JobWorkerMediator(trackedJob);
 		expect(mediator.trackedJob).toBe(trackedJob, 'Expected JobWorkerMediator#trackedJob %s to be the tracked job');
 		expect(mediator.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
+		expect(mediator.exited).toBe(false, 'Expected JobWorkerMediator#exited %s to be %s');
 		expect(mediator instanceof EventEmitter).toBe(true, 'Expected JobWorkerMediator to be instance of EventEmitter');
 	});
 
@@ -102,10 +99,12 @@ describe('JobWorkerMediator', function() {
 		var MediatorImpl = extendJobWorkerMediator(function() {
 			JobWorkerMediator.apply(this, arguments);
 			expect.spyOn(this, 'execWorker').andCall(function() {
+				expect(this.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
 				expect(this.addListeners.calls.length).toBe(0, 'Expected JobWorkerMediator#addListeners call count %s to be %s');
 				expect(this.initStartupTimeout.calls.length).toBe(0, 'Expected JobWorkerMediator#initStartupTimeout call count %s to be %s');
 			});
 			expect.spyOn(this, 'addListeners').andCall(function() {
+				expect(this.started).toBe(true, 'Expected JobWorkerMediator#started %s to be %s');
 				expect(this.execWorker.calls.length).toBe(1, 'Expected JobWorkerMediator#execWorker call count %s to be %s');
 				expect(this.initStartupTimeout.calls.length).toBe(0, 'Expected JobWorkerMediator#initStartupTimeout call count %s to be %s');
 			});
@@ -335,8 +334,7 @@ describe('JobWorkerMediator', function() {
 		return new Promise(function(resolve, reject) {
 			mediator = new MediatorImpl(trackedJob)
 				.on(constants.EVENT_JOB_SUCCESS, resolve)
-				.on(constants.EVENT_JOB_FAILURE, reject)
-				.on(constants.EVENT_JOB_PROGRESS, noCall);
+				.on(constants.EVENT_JOB_FAILURE, reject);
 			mediator.startWorker().then(function() {
 				mediator.handleStartupConfirmation();
 				mediator.handleError(expectedError);
@@ -396,6 +394,54 @@ describe('JobWorkerMediator', function() {
 			expect(spyProgress.calls[0].arguments[0]).toBe(expectedProgressA, 'Expected JobWorkerMediator#handleProgress calls[0].arguments[0] %s to be %s');
 			expect(spyProgress.calls[1].arguments.length).toBe(1, 'Expected JobWorkerMediator#handleProgress calls[1].arguments %s to be %s');
 			expect(spyProgress.calls[1].arguments[0]).toBe(expectedProgressB, 'Expected JobWorkerMediator#handleProgress calls[1].arguments[0] %s to be %s');
+		});
+	});
+
+	it('should set JobWorkerMediator#exited and emit JOB_EXIT when JobWorkerMediator#handleExit is called', function() {
+		var trackedJob = {
+			jobId: 'BAR',
+			jobConfig: {
+				jobName: 'FOO'
+			},
+			manager: createManagerFixture()
+		};
+
+		var MediatorImpl = extendJobWorkerMediator(function() {
+			JobWorkerMediator.apply(this, arguments);
+		}, {
+			execWorker: function() {
+
+			},
+			addListeners: function() {
+
+			},
+			removeListeners: function() {
+
+			}
+		});
+
+		var spyExitEvent = expect.createSpy().andCall(function() {
+			expect(mediator.exited).toBe(true, 'Expected JobWorkerMediator#exited %s to be %s');
+		});
+
+		var mediator;
+		return new Promise(function(resolve, reject) {
+			mediator = new MediatorImpl(trackedJob)
+				.on(constants.EVENT_JOB_SUCCESS, resolve)
+				.on(constants.EVENT_JOB_FAILURE, reject)
+				.on(constants.EVENT_JOB_EXIT, spyExitEvent);
+			mediator.startWorker().then(function() {
+				mediator.handleStartupConfirmation();
+				mediator.handleSuccess();
+				expect(mediator.exited).toBe(false, 'Expected JobWorkerMediator#exited %s to be %s');
+				expect(spyExitEvent.calls.length).toBe(0, 'Expected JOB_EXIT emit count %s to be %s');
+				mediator.handleExit();
+				expect(mediator.exited).toBe(true, 'Expected JobWorkerMediator#exited %s to be %s');
+				expect(spyExitEvent.calls.length).toBe(1, 'Expected JOB_EXIT emit count %s to be %s');
+			}).catch(reject);
+		}).then(function() {
+			expect(mediator.exited).toBe(true, 'Expected JobWorkerMediator#exited %s to be %s');
+			expect(spyExitEvent.calls.length).toBe(1, 'Expected JOB_EXIT emit count %s to be %s');
 		});
 	});
 
