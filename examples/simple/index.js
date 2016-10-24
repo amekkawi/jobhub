@@ -7,7 +7,7 @@ var verbose = process.argv.indexOf('-v') >= 0;
 
 var hub = new jobhub.HubManager({
 	jobsModulePath: path.resolve(__dirname, 'jobs.js')
-});
+}).start();
 
 if (verbose) {
 	require('../util').logManagerEvents(hub);
