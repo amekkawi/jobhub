@@ -19,7 +19,7 @@ describe('TrackedJob', function() {
 	}
 
 	function createJobWorkerMediatorFixture(trackedJob, overrides) {
-		return Object.assign({
+		return Object.assign(new EventEmitter(), {
 			trackedJob: trackedJob,
 			startWorker: function() {
 				new Error('Expected to not call JobWorkerMediator#startWorker');
@@ -482,6 +482,17 @@ describe('TrackedJob', function() {
 
 		var spyStartWorker = expect.createSpy()
 			.andCall(function() {
+				expect(workerMediator.on.calls.length).toBe(3);
+				expect(workerMediator.on.calls[0].arguments.length).toBe(2);
+				expect(workerMediator.on.calls[0].arguments[0]).toBe(constants.EVENT_JOB_SUCCESS);
+				expect(workerMediator.on.calls[0].arguments[1]).toBeA(Function);
+				expect(workerMediator.on.calls[1].arguments.length).toBe(2);
+				expect(workerMediator.on.calls[1].arguments[0]).toBe(constants.EVENT_JOB_FAILURE);
+				expect(workerMediator.on.calls[1].arguments[1]).toBeA(Function);
+				expect(workerMediator.on.calls[2].arguments.length).toBe(2);
+				expect(workerMediator.on.calls[2].arguments[0]).toBe(constants.EVENT_JOB_PROGRESS);
+				expect(workerMediator.on.calls[2].arguments[1]).toBeA(Function);
+
 				expect(spyStartWorker.calls.length).toBe(1, 'Expected JobWorkerMediator#startWorker call count %s to be %s');
 				expect(spyCreateMediator.calls.length).toBe(1, 'Expected MIDDLEWARE_CREATE_WORKER_MEDIATOR emit count %s to be %s');
 
@@ -499,19 +510,21 @@ describe('TrackedJob', function() {
 				expect(spyCreateMediator.calls.length).toBe(1, 'Expected MIDDLEWARE_CREATE_WORKER_MEDIATOR emit count %s to be %s');
 
 				expect(this).toBe(trackedJob, 'Expected context %s to be trackedJob');
-				expect(arguments.length).toBe(4, 'Expected arguments count %s to be %s');
-				expect(arguments[0]).toBeA(Function, 'Expected arguments[0] %s to be a %s');
+				expect(arguments.length).toBe(2, 'Expected arguments count %s to be %s');
+				expect(arguments[0]).toBe(trackedJob, 'Expected arguments[0] %s to be trackedJob');
 				expect(arguments[1]).toBeA(Function, 'Expected arguments[1] %s to be a %s');
-				expect(arguments[2]).toBeA(Function, 'Expected arguments[2] %s to be a %s');
-				expect(arguments[3]).toBeA(Function, 'Expected arguments[3] %s to be a %s');
 
 				// Check what would have been returned if not intercepted
-				var origRet = arguments[3](); // Next
+				var origRet = arguments[1](); // Next
 				expect(origRet).toBeA(JobWorkerIPCMediator, 'Expected result of next %s to be a JobWorkerIPCMediator');
 
-				return workerMediator = createJobWorkerMediatorFixture(this, {
+				workerMediator = createJobWorkerMediatorFixture(this, {
 					startWorker: spyStartWorker
 				});
+
+				expect.spyOn(workerMediator, 'on').andCallThrough();
+
+				return workerMediator;
 			});
 
 		manager.middleware.addSyncMiddlware(
@@ -595,12 +608,10 @@ describe('TrackedJob', function() {
 	it('should allow mediator to resolve', function() {
 		var manager = createManagerFixture();
 		var expectedResult = {};
-		var resolveCb;
 
 		manager.middleware.addSyncMiddlware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			function() {
-				resolveCb = arguments[1];
 				return createJobWorkerMediatorFixture(this, {
 					startWorker: function() {
 						return Promise.resolve();
@@ -619,7 +630,7 @@ describe('TrackedJob', function() {
 		var trackedJob = new TrackedJob(manager, 'BAR', jobConfig, {});
 
 		var spyForkedEvent = expect.createSpy().andCall(function() {
-			resolveCb(expectedResult);
+			trackedJob.workerMediator.emit(constants.EVENT_JOB_SUCCESS, expectedResult);
 		});
 		trackedJob.on(constants.EVENT_JOB_FORKED, spyForkedEvent);
 
@@ -645,12 +656,10 @@ describe('TrackedJob', function() {
 	it('should allow mediator to reject', function() {
 		var manager = createManagerFixture();
 		var expectedError = new Error();
-		var rejectCb;
 
 		manager.middleware.addSyncMiddlware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			function() {
-				rejectCb = arguments[2];
 				return createJobWorkerMediatorFixture(this, {
 					startWorker: function() {
 						return Promise.resolve();
@@ -669,7 +678,7 @@ describe('TrackedJob', function() {
 		var trackedJob = new TrackedJob(manager, 'BAR', jobConfig, {});
 
 		trackedJob.on(constants.EVENT_JOB_FORKED, function() {
-			rejectCb(expectedError);
+			trackedJob.workerMediator.emit(constants.EVENT_JOB_FAILURE, expectedError);
 		});
 
 		trackedJob.run();
@@ -756,14 +765,10 @@ describe('TrackedJob', function() {
 	it('should emit EVENT_JOB_PROGRESS for run', function() {
 		var progressObj = {};
 		var manager = createManagerFixture();
-		var resolveCb;
-		var sendProgressCb;
 
 		manager.middleware.addSyncMiddlware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			function() {
-				sendProgressCb = arguments[0];
-				resolveCb = arguments[1];
 				return createJobWorkerMediatorFixture(this, {
 					startWorker: function() {
 						return Promise.resolve();
@@ -781,8 +786,8 @@ describe('TrackedJob', function() {
 		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
 
 		trackedJob.on(constants.EVENT_JOB_FORKED, function() {
-			sendProgressCb(progressObj);
-			resolveCb();
+			trackedJob.workerMediator.emit(constants.EVENT_JOB_PROGRESS, progressObj);
+			trackedJob.workerMediator.emit(constants.EVENT_JOB_SUCCESS);
 		});
 
 		var spyJobProgressEvent = expect.createSpy().andCall(function() {

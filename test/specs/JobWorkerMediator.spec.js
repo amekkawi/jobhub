@@ -1,4 +1,5 @@
 var inherits = require('util').inherits;
+var EventEmitter = require('events').EventEmitter;
 var expect = require('expect');
 var errors = require('../../lib/errors');
 var constants = require('../../lib/constants');
@@ -34,8 +35,9 @@ describe('JobWorkerMediator', function() {
 			},
 			manager: createManagerFixture()
 		};
-		var mediator = new JobWorkerMediator(trackedJob, noCall, noCall, noCall);
-		expect(mediator.trackedJob).toBe(trackedJob);
+		var mediator = new JobWorkerMediator(trackedJob);
+		expect(mediator.trackedJob).toBe(trackedJob, 'Expected JobWorkerMediator#trackedJob %s to be the tracked job');
+		expect(mediator instanceof EventEmitter).toBe(true, 'Expected JobWorkerMediator to be instance of EventEmitter');
 	});
 
 	it('should throw error if not implemented abstract methods', function() {
@@ -51,7 +53,7 @@ describe('JobWorkerMediator', function() {
 			JobWorkerMediator.apply(this, arguments);
 		}, {});
 
-		var mediator = new MediatorImpl(trackedJob, noCall, noCall, noCall);
+		var mediator = new MediatorImpl(trackedJob);
 
 		return Promise.all([
 			new Promise(function(resolve, reject) {
@@ -112,7 +114,7 @@ describe('JobWorkerMediator', function() {
 			});
 		});
 
-		var mediator = new MediatorImpl(trackedJob, noCall, noCall, noCall);
+		var mediator = new MediatorImpl(trackedJob);
 		return mediator.startWorker()
 			.then(function() {
 				expect(mediator.execWorker.calls.length).toBe(1, 'Expected JobWorkerMediator#execWorker call count %s to be %s');
@@ -145,7 +147,7 @@ describe('JobWorkerMediator', function() {
 			}
 		});
 
-		var mediator = new MediatorImpl(trackedJob, noCall, noCall, noCall);
+		var mediator = new MediatorImpl(trackedJob);
 		return mediator.startWorker().then(function() {
 			throw new Error('Expected to not resolve');
 		}, function(err) {
@@ -173,7 +175,7 @@ describe('JobWorkerMediator', function() {
 			}
 		});
 
-		var mediator = new MediatorImpl(trackedJob, noCall, noCall, noCall);
+		var mediator = new MediatorImpl(trackedJob);
 		return mediator.startWorker().then(function() {
 			throw new Error('Expected to not resolve');
 		}, function(err) {
@@ -209,7 +211,7 @@ describe('JobWorkerMediator', function() {
 			}
 		});
 
-		var mediator = new MediatorImpl(trackedJob, noCall, noCall, noCall);
+		var mediator = new MediatorImpl(trackedJob);
 		return mediator.startWorker().then(function() {
 			throw new Error('Expected to not resolve');
 		}, function(err) {
@@ -251,7 +253,7 @@ describe('JobWorkerMediator', function() {
 			}
 		});
 
-		var mediator = new MediatorImpl(trackedJob, noCall, noCall, noCall);
+		var mediator = new MediatorImpl(trackedJob);
 		return mediator.startWorker().then(function() {
 			throw new Error('Expected to not resolve');
 		}, function(err) {
@@ -291,7 +293,9 @@ describe('JobWorkerMediator', function() {
 
 		var mediator;
 		return new Promise(function(resolve, reject) {
-			mediator = new MediatorImpl(trackedJob, noCall, resolve, reject);
+			mediator = new MediatorImpl(trackedJob)
+				.on(constants.EVENT_JOB_SUCCESS, resolve)
+				.on(constants.EVENT_JOB_FAILURE, reject);
 			mediator.startWorker().then(function() {
 				mediator.handleStartupConfirmation();
 				mediator.handleSuccess(expectedResult);
@@ -328,7 +332,10 @@ describe('JobWorkerMediator', function() {
 
 		var mediator;
 		return new Promise(function(resolve, reject) {
-			mediator = new MediatorImpl(trackedJob, noCall, resolve, reject);
+			mediator = new MediatorImpl(trackedJob)
+				.on(constants.EVENT_JOB_SUCCESS, resolve)
+				.on(constants.EVENT_JOB_FAILURE, reject)
+				.on(constants.EVENT_JOB_PROGRESS, noCall);
 			mediator.startWorker().then(function() {
 				mediator.handleStartupConfirmation();
 				mediator.handleError(expectedError);
@@ -372,7 +379,10 @@ describe('JobWorkerMediator', function() {
 
 		var mediator;
 		return new Promise(function(resolve, reject) {
-			mediator = new MediatorImpl(trackedJob, spyProgress, resolve, reject);
+			mediator = new MediatorImpl(trackedJob)
+				.on(constants.EVENT_JOB_SUCCESS, resolve)
+				.on(constants.EVENT_JOB_FAILURE, reject)
+				.on(constants.EVENT_JOB_PROGRESS, spyProgress);
 			mediator.startWorker().then(function() {
 				mediator.handleStartupConfirmation();
 				mediator.handleProgress(expectedProgressA);
@@ -416,7 +426,7 @@ describe('JobWorkerMediator', function() {
 			}
 		});
 
-		var mediator = new MediatorImpl(trackedJob, noCall, noCall, noCall);
+		var mediator = new MediatorImpl(trackedJob);
 		return mediator.startWorker().then(function() {
 			expect(mediator.beginStartupTimeout.calls.length).toBe(0, 'Expected JobWorkerMediator#beginStartupTimeout call count %s to be %s');
 		});
@@ -474,7 +484,9 @@ describe('JobWorkerMediator', function() {
 
 		var mediator;
 		return new Promise(function(resolve, reject) {
-			mediator = new MediatorImpl(trackedJob, noCall, resolve, reject);
+			mediator = new MediatorImpl(trackedJob)
+				.on(constants.EVENT_JOB_SUCCESS, resolve)
+				.on(constants.EVENT_JOB_FAILURE, reject);
 			mediator.startWorker().catch(reject);
 		}).then(function() {
 			throw new Error('Expected to not resolve');
@@ -537,7 +549,9 @@ describe('JobWorkerMediator', function() {
 
 		var mediator;
 		return new Promise(function(resolve, reject) {
-			mediator = new MediatorImpl(trackedJob, noCall, resolve, reject);
+			mediator = new MediatorImpl(trackedJob)
+				.on(constants.EVENT_JOB_SUCCESS, resolve)
+				.on(constants.EVENT_JOB_FAILURE, reject);
 			mediator.startWorker().then(function() {
 				setTimeout(function() {
 					mediator.handleStartupConfirmation();

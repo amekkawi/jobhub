@@ -11,10 +11,6 @@ var MiddlewareStore = require('../../lib/MiddlewareStore');
 describe('JobWorkerIPCMediator', function() {
 	var badWorkerPath = path.join(__dirname, '..', 'fixtures', 'bad-worker.js');
 
-	function noCall() {
-		throw new Error('Expected not to be called');
-	}
-
 	function createChildProcessFixture() {
 		return Object.assign(new EventEmitter(), {
 			pid: 999999,
@@ -55,7 +51,8 @@ describe('JobWorkerIPCMediator', function() {
 			},
 			manager: createManagerFixture()
 		};
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
+		expect(mediator.trackedJob).toBe(trackedJob, 'Expected JobWorkerIPCMediator#trackedJob %s to be the tracked job');
 		expect(mediator.childProcess).toBe(null, 'Expected JobWorkerIPCMediator#childProcess %s to be %s');
 	});
 
@@ -154,7 +151,7 @@ describe('JobWorkerIPCMediator', function() {
 			spyFork
 		);
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 		return mediator.execWorker().then(function() {
 			expect(spyArgs.calls.length).toBe(1, 'Expected MIDDLEWARE_BUILD_FORK_ARGS middleware call count %s to be %s');
 			expect(spyOpts.calls.length).toBe(1, 'Expected MIDDLEWARE_BUILD_FORK_OPTS middleware call count %s to be %s');
@@ -172,7 +169,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 
 		var childProcess = mediator.childProcess = createChildProcessFixture();
 		expect.spyOn(childProcess, 'on').andCallThrough();
@@ -218,7 +215,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 
 		var childProcess = mediator.childProcess = createChildProcessFixture();
 
@@ -270,7 +267,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 
 		var childProcess = mediator.childProcess = createChildProcessFixture();
 		expect.spyOn(childProcess, 'send').andCall(function() {
@@ -305,7 +302,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect.spyOn(mediator, 'handleError').andCall(function() {
 			expect(arguments.length).toBe(1, 'Expected arguments length %s to be %s');
 			expect(arguments[0]).toBeA(errors.JobForkError);
@@ -338,7 +335,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect.spyOn(mediator, 'handleSuccess').andCall(function() {
 			expect(arguments.length).toBe(1, 'Expected arguments length %s to be %s');
 			expect(arguments[0]).toBe(expectedResult, 'Expected arguments[0] %s to be %s');
@@ -363,7 +360,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect.spyOn(mediator, 'handleProgress').andCall(function() {
 			expect(arguments.length).toBe(1, 'Expected arguments length %s to be %s');
 			expect(arguments[0]).toBe(expectedProgress, 'Expected arguments[0] %s to be %s');
@@ -388,7 +385,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect.spyOn(mediator, 'handleError').andCall(function() {
 			expect(arguments.length).toBe(1, 'Expected arguments length %s to be %s');
 			expect(arguments[0]).toBe(expectedError, 'Expected arguments[0] %s to be %s');
@@ -415,7 +412,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect.spyOn(mediator, 'handleError');
 
 		mediator.handleChildMessage({
@@ -453,7 +450,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect.spyOn(mediator, 'handleError');
 
 		mediator.handleChildDisconnect();
@@ -477,7 +474,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect.spyOn(mediator, 'handleError');
 
 		mediator.handleChildError(expectedError);
@@ -501,7 +498,7 @@ describe('JobWorkerIPCMediator', function() {
 			manager: createManagerFixture()
 		};
 
-		var mediator = new JobWorkerIPCMediator(trackedJob, noCall, noCall, noCall);
+		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect.spyOn(mediator, 'handleError');
 
 		mediator.handleChildClose(50, 'SIG');
