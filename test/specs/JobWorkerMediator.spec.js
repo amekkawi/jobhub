@@ -37,6 +37,7 @@ describe('JobWorkerMediator', function() {
 		};
 		var mediator = new JobWorkerMediator(trackedJob);
 		expect(mediator.trackedJob).toBe(trackedJob, 'Expected JobWorkerMediator#trackedJob %s to be the tracked job');
+		expect(mediator.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
 		expect(mediator instanceof EventEmitter).toBe(true, 'Expected JobWorkerMediator to be instance of EventEmitter');
 	});
 

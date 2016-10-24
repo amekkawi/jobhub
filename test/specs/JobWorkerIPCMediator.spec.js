@@ -53,6 +53,7 @@ describe('JobWorkerIPCMediator', function() {
 		};
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect(mediator.trackedJob).toBe(trackedJob, 'Expected JobWorkerIPCMediator#trackedJob %s to be the tracked job');
+		expect(mediator.started).toBe(false, 'Expected JobWorkerIPCMediator#started %s to be %s');
 		expect(mediator.childProcess).toBe(null, 'Expected JobWorkerIPCMediator#childProcess %s to be %s');
 	});
 
