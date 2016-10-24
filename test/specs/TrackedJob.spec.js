@@ -639,7 +639,7 @@ describe('TrackedJob', function() {
 
 		var spyForkedReEmit = expect.createSpy().andCall(function() {
 			expect(this).toBe(emitter, 'Expected re-emit EVENT_JOB_FORKED context %s to be emitter');
-			expect(arguments.length).toBe(2, 'Expected re-emit EVENT_JOB_FORKED arguments count %s to be %s');
+			expect(arguments.length).toBe(1, 'Expected re-emit EVENT_JOB_FORKED arguments count %s to be %s');
 			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit EVENT_JOB_FORKED arguments[0] %s to be trackedJob');
 		});
 		emitter.on(constants.EVENT_JOB_FORKED, spyForkedReEmit);
