@@ -25,7 +25,7 @@ describe('util', function() {
 	var managerOptions = [
 		'forkModulePath',
 		'jobsModulePath',
-		'forkInitModulePath',
+		'initModulePath',
 		'terminationSIGTERMTimeout',
 		'terminationSIGKILLTimeout',
 		'workerStartupTimeout',
@@ -73,7 +73,7 @@ describe('util', function() {
 			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(managerOptions);
 			expect(parsed.jobsModulePath).toBe('path/to/worker.js');
 			expect(parsed.forkModulePath).toBe(defaultOptions.forkModulePath);
-			expect(parsed.forkInitModulePath).toBe(defaultOptions.forkInitModulePath);
+			expect(parsed.initModulePath).toBe(defaultOptions.initModulePath);
 		});
 
 		it('should omit props not in the defaults', function() {
@@ -126,14 +126,14 @@ describe('util', function() {
 			});
 		});
 
-		it('should throw a InvalidManagerOptionsError if "forkInitModulePath" is not a string', function() {
+		it('should throw a InvalidManagerOptionsError if "initModulePath" is not a string', function() {
 			expect(function() {
 				util.parseManagerOptions({
 					jobsModulePath: 'path/to/module',
-					forkInitModulePath: {}
+					initModulePath: {}
 				}, util.getDefaultManagerOptions());
 			}).toThrowWithProps(errors.InvalidManagerOptionsError, {
-				propName: 'forkInitModulePath'
+				propName: 'initModulePath'
 			});
 		});
 
@@ -372,19 +372,19 @@ describe('util', function() {
 	});
 
 	// describe('parseWorkerPayload', function() {
-	// 	var props = ['jobsModulePath', 'forkInitModulePath', 'params'].sort();
+	// 	var props = ['jobsModulePath', 'initModulePath', 'params'].sort();
 	//
 	// 	it('should normalize the props', function() {
 	// 		var payload = Object.freeze({
 	// 			jobsModulePath: 'path/to/jobs',
-	// 			forkInitModulePath: 'path/to/init',
+	// 			initModulePath: 'path/to/init',
 	// 			params: Object.freeze({})
 	// 		});
 	// 		var parsed = util.parseWorkerPayload(payload);
 	// 		expect(parsed).toBeA(Object);
 	// 		expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(props);
 	// 		expect(parsed.jobsModulePath).toBe(payload.jobsModulePath);
-	// 		expect(parsed.forkInitModulePath).toBe(payload.forkInitModulePath);
+	// 		expect(parsed.initModulePath).toBe(payload.initModulePath);
 	// 		expect(parsed.params).toBe(payload.params);
 	// 	});
 	//
@@ -395,7 +395,7 @@ describe('util', function() {
 	// 		expect(parsed).toBeA(Object);
 	// 		expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(props);
 	// 		expect(parsed.jobsModulePath).toBe('path/to/jobs');
-	// 		expect(parsed.forkInitModulePath).toBe(null);
+	// 		expect(parsed.initModulePath).toBe(null);
 	// 		expect(parsed.params).toBe(null);
 	// 	});
 	//
@@ -423,32 +423,32 @@ describe('util', function() {
 	// 		});
 	// 	});
 	//
-	// 	it('should throw InvalidWorkerPayloadError if "forkInitModulePath" is not a non-empty string', function() {
+	// 	it('should throw InvalidWorkerPayloadError if "initModulePath" is not a non-empty string', function() {
 	// 		expect(function() {
 	// 			util.parseWorkerPayload({
 	// 				jobsModulePath: '/path/to/jobs',
-	// 				forkInitModulePath: false
+	// 				initModulePath: false
 	// 			});
 	// 		}).toThrowWithProps(errors.InvalidWorkerPayloadError, {
-	// 			propName: 'forkInitModulePath'
+	// 			propName: 'initModulePath'
 	// 		});
 	//
 	// 		expect(function() {
 	// 			util.parseWorkerPayload({
 	// 				jobsModulePath: '/path/to/jobs',
-	// 				forkInitModulePath: ''
+	// 				initModulePath: ''
 	// 			});
 	// 		}).toThrowWithProps(errors.InvalidWorkerPayloadError, {
-	// 			propName: 'forkInitModulePath'
+	// 			propName: 'initModulePath'
 	// 		});
 	//
 	// 		expect(function() {
 	// 			util.parseWorkerPayload({
 	// 				jobsModulePath: '/path/to/jobs',
-	// 				forkInitModulePath: {}
+	// 				initModulePath: {}
 	// 			});
 	// 		}).toThrowWithProps(errors.InvalidWorkerPayloadError, {
-	// 			propName: 'forkInitModulePath'
+	// 			propName: 'initModulePath'
 	// 		});
 	// 	});
 	// });
