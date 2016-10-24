@@ -6,8 +6,24 @@ describe('MiddlewareStore', function() {
 	it('should add supported types', function() {
 		var store = new MiddlewareStore();
 
+		// Starts empty
+		expect(store.hasSyncSupport('FOO')).toBe(false);
+		expect(store.hasSyncSupport('BAR')).toBe(false);
+		expect(store.hasAsyncSupport('FOO')).toBe(false);
+		expect(store.hasAsyncSupport('BAR')).toBe(false);
+		expect(store.getSupportedSyncTypes()).toEqual([]);
+		expect(store.getSupportedAsyncTypes()).toEqual([]);
+
 		expect(store.addSupportedSyncTypes(['FOO'])).toBe(store);
 		expect(store.addSupportedAsyncTypes(['BAR'])).toBe(store);
+
+		// Check added
+		expect(store.hasSyncSupport('FOO')).toBe(true);
+		expect(store.hasSyncSupport('BAR')).toBe(false);
+		expect(store.hasAsyncSupport('FOO')).toBe(false);
+		expect(store.hasAsyncSupport('BAR')).toBe(true);
+		expect(store.getSupportedSyncTypes()).toEqual(['FOO']);
+		expect(store.getSupportedAsyncTypes()).toEqual(['BAR']);
 	});
 
 	it('should call sync middleware', function() {
