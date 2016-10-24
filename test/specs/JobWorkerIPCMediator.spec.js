@@ -11,7 +11,7 @@ var MiddlewareStore = require('../../lib/MiddlewareStore');
 describe('JobWorkerIPCMediator', function() {
 	var badWorkerPath = path.join(__dirname, '..', 'fixtures', 'bad-worker.js');
 
-	function createChildProcessFixture() {
+	function createChildProcessFixture(overrides) {
 		return Object.assign(new EventEmitter(), {
 			pid: 999999,
 			connected: true,
@@ -24,7 +24,7 @@ describe('JobWorkerIPCMediator', function() {
 			send: function() {
 				throw new Error('Expected to not call ChildProcess#send');
 			}
-		});
+		}, overrides);
 	}
 
 	function createManagerFixture(overrides) {
@@ -543,5 +543,44 @@ describe('JobWorkerIPCMediator', function() {
 
 		expect(mediator.handleExit.calls.length).toBe(1, 'Expected JobWorkerMediator#handleExit call count %s to be %s');
 		expect(mediator.handleExit.calls[0].arguments.length).toBe(0);
+	});
+
+	it('should terminate child process if started and not yet exited', function() {
+		var trackedJob = {
+			jobId: 'BAR',
+			jobConfig: {
+				jobName: 'FOO'
+			},
+			params: {},
+			manager: createManagerFixture()
+		};
+
+		var childProcess = createChildProcessFixture({
+			kill: expect.createSpy()
+		});
+
+		var mediator = new JobWorkerIPCMediator(trackedJob);
+
+		mediator.terminate();
+		mediator.terminate(true);
+		expect(childProcess.kill.calls.length).toBe(0);
+
+		mediator.childProcess = childProcess;
+		mediator.terminate();
+		mediator.terminate(true);
+		expect(childProcess.kill.calls.length).toBe(0);
+
+		mediator.started = true;
+		mediator.terminate();
+		mediator.terminate(true);
+		expect(mediator.childProcess.kill.calls.length).toBe(2);
+		expect(mediator.childProcess.kill.calls[0].arguments.length).toBe(0);
+		expect(mediator.childProcess.kill.calls[1].arguments.length).toBe(1);
+		expect(mediator.childProcess.kill.calls[1].arguments[0]).toBe(9);
+
+		mediator.exited = true;
+		mediator.terminate();
+		mediator.terminate(true);
+		expect(mediator.childProcess.kill.calls.length).toBe(2);
 	});
 });
