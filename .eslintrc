@@ -155,7 +155,6 @@
           "arg": "param",
           "argument": "param",
           "func": "function",
-          "fires": "emits",
           "desc": "description"
         },
         "preferType": {
