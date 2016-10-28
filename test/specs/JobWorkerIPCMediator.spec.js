@@ -120,6 +120,8 @@ describe('JobWorkerIPCMediator', function() {
 		});
 
 		var spyFork = expect.createSpy().andCall(function() {
+			expect(mediator.addChildListeners.calls.length).toBe(0, 'Expected JobWorkerIPCMediator#addChildListeners call count %s to be %s');
+
 			expect(spyArgs.calls.length).toBe(1);
 			expect(spyOpts.calls.length).toBe(1);
 			expect(spyFork.calls.length).toBe(1);
@@ -154,11 +156,17 @@ describe('JobWorkerIPCMediator', function() {
 		);
 
 		var mediator = new JobWorkerIPCMediator(trackedJob);
+
+		expect.spyOn(mediator, 'addChildListeners').andCall(function() {
+			expect(spyFork.calls.length).toBe(1, 'Expected MIDDLEWARE_FORK_JOB_PROCESS middleware call count %s to be %s');
+		});
+
 		return mediator.execWorker().then(function() {
 			expect(spyArgs.calls.length).toBe(1, 'Expected MIDDLEWARE_BUILD_FORK_ARGS middleware call count %s to be %s');
 			expect(spyOpts.calls.length).toBe(1, 'Expected MIDDLEWARE_BUILD_FORK_OPTS middleware call count %s to be %s');
 			expect(spyFork.calls.length).toBe(1, 'Expected MIDDLEWARE_FORK_JOB_PROCESS middleware call count %s to be %s');
 			expect(mediator.childProcess).toBe(childProcess, 'Expected JobWorkerIPCMediator#childProcess %s to be created childProcess');
+			expect(mediator.addChildListeners.calls.length).toBe(1, 'Expected JobWorkerIPCMediator#addChildListeners call count %s to be %s');
 		});
 	});
 
@@ -177,8 +185,8 @@ describe('JobWorkerIPCMediator', function() {
 		expect.spyOn(childProcess, 'on').andCallThrough();
 		expect.spyOn(childProcess, 'removeListener').andCallThrough();
 
-		mediator.addListeners();
-		expect(childProcess.on.calls.length).toBe(5);
+		mediator.addChildListeners();
+		expect(childProcess.on.calls.length).toBe(5, 'Expected childProcess#on call count %s to be %s');
 		expect(childProcess.on.calls[0].arguments.length).toBe(2);
 		expect(childProcess.on.calls[0].arguments[0]).toBe('message');
 		expect(childProcess.on.calls[0].arguments[1]).toBe(mediator.handleChildMessage);
@@ -195,8 +203,8 @@ describe('JobWorkerIPCMediator', function() {
 		expect(childProcess.on.calls[4].arguments[0]).toBe('exit');
 		expect(childProcess.on.calls[4].arguments[1]).toBe(mediator.handleChildExit);
 
-		mediator.removeListeners();
-		expect(childProcess.removeListener.calls.length).toBe(5);
+		mediator.stopMediation();
+		expect(childProcess.removeListener.calls.length).toBe(4, 'Expected childProcess#removeListener call count %s to be %s');
 		expect(childProcess.removeListener.calls[0].arguments.length).toBe(2);
 		expect(childProcess.removeListener.calls[0].arguments[0]).toBe('message');
 		expect(childProcess.removeListener.calls[0].arguments[1]).toBe(mediator.handleChildMessage);
@@ -209,9 +217,6 @@ describe('JobWorkerIPCMediator', function() {
 		expect(childProcess.removeListener.calls[3].arguments.length).toBe(2);
 		expect(childProcess.removeListener.calls[3].arguments[0]).toBe('close');
 		expect(childProcess.removeListener.calls[3].arguments[1]).toBe(mediator.handleChildClose);
-		expect(childProcess.removeListener.calls[4].arguments.length).toBe(2);
-		expect(childProcess.removeListener.calls[4].arguments[0]).toBe('exit');
-		expect(childProcess.removeListener.calls[4].arguments[1]).toBe(mediator.handleChildExit);
 	});
 
 	it('should call handlers on childProcess events', function() {
@@ -252,7 +257,7 @@ describe('JobWorkerIPCMediator', function() {
 
 		expect.spyOn(mediator, 'handleChildExit');
 
-		mediator.addListeners();
+		mediator.addChildListeners();
 
 		childProcess.emit('message', expectedMessage);
 		expect(mediator.handleChildMessage.calls.length).toBe(1, 'Expected JobWorkerIPCMediator#handleChildMessage call count %s to be %s');
@@ -539,8 +544,15 @@ describe('JobWorkerIPCMediator', function() {
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect.spyOn(mediator, 'handleExit');
 
+		mediator.childProcess = createChildProcessFixture();
+		expect.spyOn(mediator.childProcess, 'removeListener');
+
 		mediator.handleChildExit();
 
+		expect(mediator.childProcess.removeListener.calls.length).toBe(1, 'Expected JobWorkerMediator#handleExit call count %s to be %s');
+		expect(mediator.childProcess.removeListener.calls[0].arguments.length).toBe(2);
+		expect(mediator.childProcess.removeListener.calls[0].arguments[0]).toBe('exit');
+		expect(mediator.childProcess.removeListener.calls[0].arguments[1]).toBe(mediator.handleChildExit);
 		expect(mediator.handleExit.calls.length).toBe(1, 'Expected JobWorkerMediator#handleExit call count %s to be %s');
 		expect(mediator.handleExit.calls[0].arguments.length).toBe(0);
 	});
