@@ -586,9 +586,10 @@ describe('JobWorkerIPCMediator', function() {
 		mediator.terminate();
 		mediator.terminate(true);
 		expect(mediator.childProcess.kill.calls.length).toBe(2);
-		expect(mediator.childProcess.kill.calls[0].arguments.length).toBe(0);
+		expect(mediator.childProcess.kill.calls[0].arguments.length).toBe(1);
+		expect(mediator.childProcess.kill.calls[0].arguments[0]).toBe('SIGTERM');
 		expect(mediator.childProcess.kill.calls[1].arguments.length).toBe(1);
-		expect(mediator.childProcess.kill.calls[1].arguments[0]).toBe(9);
+		expect(mediator.childProcess.kill.calls[1].arguments[0]).toBe('SIGKILL');
 
 		mediator.exited = true;
 		mediator.terminate();
