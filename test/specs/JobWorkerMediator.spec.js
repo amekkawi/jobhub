@@ -65,26 +65,6 @@ describe('JobWorkerMediator', function() {
 				}
 			}),
 			new Promise(function(resolve, reject) {
-				mediator.addListeners();
-				reject(new Error('Expected to throw error for JobWorkerMediator#addListeners'))
-			}).then(function() {
-				throw new Error('Expected to not resolve for JobWorkerMediator#addListeners');
-			}, function(err) {
-				if (!(err instanceof Error) || err.message !== 'JobWorkerMediator#addListeners is abstract and must be overridden') {
-					throw err;
-				}
-			}),
-			new Promise(function(resolve, reject) {
-				mediator.removeListeners();
-				reject(new Error('Expected to throw error for JobWorkerMediator#removeListeners'))
-			}).then(function() {
-				throw new Error('Expected to not resolve for JobWorkerMediator#removeListeners');
-			}, function(err) {
-				if (!(err instanceof Error) || err.message !== 'JobWorkerMediator#removeListeners is abstract and must be overridden') {
-					throw err;
-				}
-			}),
-			new Promise(function(resolve, reject) {
 				mediator.terminate();
 				reject(new Error('Expected to throw error for JobWorkerMediator#terminate'))
 			}).then(function() {
@@ -109,18 +89,12 @@ describe('JobWorkerMediator', function() {
 		var MediatorImpl = extendJobWorkerMediator(function() {
 			JobWorkerMediator.apply(this, arguments);
 			expect.spyOn(this, 'execWorker').andCall(function() {
+				expect(this.initStartupTimeout.calls.length).toBe(1, 'Expected JobWorkerMediator#initStartupTimeout call count %s to be %s');
 				expect(this.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
-				expect(this.addListeners.calls.length).toBe(0, 'Expected JobWorkerMediator#addListeners call count %s to be %s');
-				expect(this.initStartupTimeout.calls.length).toBe(0, 'Expected JobWorkerMediator#initStartupTimeout call count %s to be %s');
-			});
-			expect.spyOn(this, 'addListeners').andCall(function() {
-				expect(this.started).toBe(true, 'Expected JobWorkerMediator#started %s to be %s');
-				expect(this.execWorker.calls.length).toBe(1, 'Expected JobWorkerMediator#execWorker call count %s to be %s');
-				expect(this.initStartupTimeout.calls.length).toBe(0, 'Expected JobWorkerMediator#initStartupTimeout call count %s to be %s');
 			});
 			expect.spyOn(this, 'initStartupTimeout').andCall(function() {
-				expect(this.execWorker.calls.length).toBe(1, 'Expected JobWorkerMediator#execWorker call count %s to be %s');
-				expect(this.addListeners.calls.length).toBe(1, 'Expected JobWorkerMediator#addListeners call count %s to be %s');
+				expect(this.execWorker.calls.length).toBe(0, 'Expected JobWorkerMediator#execWorker call count %s to be %s');
+				expect(this.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
 			});
 		});
 
@@ -128,8 +102,8 @@ describe('JobWorkerMediator', function() {
 		return mediator.startWorker()
 			.then(function() {
 				expect(mediator.execWorker.calls.length).toBe(1, 'Expected JobWorkerMediator#execWorker call count %s to be %s');
-				expect(mediator.addListeners.calls.length).toBe(1, 'Expected JobWorkerMediator#addListeners call count %s to be %s');
 				expect(mediator.initStartupTimeout.calls.length).toBe(1, 'Expected JobWorkerMediator#initStartupTimeout call count %s to be %s');
+				expect(mediator.started).toBe(true, 'Expected JobWorkerMediator#started %s to be %s');
 			});
 	});
 
@@ -148,12 +122,6 @@ describe('JobWorkerMediator', function() {
 		}, {
 			execWorker: function() {
 				return Promise.reject(expectedError);
-			},
-			addListeners: function() {
-				throw new Error('Expected not to be called');
-			},
-			removeListeners: function() {
-				throw new Error('Expected not to be called');
 			}
 		});
 
@@ -195,45 +163,6 @@ describe('JobWorkerMediator', function() {
 		});
 	});
 
-	it('should catch errors thrown by JobWorkerMediator#addListeners and reject JobWorkerMediator#startWorker', function() {
-		var expectedError = new Error();
-		var trackedJob = {
-			jobId: 'BAR',
-			jobConfig: {
-				jobName: 'FOO'
-			},
-			manager: createManagerFixture()
-		};
-
-		var MediatorImpl = extendJobWorkerMediator(function() {
-			JobWorkerMediator.apply(this, arguments);
-			expect.spyOn(this, 'stopMediation').andCallThrough();
-			expect.spyOn(this, 'removeListeners').andCallThrough();
-		}, {
-			execWorker: function() {
-				return Promise.resolve();
-			},
-			addListeners: function() {
-				throw expectedError;
-			},
-			removeListeners: function() {
-				expect(this.stopMediation.calls.length).toBe(1, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
-			}
-		});
-
-		var mediator = new MediatorImpl(trackedJob);
-		return mediator.startWorker().then(function() {
-			throw new Error('Expected to not resolve');
-		}, function(err) {
-			if (err !== expectedError) {
-				throw err;
-			}
-
-			expect(mediator.stopMediation.calls.length).toBe(1, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
-			expect(mediator.removeListeners.calls.length).toBe(1, 'Expected JobWorkerMediator#removeListeners call count %s to be %s');
-		});
-	});
-
 	it('should catch errors thrown by JobWorkerMediator#initStartupTimeout and reject JobWorkerMediator#startWorker', function() {
 		var expectedError = new Error();
 		var trackedJob = {
@@ -247,19 +176,12 @@ describe('JobWorkerMediator', function() {
 		var MediatorImpl = extendJobWorkerMediator(function() {
 			JobWorkerMediator.apply(this, arguments);
 			expect.spyOn(this, 'stopMediation').andCallThrough();
-			expect.spyOn(this, 'removeListeners').andCallThrough();
 		}, {
 			execWorker: function() {
-				return Promise.resolve();
-			},
-			addListeners: function() {
-
+				throw new Error('Expected JobWorkerMediator#execWorker to not be called');
 			},
 			initStartupTimeout: function() {
 				throw expectedError;
-			},
-			removeListeners: function() {
-				expect(this.stopMediation.calls.length).toBe(1, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
 			}
 		});
 
@@ -272,11 +194,10 @@ describe('JobWorkerMediator', function() {
 			}
 
 			expect(mediator.stopMediation.calls.length).toBe(1, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
-			expect(mediator.removeListeners.calls.length).toBe(1, 'Expected JobWorkerMediator#removeListeners call count %s to be %s');
 		});
 	});
 
-	it('should resolve when JobWorkerMediator#handleSuccess is called', function() {
+	it('should stop mediation and emit JOB_SUCCESS when JobWorkerMediator#handleSuccess is called', function() {
 		var expectedResult = {};
 
 		var trackedJob = {
@@ -292,30 +213,42 @@ describe('JobWorkerMediator', function() {
 		}, {
 			execWorker: function() {
 
-			},
-			addListeners: function() {
-
-			},
-			removeListeners: function() {
-
 			}
 		});
 
 		var mediator;
 		return new Promise(function(resolve, reject) {
+			var successEventSpy = expect.createSpy().andCall(function() {
+				expect(mediator.stopMediation.calls.length).toBe(1, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
+				return resolve.apply(this, arguments);
+			});
+
 			mediator = new MediatorImpl(trackedJob)
-				.on(constants.EVENT_JOB_SUCCESS, resolve)
+				.on(constants.EVENT_JOB_SUCCESS, successEventSpy)
 				.on(constants.EVENT_JOB_FAILURE, reject);
+
+			expect.spyOn(mediator, 'stopMediation').andCall(function() {
+				expect(successEventSpy.calls.length).toBe(0, 'Expected JOB_SUCCESS emit count %s to be %s');
+			});
+
 			mediator.startWorker().then(function() {
 				mediator.handleStartupConfirmation();
+
+				expect(mediator.stopMediation.calls.length).toBe(0, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
+				expect(successEventSpy.calls.length).toBe(0, 'Expected JOB_SUCCESS emit count %s to be %s');
+
 				mediator.handleSuccess(expectedResult);
+
+				expect(mediator.stopMediation.calls.length).toBe(1, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
+				expect(successEventSpy.calls.length).toBe(1, 'Expected JOB_SUCCESS emit count %s to be %s');
+
 			}).catch(reject);
 		}).then(function(result) {
 			expect(result).toBe(expectedResult);
 		});
 	});
 
-	it('should resolve when JobWorkerMediator#handleError is called', function() {
+	it('should stop mediation and emit JOB_FAILURE when JobWorkerMediator#handleError is called', function() {
 		var expectedError = new Error();
 
 		var trackedJob = {
@@ -331,23 +264,34 @@ describe('JobWorkerMediator', function() {
 		}, {
 			execWorker: function() {
 
-			},
-			addListeners: function() {
-
-			},
-			removeListeners: function() {
-
 			}
 		});
 
 		var mediator;
 		return new Promise(function(resolve, reject) {
+			var failureEventSpy = expect.createSpy().andCall(function() {
+				expect(mediator.stopMediation.calls.length).toBe(1, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
+				return reject.apply(this, arguments);
+			});
+
 			mediator = new MediatorImpl(trackedJob)
 				.on(constants.EVENT_JOB_SUCCESS, resolve)
-				.on(constants.EVENT_JOB_FAILURE, reject);
+				.on(constants.EVENT_JOB_FAILURE, failureEventSpy);
+
+			expect.spyOn(mediator, 'stopMediation').andCall(function() {
+				expect(failureEventSpy.calls.length).toBe(0, 'Expected JOB_FAILURE emit count %s to be %s');
+			});
+
 			mediator.startWorker().then(function() {
 				mediator.handleStartupConfirmation();
+
+				expect(mediator.stopMediation.calls.length).toBe(0, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
+				expect(failureEventSpy.calls.length).toBe(0, 'Expected JOB_FAILURE emit count %s to be %s');
+
 				mediator.handleError(expectedError);
+
+				expect(mediator.stopMediation.calls.length).toBe(1, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
+				expect(failureEventSpy.calls.length).toBe(1, 'Expected JOB_FAILURE emit count %s to be %s');
 			}).catch(reject);
 		}).then(function() {
 			throw new Error('Expected to not resolve');
@@ -374,12 +318,6 @@ describe('JobWorkerMediator', function() {
 			JobWorkerMediator.apply(this, arguments);
 		}, {
 			execWorker: function() {
-
-			},
-			addListeners: function() {
-
-			},
-			removeListeners: function() {
 
 			}
 		});
@@ -420,12 +358,6 @@ describe('JobWorkerMediator', function() {
 			JobWorkerMediator.apply(this, arguments);
 		}, {
 			execWorker: function() {
-
-			},
-			addListeners: function() {
-
-			},
-			removeListeners: function() {
 
 			}
 		});
@@ -474,12 +406,6 @@ describe('JobWorkerMediator', function() {
 		}, {
 			execWorker: function() {
 				return Promise.resolve();
-			},
-			addListeners: function() {
-
-			},
-			removeListeners: function() {
-
 			}
 		});
 
@@ -504,7 +430,6 @@ describe('JobWorkerMediator', function() {
 
 		var MediatorImpl = extendJobWorkerMediator(function() {
 			JobWorkerMediator.apply(this, arguments);
-			expect.spyOn(this, 'removeListeners').andCallThrough();
 
 			var initStartupTimeout = this.initStartupTimeout;
 			expect.spyOn(this, 'initStartupTimeout').andCall(function() {
@@ -528,14 +453,6 @@ describe('JobWorkerMediator', function() {
 		}, {
 			execWorker: function() {
 				return Promise.resolve();
-			},
-			addListeners: function() {
-				expect(this.initStartupTimeout.calls.length).toBe(0);
-				expect(this.beginStartupTimeout.calls.length).toBe(0);
-			},
-			removeListeners: function() {
-				expect(this.initStartupTimeout.calls.length).toBe(1);
-				expect(this.beginStartupTimeout.calls.length).toBe(1);
 			}
 		});
 
@@ -555,10 +472,6 @@ describe('JobWorkerMediator', function() {
 			expect(err.message).toBe('Job took too long to send a start confirmation message', 'Expected JobForkError#message %s to be %s');
 			expect(err.jobId).toBe(trackedJob.jobId, 'Expected JobForkError#jobId %s to be %s');
 			expect(err.jobName).toBe(trackedJob.jobConfig.jobName, 'Expected JobForkError#jobName %s to be %s');
-
-			expect(mediator.removeListeners.calls.length).toBe(1);
-			expect(mediator.removeListeners.calls[0].context).toBe(mediator);
-			expect(mediator.removeListeners.calls[0].arguments.length).toBe(0);
 
 			expect(mediator.initStartupTimeout.calls.length).toBe(1);
 			expect(mediator.initStartupTimeout.calls[0].context).toBe(mediator);
@@ -594,12 +507,6 @@ describe('JobWorkerMediator', function() {
 			JobWorkerMediator.apply(this, arguments);
 		}, {
 			execWorker: function() {
-
-			},
-			addListeners: function() {
-
-			},
-			removeListeners: function() {
 
 			}
 		});
