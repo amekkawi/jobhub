@@ -504,8 +504,7 @@ describe('util', function() {
 		});
 
 		it('should call validate with correct arguments', function() {
-			var expectedRet = {};
-			var spy = expect.createSpy().andReturn(expectedRet);
+			var spy = expect.createSpy().andReturn({});
 			var jobConfig = {
 				validate: spy
 			};
@@ -518,7 +517,7 @@ describe('util', function() {
 			expect(spy.calls[0].arguments[0]).toBe(params);
 			expect(spy.calls[0].arguments[1]).toBe(errors.InvalidJobParamError);
 			return ret.then(function(v) {
-				expect(v).toBe(expectedRet);
+				expect(v).toBe(void 0);
 			});
 		});
 
@@ -540,19 +539,18 @@ describe('util', function() {
 		});
 
 		it('should handle Promise returned by validate', function() {
-			var expectedRet = {};
 			var jobConfig = {
 				validate: function() {
 					return Promise.resolve()
 						.then(function() {
-							return expectedRet;
+							return {};
 						});
 				}
 			};
 			var ret = util.validateJobParams(jobConfig, {});
 			expect(ret).toBeA(Promise);
 			return ret.then(function(v) {
-				expect(v).toBe(expectedRet);
+				expect(v).toBe(void 0);
 			});
 		});
 
