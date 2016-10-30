@@ -9,6 +9,7 @@ describe('util', function() {
 		'dehydrateError',
 		'getDefaultManagerOptions',
 		'getUniqueKey',
+		'objectValues',
 		'onlyOneCallback',
 		'parseJobConfig',
 		'parseManagerOptions',
@@ -493,6 +494,8 @@ describe('util', function() {
 			}).toThrow(errors.InvalidUniqueKeyError);
 		});
 	});
+
+	describe('objectValues');
 
 	describe('validateJobParams', function() {
 		it('should return Promise if jobConfig has no validate', function() {
