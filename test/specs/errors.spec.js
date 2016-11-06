@@ -11,7 +11,8 @@ describe('errors', function() {
 		'InvalidUniqueKeyError',
 		'JobForkError',
 		'InvalidJobParamError',
-		'UnsupportedMiddlewareTypeError'
+		'UnsupportedMiddlewareTypeError',
+		'JobWorkerHandlerError'
 	].sort();
 
 	it('should export correct errors', function() {
@@ -34,4 +35,5 @@ describe('errors', function() {
 	it('should instantiate "JobForkError');
 	it('should instantiate "InvalidJobParamError');
 	it('should instantiate "UnsupportedMiddlewareTypeError');
+	it('should instantiate "JobWorkerHandlerError"');
 });
