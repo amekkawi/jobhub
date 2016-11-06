@@ -715,7 +715,9 @@ describe('TrackedJob', function() {
 		var jobConfig = {
 			quickRun: function(job) {
 				expect(trackedJob.progress).toBe(null, 'Expected TrackedJob#progress %s to be %s');
-				job.sendProgress(progressObj);
+				var progressRet = job.sendProgress(progressObj);
+				expect(progressRet).toBeA(Promise);
+				expect(spyJobProgress.calls.length).toBe(1, 'Expected EVENT_JOB_PROGRESS emit count %s to be %s');
 				job.resolve(500);
 			},
 			run: function() {
