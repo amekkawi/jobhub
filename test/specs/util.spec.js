@@ -495,7 +495,9 @@ describe('util', function() {
 		});
 	});
 
-	describe('objectValues');
+	describe('objectValues', function() {
+		it('should return values for owned keys');
+	});
 
 	describe('validateJobParams', function() {
 		it('should return Promise if jobConfig has no validate', function() {
