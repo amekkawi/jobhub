@@ -13,7 +13,7 @@ var TrackedJob = require('../../lib/TrackedJob');
 describe('HubManager', function() {
 	var jobsFixturePath = path.resolve(__dirname, '../fixtures/jobs.js');
 
-	it('should throw InvalidManagerOptionsError if options is missing or is missing jobsModulePath', function() {
+	it('should throw InvalidManagerOptionsError if options not provided or missing options.jobsModulePath', function() {
 		var thrownError;
 
 		try {
