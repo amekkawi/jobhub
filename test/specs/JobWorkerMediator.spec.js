@@ -36,6 +36,7 @@ describe('JobWorkerMediator', function() {
 		expect(mediator.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
 		expect(mediator.settled).toBe(false, 'Expected JobWorkerMediator#settled %s to be %s');
 		expect(mediator.exited).toBe(false, 'Expected JobWorkerMediator#exited %s to be %s');
+		expect(mediator.processId).toBe(null, 'Expected JobWorkerMediator#processId %s to be %s');
 		expect(mediator instanceof EventEmitter).toBe(true, 'Expected JobWorkerMediator to be instance of EventEmitter');
 	});
 

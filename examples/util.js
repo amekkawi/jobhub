@@ -22,7 +22,7 @@ exports.logManagerEvents = function(emitter) {
 			'[MANAGER] event:JOB_FORKED job:%s id:%s pid:%s',
 			JSON.stringify(trackedJob.jobConfig.jobName),
 			JSON.stringify(trackedJob.jobId),
-			trackedJob.childProcess.pid
+			trackedJob.workerMediator.processId
 		);
 	});
 

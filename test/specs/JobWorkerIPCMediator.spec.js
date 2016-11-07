@@ -158,6 +158,7 @@ describe('JobWorkerIPCMediator', function() {
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 
 		expect.spyOn(mediator, 'addChildListeners').andCall(function() {
+			expect(mediator.processId).toBe('999999', 'Expected JobWorkerIPCMediator#processId %s to be %s');
 			expect(spyFork.calls.length).toBe(1, 'Expected MIDDLEWARE_FORK_JOB_PROCESS middleware call count %s to be %s');
 		});
 
@@ -167,6 +168,7 @@ describe('JobWorkerIPCMediator', function() {
 			expect(spyFork.calls.length).toBe(1, 'Expected MIDDLEWARE_FORK_JOB_PROCESS middleware call count %s to be %s');
 			expect(mediator.childProcess).toBe(childProcess, 'Expected JobWorkerIPCMediator#childProcess %s to be created childProcess');
 			expect(mediator.addChildListeners.calls.length).toBe(1, 'Expected JobWorkerIPCMediator#addChildListeners call count %s to be %s');
+			expect(mediator.processId).toBe('999999', 'Expected JobWorkerIPCMediator#processId %s to be %s');
 		});
 	});
 
