@@ -57,12 +57,12 @@ describe('HubManager', function() {
 
 		expect(manager.middleware).toBeA(MiddlewareStore, 'Expected HubManager#middleware %s to be a %s');
 		expect(manager.middleware.getSupportedSyncTypes()).toEqual(manager.getSupportedSyncMiddleware(), 'Expected supported sync middleware %s to equal %s');
-		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_LOAD_JOBS)).toBe(true, 'Expected middleware support for MIDDLEWARE_LOAD_JOBS');
-		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_CREATE_JOB)).toBe(true, 'Expected middleware support for MIDDLEWARE_CREATE_JOB');
-		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_FORK_JOB_PROCESS)).toBe(true, 'Expected middleware support for MIDDLEWARE_FORK_JOB_PROCESS');
-		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_BUILD_FORK_ARGS)).toBe(true, 'Expected middleware support for MIDDLEWARE_BUILD_FORK_ARGS');
-		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_BUILD_FORK_OPTS)).toBe(true, 'Expected middleware support for MIDDLEWARE_BUILD_FORK_OPTS');
-		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR)).toBe(true, 'Expected middleware support for MIDDLEWARE_CREATE_WORKER_MEDIATOR');
+		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_LOAD_JOBS)).toBe(true, 'Expected middleware support for "loadJobs"');
+		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_CREATE_JOB)).toBe(true, 'Expected middleware support for "createJob"');
+		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_FORK_JOB_PROCESS)).toBe(true, 'Expected middleware support for "forkJobProcess"');
+		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_BUILD_FORK_ARGS)).toBe(true, 'Expected middleware support for "buildForkArgs"');
+		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_BUILD_FORK_OPTS)).toBe(true, 'Expected middleware support for "buildForkOpts"');
+		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR)).toBe(true, 'Expected middleware support for "createWorkerMediator"');
 		expect(manager.jobs).toBeA(JobConfigStore, 'Expected HubManager#jobs %s to be a %s');
 	});
 
@@ -85,7 +85,7 @@ describe('HubManager', function() {
 		expect(manager.middleware.getSupportedSyncTypes()).toEqual(['FOO']);
 	});
 
-	it('should load jobs using MIDDLEWARE_LOAD_JOBS middleware and emit MANAGER_STARTED when HubManager#start is called', function() {
+	it('should load jobs using "loadJobs" middleware and emit "managerStarted" when HubManager#start is called', function() {
 		var options = {
 			jobsModulePath: jobsFixturePath
 		};
@@ -382,7 +382,7 @@ describe('HubManager', function() {
 		}
 	});
 
-	it('should create job using MIDDLEWARE_CREATE_JOB middleware', function() {
+	it('should create job using "createJob" middleware', function() {
 		var expectedParams = {};
 
 		var options = {

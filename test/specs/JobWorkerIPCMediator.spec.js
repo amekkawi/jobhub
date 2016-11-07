@@ -159,13 +159,13 @@ describe('JobWorkerIPCMediator', function() {
 
 		expect.spyOn(mediator, 'addChildListeners').andCall(function() {
 			expect(mediator.processId).toBe('999999', 'Expected JobWorkerIPCMediator#processId %s to be %s');
-			expect(spyFork.calls.length).toBe(1, 'Expected MIDDLEWARE_FORK_JOB_PROCESS middleware call count %s to be %s');
+			expect(spyFork.calls.length).toBe(1, 'Expected "forkJobProcess" middleware call count %s to be %s');
 		});
 
 		return mediator.execWorker().then(function() {
-			expect(spyArgs.calls.length).toBe(1, 'Expected MIDDLEWARE_BUILD_FORK_ARGS middleware call count %s to be %s');
-			expect(spyOpts.calls.length).toBe(1, 'Expected MIDDLEWARE_BUILD_FORK_OPTS middleware call count %s to be %s');
-			expect(spyFork.calls.length).toBe(1, 'Expected MIDDLEWARE_FORK_JOB_PROCESS middleware call count %s to be %s');
+			expect(spyArgs.calls.length).toBe(1, 'Expected "buildForkArgs" middleware call count %s to be %s');
+			expect(spyOpts.calls.length).toBe(1, 'Expected "buildForkOpts" middleware call count %s to be %s');
+			expect(spyFork.calls.length).toBe(1, 'Expected "forkJobProcess" middleware call count %s to be %s');
 			expect(mediator.childProcess).toBe(childProcess, 'Expected JobWorkerIPCMediator#childProcess %s to be created childProcess');
 			expect(mediator.addChildListeners.calls.length).toBe(1, 'Expected JobWorkerIPCMediator#addChildListeners call count %s to be %s');
 			expect(mediator.processId).toBe('999999', 'Expected JobWorkerIPCMediator#processId %s to be %s');

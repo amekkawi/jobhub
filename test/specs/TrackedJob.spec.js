@@ -84,7 +84,7 @@ describe('TrackedJob', function() {
 		});
 	});
 
-	it('should set props and emit EVENT_JOB_STARTED when run', function() {
+	it('should set props and emit "jobStarted" when run', function() {
 		var manager = createManagerFixture();
 		var expectedError = new Error();
 
@@ -120,7 +120,7 @@ describe('TrackedJob', function() {
 		expect(trackedJob.isRunning).toBe(true, 'Expected TrackedJob#isRunning %s to be %s');
 		expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
 		expect(trackedJob.promise).toBeA(Promise, 'Expected TrackedJob#promise %s to be a Promise');
-		expect(spyStartedEvent.calls.length).toBe(1, 'Expected EVENT_JOB_STARTED emit count %s to be %s');
+		expect(spyStartedEvent.calls.length).toBe(1, 'Expected "jobStarted" emit count %s to be %s');
 
 		return trackedJob.promise.then(function() {
 			throw new Error('Expected not to resolve');
@@ -131,7 +131,7 @@ describe('TrackedJob', function() {
 
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
-			expect(spyStartedEvent.calls.length).toBe(1, 'Expected JOB_STAGE_VALIDATE_PARAMS emit count %s to be %s');
+			expect(spyStartedEvent.calls.length).toBe(1, 'Expected "validateParams" emit count %s to be %s');
 		});
 	});
 
@@ -172,9 +172,9 @@ describe('TrackedJob', function() {
 		trackedJob.reEmitTo(emitter);
 
 		var spyStartedReEmit = expect.createSpy().andCall(function() {
-			expect(this).toBe(emitter, 'Expected re-emit EVENT_JOB_STARTED context %s to be emitter');
-			expect(arguments.length).toBe(1, 'Expected re-emit EVENT_JOB_STARTED arguments count %s to be %s');
-			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit EVENT_JOB_STARTED arguments[0] %s to be trackedJob');
+			expect(this).toBe(emitter, 'Expected re-emit "jobStarted" context %s to be emitter');
+			expect(arguments.length).toBe(1, 'Expected re-emit "jobStarted" arguments count %s to be %s');
+			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit "jobStarted" arguments[0] %s to be trackedJob');
 		});
 		emitter.on(constants.EVENT_JOB_STARTED, spyStartedReEmit);
 
@@ -188,18 +188,18 @@ describe('TrackedJob', function() {
 		trackedJob.on(constants.EVENT_JOB_FAILURE, spyFailureEvent);
 
 		var spyFailureReEmit = expect.createSpy().andCall(function() {
-			expect(this).toBe(emitter, 'Expected re-emit EVENT_JOB_FAILURE context %s to be emitter');
-			expect(arguments.length).toBe(2, 'Expected re-emit EVENT_JOB_FAILURE arguments count %s to be %s');
-			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit EVENT_JOB_FAILURE arguments[0] %s to be trackedJob');
-			expect(arguments[1]).toBe(expectedError, 'Expected re-emit EVENT_JOB_FAILURE arguments[1] %s to be thrown error');
+			expect(this).toBe(emitter, 'Expected re-emit "jobFailure" context %s to be emitter');
+			expect(arguments.length).toBe(2, 'Expected re-emit "jobFailure" arguments count %s to be %s');
+			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit "jobFailure" arguments[0] %s to be trackedJob');
+			expect(arguments[1]).toBe(expectedError, 'Expected re-emit "jobFailure" arguments[1] %s to be thrown error');
 		});
 		emitter.on(constants.EVENT_JOB_FAILURE, spyFailureReEmit);
 
 		// Synchronous checks
 		trackedJob.run();
 		expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
-		expect(spyStartedEvent.calls.length).toBe(1, 'Expected EVENT_JOB_STARTED emit count %s to be %s');
-		expect(spyFailureEvent.calls.length).toBe(0, 'Expected EVENT_JOB_FAILURE emit count %s to be %s');
+		expect(spyStartedEvent.calls.length).toBe(1, 'Expected "jobStarted" emit count %s to be %s');
+		expect(spyFailureEvent.calls.length).toBe(0, 'Expected "jobFailure" emit count %s to be %s');
 		expect(jobConfig.validate.calls.length).toBe(0, 'Expected validate call count %s to be %s');
 
 		return trackedJob.promise.then(function() {
@@ -213,10 +213,10 @@ describe('TrackedJob', function() {
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
 			expect(jobConfig.validate.calls.length).toBe(1, 'Expected validate call count %s to be %s');
-			expect(spyStartedEvent.calls.length).toBe(1, 'Expected EVENT_JOB_STARTED emit count %s to be %s');
-			expect(spyStartedReEmit.calls.length).toBe(1, 'Expected EVENT_JOB_STARTED re-emit count %s to be %s');
-			expect(spyFailureEvent.calls.length).toBe(1, 'Expected EVENT_JOB_FAILURE emit count %s to be %s');
-			expect(spyFailureReEmit.calls.length).toBe(1, 'Expected EVENT_JOB_FAILURE re-emit count %s to be %s');
+			expect(spyStartedEvent.calls.length).toBe(1, 'Expected "jobStarted" emit count %s to be %s');
+			expect(spyStartedReEmit.calls.length).toBe(1, 'Expected "jobStarted" re-emit count %s to be %s');
+			expect(spyFailureEvent.calls.length).toBe(1, 'Expected "jobFailure" emit count %s to be %s');
+			expect(spyFailureReEmit.calls.length).toBe(1, 'Expected "jobFailure" re-emit count %s to be %s');
 		});
 	});
 
@@ -313,24 +313,24 @@ describe('TrackedJob', function() {
 		trackedJob.reEmitTo(emitter);
 
 		var spySuccessReEmit = expect.createSpy().andCall(function() {
-			expect(this).toBe(emitter, 'Expected re-emit EVENT_JOB_SUCCESS context %s to be emitter');
-			expect(arguments.length).toBe(2, 'Expected re-emit EVENT_JOB_SUCCESS arguments count %s to be %s');
-			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit EVENT_JOB_SUCCESS arguments[0] %s to be trackedJob');
-			expect(arguments[1]).toBe(expectedResult, 'Expected re-emit EVENT_JOB_SUCCESS arguments[1] %s to be %s');
+			expect(this).toBe(emitter, 'Expected re-emit "jobSuccess" context %s to be emitter');
+			expect(arguments.length).toBe(2, 'Expected re-emit "jobSuccess" arguments count %s to be %s');
+			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit "jobSuccess" arguments[0] %s to be trackedJob');
+			expect(arguments[1]).toBe(expectedResult, 'Expected re-emit "jobSuccess" arguments[1] %s to be %s');
 		});
 		emitter.on(constants.EVENT_JOB_SUCCESS, spySuccessReEmit);
 
 		trackedJob.run();
 		expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
 		expect(jobConfig.validate.calls.length).toBe(0, 'Expected validate call count %s to be %s');
-		expect(spySuccessEvent.calls.length).toBe(0, 'Expected EVENT_JOB_SUCCESS emit count %s to be %s');
+		expect(spySuccessEvent.calls.length).toBe(0, 'Expected "jobSuccess" emit count %s to be %s');
 		expect(jobConfig.quickRun.calls.length).toBe(0, 'Expected quickRun call count %s to be %s');
 
 		return trackedJob.promise.then(function(val) {
 			expect(jobConfig.validate.calls.length).toBe(1, 'Expected validate call count %s to be %s');
 			expect(jobConfig.quickRun.calls.length).toBe(1, 'Expected quickRun call count %s to be %s');
-			expect(spySuccessEvent.calls.length).toBe(1, 'Expected EVENT_JOB_SUCCESS emit count %s to be %s');
-			expect(spySuccessReEmit.calls.length).toBe(1, 'Expected EVENT_JOB_SUCCESS re-emit count %s to be %s');
+			expect(spySuccessEvent.calls.length).toBe(1, 'Expected "jobSuccess" emit count %s to be %s');
+			expect(spySuccessReEmit.calls.length).toBe(1, 'Expected "jobSuccess" re-emit count %s to be %s');
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
 			expect(val).toBe(expectedResult, 'Expected result %s to be %s');
@@ -372,7 +372,7 @@ describe('TrackedJob', function() {
 
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
-			expect(spyFailureEvent.calls.length).toBe(1, 'Expected EVENT_JOB_FAILURE emit count %s to be %s');
+			expect(spyFailureEvent.calls.length).toBe(1, 'Expected "jobFailure" emit count %s to be %s');
 		});
 	});
 
@@ -411,11 +411,11 @@ describe('TrackedJob', function() {
 
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
-			expect(spyFailureEvent.calls.length).toBe(1, 'Expected EVENT_JOB_FAILURE emit count %s to be %s');
+			expect(spyFailureEvent.calls.length).toBe(1, 'Expected "jobFailure" emit count %s to be %s');
 		});
 	});
 
-	it('should catch error thrown in EVENT_JOB_SUCCESS', function() {
+	it('should catch error thrown in "jobSuccess" event handlers', function() {
 		var expectedError = new Error();
 		var manager = createManagerFixture();
 		var jobConfig = {
@@ -444,7 +444,7 @@ describe('TrackedJob', function() {
 			});
 	});
 
-	it('should catch error thrown in EVENT_JOB_FAILURE', function() {
+	it('should catch error thrown in "jobFailure" event handlers', function() {
 		var expectedError = new Error();
 		var manager = createManagerFixture();
 		var jobConfig = {
@@ -494,7 +494,7 @@ describe('TrackedJob', function() {
 				expect(workerMediator.on.calls[2].arguments[1]).toBeA(Function);
 
 				expect(spyStartWorker.calls.length).toBe(1, 'Expected JobWorkerMediator#startWorker call count %s to be %s');
-				expect(spyCreateMediator.calls.length).toBe(1, 'Expected MIDDLEWARE_CREATE_WORKER_MEDIATOR emit count %s to be %s');
+				expect(spyCreateMediator.calls.length).toBe(1, 'Expected "createWorkerMediator" emit count %s to be %s');
 
 				expect(trackedJob.workerMediator).toBe(workerMediator, 'Expected TrackedJob#workerMediator %s to be %s');
 				expect(arguments.length).toBe(0, 'Expected arguments count %s to be %s');
@@ -507,7 +507,7 @@ describe('TrackedJob', function() {
 				expect(trackedJob.stage).toBe(constants.JOB_STAGE_RUN, 'Expected TrackedJob stage %s to be %s');
 
 				expect(spyStartWorker.calls.length).toBe(0, 'Expected JobWorkerMediator#startWorker call count %s to be %s');
-				expect(spyCreateMediator.calls.length).toBe(1, 'Expected MIDDLEWARE_CREATE_WORKER_MEDIATOR emit count %s to be %s');
+				expect(spyCreateMediator.calls.length).toBe(1, 'Expected "createWorkerMediator" emit count %s to be %s');
 
 				expect(this).toBe(trackedJob, 'Expected context %s to be trackedJob');
 				expect(arguments.length).toBe(2, 'Expected arguments count %s to be %s');
@@ -553,14 +553,14 @@ describe('TrackedJob', function() {
 				throw err;
 			}
 
-			expect(spyJobForkedEvent.calls.length).toBe(0, 'Expected EVENT_JOB_FORKED emit count %s to be %s');
+			expect(spyJobForkedEvent.calls.length).toBe(0, 'Expected "jobForked" emit count %s to be %s');
 			expect(spyCreateMediator.calls.length).toBe(1, 'Expected middleware call count %s to be %s');
 			expect(spyStartWorker.calls.length).toBe(1, 'Expected JobWorkerMediator#startWorker call count %s to be %s');
 			expect(trackedJob.workerMediator).toBe(workerMediator, 'Expected TrackedJob#workerMediator %s to be %s');
 		});
 	});
 
-	it('should emit EVENT_JOB_FORKED and catch thrown errors', function() {
+	it('should emit "jobForked" and catch thrown errors', function() {
 		var manager = createManagerFixture();
 		var expectedError = new Error();
 
@@ -601,7 +601,7 @@ describe('TrackedJob', function() {
 				throw err;
 			}
 
-			expect(spyForkedEvent.calls.length).toBe(1, 'Expected EVENT_JOB_FORKED emit count %s to be %s');
+			expect(spyForkedEvent.calls.length).toBe(1, 'Expected "jobForked" emit count %s to be %s');
 		});
 	});
 
@@ -638,17 +638,17 @@ describe('TrackedJob', function() {
 		trackedJob.reEmitTo(emitter);
 
 		var spyForkedReEmit = expect.createSpy().andCall(function() {
-			expect(this).toBe(emitter, 'Expected re-emit EVENT_JOB_FORKED context %s to be emitter');
-			expect(arguments.length).toBe(1, 'Expected re-emit EVENT_JOB_FORKED arguments count %s to be %s');
-			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit EVENT_JOB_FORKED arguments[0] %s to be trackedJob');
+			expect(this).toBe(emitter, 'Expected re-emit "jobForked" context %s to be emitter');
+			expect(arguments.length).toBe(1, 'Expected re-emit "jobForked" arguments count %s to be %s');
+			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit "jobForked" arguments[0] %s to be trackedJob');
 		});
 		emitter.on(constants.EVENT_JOB_FORKED, spyForkedReEmit);
 
 		trackedJob.run();
 
 		return trackedJob.promise.then(function(ret) {
-			expect(spyForkedEvent.calls.length).toBe(1, 'Expected EVENT_JOB_FORKED emit count %s to be %s');
-			expect(spyForkedReEmit.calls.length).toBe(1, 'Expected EVENT_JOB_FORKED re-emit count %s to be %s');
+			expect(spyForkedEvent.calls.length).toBe(1, 'Expected "jobForked" emit count %s to be %s');
+			expect(spyForkedReEmit.calls.length).toBe(1, 'Expected "jobForked" re-emit count %s to be %s');
 			expect(ret).toBe(expectedResult, 'Expected job result %s to be %s');
 		});
 	});
@@ -693,7 +693,7 @@ describe('TrackedJob', function() {
 		});
 	});
 
-	it('should emit EVENT_JOB_PROGRESS for quickRun', function() {
+	it('should emit "jobProgress" for quickRun', function() {
 		var progressObj = {
 			boolT: true,
 			boolF: false,
@@ -717,7 +717,7 @@ describe('TrackedJob', function() {
 				expect(trackedJob.progress).toBe(null, 'Expected TrackedJob#progress %s to be %s');
 				var progressRet = job.sendProgress(progressObj);
 				expect(progressRet).toBeA(Promise);
-				expect(spyJobProgress.calls.length).toBe(1, 'Expected EVENT_JOB_PROGRESS emit count %s to be %s');
+				expect(spyJobProgress.calls.length).toBe(1, 'Expected "jobProgress" emit count %s to be %s');
 				job.resolve(500);
 			},
 			run: function() {
@@ -742,29 +742,29 @@ describe('TrackedJob', function() {
 		trackedJob.reEmitTo(emitter);
 
 		var spyProgressReEmit = expect.createSpy().andCall(function() {
-			expect(this).toBe(emitter, 'Expected re-emit EVENT_JOB_PROGRESS context %s to be emitter');
-			expect(arguments.length).toBe(2, 'Expected re-emit EVENT_JOB_PROGRESS arguments count %s to be %s');
-			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit EVENT_JOB_PROGRESS arguments[0] %s to be trackedJob');
-			//expect(arguments[1]).toBe(trackedJob, 'Expected re-emit EVENT_JOB_PROGRESS arguments[0] %s to be trackedJob');
-			expect(arguments[1]).toBeA(Object, 'Expected re-emit EVENT_JOB_PROGRESS arguments[1] type %s to be an object');
+			expect(this).toBe(emitter, 'Expected re-emit "jobProgress" context %s to be emitter');
+			expect(arguments.length).toBe(2, 'Expected re-emit "jobProgress" arguments count %s to be %s');
+			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit "jobProgress" arguments[0] %s to be trackedJob');
+			//expect(arguments[1]).toBe(trackedJob, 'Expected re-emit "jobProgress" arguments[0] %s to be trackedJob');
+			expect(arguments[1]).toBeA(Object, 'Expected re-emit "jobProgress" arguments[1] type %s to be an object');
 			expect(Object.keys(arguments[1])).toEqual(Object.keys(progressObjCleaned), 'Expected arguments[0] keys %s to equal %s');
-			expect(arguments[1]).toEqual(progressObjCleaned, 'Expected re-emit EVENT_JOB_PROGRESS arguments[1] %s to equal %s');
-			expect(arguments[1]).toBe(trackedJob.progress, 'Expected re-emit EVENT_JOB_PROGRESS arguments[1] %s to be TrackedJob#progress');
+			expect(arguments[1]).toEqual(progressObjCleaned, 'Expected re-emit "jobProgress" arguments[1] %s to equal %s');
+			expect(arguments[1]).toBe(trackedJob.progress, 'Expected re-emit "jobProgress" arguments[1] %s to be TrackedJob#progress');
 		});
 		emitter.on(constants.EVENT_JOB_PROGRESS, spyProgressReEmit);
 
 		trackedJob.run();
 
 		return trackedJob.promise.then(function() {
-			expect(spyJobProgress.calls.length).toBe(1, 'Expected EVENT_JOB_PROGRESS emit count %s to be %s');
-			expect(spyProgressReEmit.calls.length).toBe(1, 'Expected EVENT_JOB_PROGRESS re-emit count %s to be %s');
+			expect(spyJobProgress.calls.length).toBe(1, 'Expected "jobProgress" emit count %s to be %s');
+			expect(spyProgressReEmit.calls.length).toBe(1, 'Expected "jobProgress" re-emit count %s to be %s');
 			expect(trackedJob.progress).toBeA(Object, 'Expected arguments[0] type %s to be an object');
 			expect(Object.keys(trackedJob.progress)).toEqual(Object.keys(progressObjCleaned), 'Expected arguments[0] keys %s to equal %s');
 			expect(trackedJob.progress).toEqual(progressObjCleaned, 'Expected arguments[0] %s to equal %s');
 		});
 	});
 
-	it('should emit EVENT_JOB_PROGRESS for run', function() {
+	it('should emit "jobProgress" for run', function() {
 		var progressObj = {};
 		var manager = createManagerFixture();
 
@@ -804,17 +804,17 @@ describe('TrackedJob', function() {
 		trackedJob.reEmitTo(emitter);
 
 		var spyProgressReEmit = expect.createSpy().andCall(function() {
-			expect(this).toBe(emitter, 'Expected re-emit EVENT_JOB_PROGRESS context %s to be emitter');
-			expect(arguments.length).toBe(2, 'Expected re-emit EVENT_JOB_PROGRESS arguments count %s to be %s');
-			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit EVENT_JOB_PROGRESS arguments[0] %s to be trackedJob');
-			expect(arguments[1]).toBe(progressObj, 'Expected re-emit EVENT_JOB_PROGRESS arguments[1] type %s to be TrackedJob#progress');
+			expect(this).toBe(emitter, 'Expected re-emit "jobProgress" context %s to be emitter');
+			expect(arguments.length).toBe(2, 'Expected re-emit "jobProgress" arguments count %s to be %s');
+			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit "jobProgress" arguments[0] %s to be trackedJob');
+			expect(arguments[1]).toBe(progressObj, 'Expected re-emit "jobProgress" arguments[1] type %s to be TrackedJob#progress');
 		});
 		emitter.on(constants.EVENT_JOB_PROGRESS, spyProgressReEmit);
 
 		return trackedJob.run()
 			.then(function() {
-				expect(spyJobProgressEvent.calls.length).toBe(1, 'Expected EVENT_JOB_FORKED emit count %s to be %s');
-				expect(spyProgressReEmit.calls.length).toBe(1, 'Expected EVENT_JOB_FORKED re-emit count %s to be %s');
+				expect(spyJobProgressEvent.calls.length).toBe(1, 'Expected "jobForked" emit count %s to be %s');
+				expect(spyProgressReEmit.calls.length).toBe(1, 'Expected "jobForked" re-emit count %s to be %s');
 			});
 	});
 

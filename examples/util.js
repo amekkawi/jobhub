@@ -1,52 +1,52 @@
 /* eslint-disable no-console */
 
 exports.logManagerEvents = function(emitter) {
-	emitter.on('JOB_CREATED', function(trackedJob) {
+	emitter.on('jobCreated', function(trackedJob) {
 		console.log(
-			'[MANAGER] event:JOB_CREATED job:%s id:%s',
+			'[MANAGER] event:jobCreated job:%s id:%s',
 			JSON.stringify(trackedJob.jobConfig.jobName),
 			JSON.stringify(trackedJob.jobId)
 		);
 	});
 
-	emitter.on('JOB_STARTED', function(trackedJob) {
+	emitter.on('jobStarted', function(trackedJob) {
 		console.log(
-			'[MANAGER] event:JOB_STARTED job:%s id:%s',
+			'[MANAGER] event:jobStarted job:%s id:%s',
 			JSON.stringify(trackedJob.jobConfig.jobName),
 			JSON.stringify(trackedJob.jobId)
 		);
 	});
 
-	emitter.on('JOB_FORKED', function(trackedJob) {
+	emitter.on('jobForked', function(trackedJob) {
 		console.log(
-			'[MANAGER] event:JOB_FORKED job:%s id:%s pid:%s',
+			'[MANAGER] event:jobForked job:%s id:%s pid:%s',
 			JSON.stringify(trackedJob.jobConfig.jobName),
 			JSON.stringify(trackedJob.jobId),
 			trackedJob.workerMediator.processId
 		);
 	});
 
-	emitter.on('JOB_PROGRESS', function(trackedJob, progress) {
+	emitter.on('jobProgress', function(trackedJob, progress) {
 		console.log(
-			'[MANAGER] event:JOB_FORKED job:%s id:%s progress:(%s)',
+			'[MANAGER] event:jobForked job:%s id:%s progress:(%s)',
 			JSON.stringify(trackedJob.jobConfig.jobName),
 			JSON.stringify(trackedJob.jobId),
 			JSON.stringify(progress)
 		);
 	});
 
-	emitter.on('JOB_SUCCESS', function(trackedJob, result) {
+	emitter.on('jobSuccess', function(trackedJob, result) {
 		console.log(
-			'[MANAGER] event:JOB_SUCCESS job:%s id:%s result:(%s)',
+			'[MANAGER] event:jobSuccess job:%s id:%s result:(%s)',
 			JSON.stringify(trackedJob.jobConfig.jobName),
 			JSON.stringify(trackedJob.jobId),
 			JSON.stringify(result)
 		);
 	});
 
-	emitter.on('JOB_FAILURE', function(trackedJob, error) {
+	emitter.on('jobFailure', function(trackedJob, error) {
 		console.error(
-			'[MANAGER] event:JOB_FAILURE job:%s id:%s error:(%s)',
+			'[MANAGER] event:jobFailure job:%s id:%s error:(%s)',
 			JSON.stringify(trackedJob.jobConfig.jobName),
 			JSON.stringify(trackedJob.jobId),
 			JSON.stringify(error)

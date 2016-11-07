@@ -1,5 +1,6 @@
 var EventEmitter = require('events').EventEmitter;
 var expect = require('expect');
+var constants = require('../../lib/constants');
 var errors = require('../../lib/errors');
 var JobConfigStore = require('../../lib/JobConfigStore');
 
@@ -9,7 +10,7 @@ describe('JobConfigStore', function() {
 		expect(store instanceof EventEmitter).toBe(true, 'Expected JobConfigStore to be instance of EventEmitter');
 	});
 
-	it('should allow jobs to be registered and emit JOB_REGISTERED', function() {
+	it('should allow jobs to be registered and emit jobRegistered', function() {
 		var expectedConfig = {
 			run: function() {}
 		};
@@ -24,11 +25,11 @@ describe('JobConfigStore', function() {
 			expect(arguments[1].jobName).toBe('foo', 'Expected arguments[1].jobName %s to be %s');
 			expect(arguments[1].run).toBe(expectedConfig.run, 'Expected arguments[1].run %s to be original function');
 		});
-		store.on('JOB_REGISTERED', spyRegisteredEvent);
+		store.on(constants.EVENT_JOB_REGISTERED, spyRegisteredEvent);
 
 		expect(store.registerJob('foo', expectedConfig)).toBe(store, 'Expected return of JobConfigStore#registerJob %s to be itself (i.e. this)');
 
-		expect(spyRegisteredEvent.calls.length).toBe(1, 'Expected JOB_REGISTERED emit count %s to be %s');
+		expect(spyRegisteredEvent.calls.length).toBe(1, 'Expected jobRegistered emit count %s to be %s');
 	});
 
 	it('should allow retrieval of a job by name', function() {
@@ -109,7 +110,7 @@ describe('JobConfigStore', function() {
 		expect(jobConfigB.run).toBe(expectedConfigB.run);
 	});
 
-	it('should allow unregistering a job and emit JOB_UNREGISTERED', function() {
+	it('should allow unregistering a job and emit "jobUnregistered"', function() {
 		var expectedConfig = { run: function() {} };
 		var store = new JobConfigStore();
 
@@ -121,26 +122,26 @@ describe('JobConfigStore', function() {
 			expect(arguments[1].jobName).toBe('foo', 'Expected arguments[1].jobName %s to be %s');
 			expect(arguments[1].run).toBe(expectedConfig.run, 'Expected arguments[1].run %s to be original function');
 		});
-		store.on('JOB_UNREGISTERED', spyUnregisteredEvent);
+		store.on(constants.EVENT_JOB_UNREGISTERED, spyUnregisteredEvent);
 
 		store.registerJob('foo', expectedConfig);
 		expect(store.unregisterJob('foo')).toBe(store, 'Expected return of JobConfigStore#unregisterJob %s to be itself (i.e. this)');
 		expect(store.getJobConfig('foo')).toBe(null);
 
-		expect(spyUnregisteredEvent.calls.length).toBe(1, 'Expected JOB_UNREGISTERED emit count %s to be %s');
+		expect(spyUnregisteredEvent.calls.length).toBe(1, 'Expected "jobUnregistered" emit count %s to be %s');
 	});
 
 	it('should allow all jobs to be unregistered', function() {
 		var store = new JobConfigStore();
 
 		var spyUnregisteredEvent = expect.createSpy();
-		store.on('JOB_UNREGISTERED', spyUnregisteredEvent);
+		store.on(constants.EVENT_JOB_UNREGISTERED, spyUnregisteredEvent);
 
 		store.registerJob('foo', { run: function() {} });
 		store.registerJob('bar', { run: function() {} });
 		expect(store.unregisterAllJobs()).toBe(store, 'Expected return of JobConfigStore#unregisterAllJobs %s to be itself (i.e. this)');
 
-		expect(spyUnregisteredEvent.calls.length).toBe(2, 'Expected JOB_UNREGISTERED emit count %s to be %s');
+		expect(spyUnregisteredEvent.calls.length).toBe(2, 'Expected "jobUnregistered" emit count %s to be %s');
 		expect(store.getJobConfig('foo')).toBe(null);
 		expect(store.getJobConfig('bar')).toBe(null);
 	});

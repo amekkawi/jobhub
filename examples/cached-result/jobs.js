@@ -33,8 +33,8 @@ exports.sortedFirstLast = {
 		// Note: "this" will point to the specific instance of JobConfig used by a HubManager
 
 		// Only cache if the job was run in a worker process,
-		// and was not from a quickRun (in which case stage would be 'QUICK_RUN')
-		if (stage === 'RUN') {
+		// and was not from a quickRun (in which case stage would be 'quickRun')
+		if (stage === 'run') {
 			if (cacheStorage) {
 				cacheStorage.set(this, Object.assign({ __fromCache: true }, result));
 			}

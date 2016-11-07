@@ -24,8 +24,8 @@ describe('JobWorker', function() {
 
 		expect(worker.middleware).toBeA(MiddlewareStore, 'Expected JobWorker#middleware %s to be a %s');
 		expect(worker.middleware.getSupportedSyncTypes()).toEqual(worker.getSupportedSyncMiddleware(), 'Expected supported sync middleware %s to equal %s');
-		expect(worker.middleware.hasSyncSupport(constants.MIDDLEWARE_WORKER_LOAD_JOB)).toBe(true, 'Expected middleware support for MIDDLEWARE_WORKER_LOAD_JOB');
-		expect(worker.middleware.hasSyncSupport(constants.MIDDLEWARE_WORKER_BUILD_JOB_ARG)).toBe(true, 'Expected middleware support for MIDDLEWARE_WORKER_BUILD_JOB_ARG');
+		expect(worker.middleware.hasSyncSupport(constants.MIDDLEWARE_WORKER_LOAD_JOB)).toBe(true, 'Expected middleware support for "workerLoadJob"');
+		expect(worker.middleware.hasSyncSupport(constants.MIDDLEWARE_WORKER_BUILD_JOB_ARG)).toBe(true, 'Expected middleware support for "workerBuildJobArg"');
 		expect(worker.jobs).toBeA(JobConfigStore, 'Expected JobWorker#jobs %s to be a %s');
 	});
 
@@ -200,7 +200,7 @@ describe('JobWorker', function() {
 			});
 		});
 
-		it('should support MIDDLEWARE_WORKER_LOAD_JOB middleware', function() {
+		it('should support "workerLoadJob" middleware', function() {
 			var jobsModulePath = path.join(__dirname, '../fixtures/jobs.js');
 			var jobsModule = require(jobsModulePath);
 			var worker = new JobWorker('foo', 'bar', {}, {
@@ -244,7 +244,7 @@ describe('JobWorker', function() {
 			});
 		});
 
-		it('should catch errors thrown by MIDDLEWARE_WORKER_LOAD_JOB middleware', function() {
+		it('should catch errors thrown by "workerLoadJob" middleware', function() {
 			var expectedError = new Error();
 			var worker = new JobWorker('foo', 'bar', {}, {
 				jobsModulePath: path.join(__dirname, '../fixtures/jobs.js')
@@ -308,7 +308,7 @@ describe('JobWorker', function() {
 			expect(worker.handleProgress.calls[0].arguments[0]).toBe(expectedProgress);
 		});
 
-		it('should support MIDDLEWARE_WORKER_BUILD_JOB_ARG middleware', function() {
+		it('should support "workerBuildJobArg" middleware', function() {
 			var expectedRet = {};
 			var expectedParams = {};
 			var expectedProgress = {};
@@ -357,7 +357,7 @@ describe('JobWorker', function() {
 			);
 
 			var jobArg = worker.buildJobArg(expectedResolve, expectedReject);
-			expect(spyWorkerBuildJobArg.calls.length).toBe(1, 'Expected MIDDLEWARE_WORKER_BUILD_JOB_ARG middleware call count %s to be %s');
+			expect(spyWorkerBuildJobArg.calls.length).toBe(1, 'Expected "workerBuildJobArg" middleware call count %s to be %s');
 			expect(jobArg).toBe(expectedRet, 'Expected JobWorker#buildJobArg return value %s to be %s');
 		});
 	});
