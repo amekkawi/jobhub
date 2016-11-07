@@ -817,8 +817,8 @@ describe('HubManager', function() {
 				.then(function() {
 					expect(termTime).toBeGreaterThan(resolveTime);
 					expect(killTime).toBeGreaterThan(resolveTime);
-					expect(termTime - resolveTime).toBeGreaterThanOrEqualTo(30).toBeLessThanOrEqualTo(30 * 2);
-					expect(killTime - termTime).toBeGreaterThanOrEqualTo(60).toBeLessThanOrEqualTo(60 * 2);
+					expect(termTime - resolveTime).toBeGreaterThanOrEqualTo(30 - 2).toBeLessThanOrEqualTo(30 * 2);
+					expect(killTime - termTime).toBeGreaterThanOrEqualTo(60 - 2).toBeLessThanOrEqualTo(60 * 2);
 
 					expect(terminateEventSpy.calls.length).toBe(2);
 					expect(terminateEventSpy.calls[0].arguments.length).toBe(2);
