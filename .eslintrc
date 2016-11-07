@@ -48,7 +48,7 @@
     ],
     "eol-last": [
       "error",
-      "unix"
+      "always"
     ],
     "linebreak-style": [
       "error",
@@ -59,7 +59,11 @@
       "error",
       "tab",
       {
-        "SwitchCase": 1
+        "SwitchCase": 1,
+        "MemberExpression": 1,
+        "CallExpression": {
+          "arguments": 1
+        }
       }
     ],
     "jsx-quotes": "error",
