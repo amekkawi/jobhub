@@ -4,7 +4,7 @@ exports.veryUnique = {
 	unique: true,
 
 	/**
-	 * @param {JobRunArg} job
+	 * @param {JobConfig_JobArg} job
 	 */
 	run: function(job) {
 		setTimeout(function() {
@@ -31,7 +31,7 @@ exports.kindaUnique = {
 	},
 
 	/**
-	 * @param {JobRunArg} job
+	 * @param {JobConfig_JobArg} job
 	 */
 	run: function(job) {
 		setTimeout(function() {

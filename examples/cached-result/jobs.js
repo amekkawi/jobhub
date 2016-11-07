@@ -10,7 +10,7 @@ var cacheStorage = typeof global.WeakMap === 'function' && new WeakMap();
  */
 exports.sortedFirstLast = {
 	/**
-	 * @param {JobRunArg} job
+	 * @param {JobConfig_JobArg} job
 	 * @param {function} next
 	 */
 	quickRun: function(job, next) {
@@ -50,7 +50,7 @@ exports.sortedFirstLast = {
 	},
 
 	/**
-	 * @param {JobRunArg} job
+	 * @param {JobConfig_JobArg} job
 	 */
 	run: function(job) {
 		// Placing require() statements in run method avoids loading them in the manager process

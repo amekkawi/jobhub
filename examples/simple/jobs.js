@@ -30,7 +30,7 @@ exports.multiply = {
 	},
 
 	/**
-	 * @param {JobRunArg} job
+	 * @param {JobConfig_JobArg} job
 	 */
 	quickRun: function(job) {
 		// Always resolve in the manager process if a quick run is attempted
@@ -38,7 +38,7 @@ exports.multiply = {
 	},
 
 	/**
-	 * @param {JobRunArg} job
+	 * @param {JobConfig_JobArg} job
 	 */
 	run: function(job) {
 		console.log('[WORKER] Running "multiply" in process pid:' + process.pid);
