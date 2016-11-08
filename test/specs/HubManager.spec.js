@@ -651,6 +651,11 @@ describe('HubManager', function() {
 
 		manager.start();
 
+		expect(manager.findUniqueTrackedJob('notexist')).toBe(null);
+		expect(manager.findUniqueTrackedJob('notexist', 'A')).toBe(null);
+		expect(manager.findUniqueTrackedJob('notexist', null)).toBe(null);
+		expect(manager.findUniqueTrackedJob('notexist', void 0)).toBe(null);
+
 		var queuedJobA = manager.queueJob('foo', { key: 'A' });
 		expect(manager.findUniqueTrackedJob('foo', 'A')).toBe(queuedJobA);
 		expect(manager.findUniqueTrackedJob('foo')).toBe(null);
