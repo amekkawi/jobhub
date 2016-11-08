@@ -1,7 +1,7 @@
 {
   "name": "jobhub",
   "version": "0.2.0",
-  "description": "Manages running jobs in child processes",
+  "description": "Move your heavy work loads into fully managed child processes",
   "main": "lib/index.js",
   "author": "Andre Mekkawi <github@andremekkawi.com>",
   "license": "MIT",
