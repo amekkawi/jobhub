@@ -627,6 +627,13 @@ describe('HubManager', function() {
 						throw new Error('Expected not to be called');
 					}
 				});
+
+				jobStore.registerJob('bar', {
+					unique: true,
+					run: function() {
+						throw new Error('Expected not to be called');
+					}
+				});
 			}
 		);
 
@@ -644,8 +651,17 @@ describe('HubManager', function() {
 
 		manager.start();
 
-		var queuedJob = manager.queueJob('foo', { key: 'A' });
-		expect(manager.findUniqueTrackedJob('foo', 'A')).toBe(queuedJob);
+		var queuedJobA = manager.queueJob('foo', { key: 'A' });
+		expect(manager.findUniqueTrackedJob('foo', 'A')).toBe(queuedJobA);
+		expect(manager.findUniqueTrackedJob('foo')).toBe(null);
+		expect(manager.findUniqueTrackedJob('foo', null)).toBe(null);
+		expect(manager.findUniqueTrackedJob('foo', void 0)).toBe(null);
+
+		var queuedJobB = manager.queueJob('bar');
+		expect(manager.findUniqueTrackedJob('bar')).toBe(queuedJobB);
+		expect(manager.findUniqueTrackedJob('bar', null)).toBe(queuedJobB);
+		expect(manager.findUniqueTrackedJob('bar', void 0)).toBe(queuedJobB);
+		expect(manager.findUniqueTrackedJob('bar', 'A')).toBe(null);
 	});
 
 	it('should remove jobs once settled', function() {
