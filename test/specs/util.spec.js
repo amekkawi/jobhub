@@ -496,7 +496,33 @@ describe('util', function() {
 	});
 
 	describe('objectValues', function() {
-		it('should return values for owned keys');
+		it('should return values in the same order as keys', function() {
+			var obj = { c: 'C', a: 'A', b: 'B' };
+			expect(Object.keys(obj)).toEqual(['c', 'a', 'b']);
+			expect(util.objectValues(obj)).toEqual(['C', 'A', 'B']);
+		});
+
+		it('should not return values for non-enumerable props', function() {
+			var obj = { c: 'C', a: 'A', b: 'B' };
+			Object.defineProperty(obj, 'd', {
+				enumerable: false,
+				value: 'd'
+			});
+			expect(Object.keys(obj)).toEqual(['c', 'a', 'b']);
+			expect(util.objectValues(obj)).toEqual(['C', 'A', 'B']);
+		});
+
+		it('should not return values for inherited props', function() {
+			function ObjSuper() {}
+			ObjSuper.prototype.superProp = 'X';
+
+			var obj = new ObjSuper();
+			obj.c = 'C';
+
+			expect(obj.superProp).toBe('X');
+			expect(Object.keys(obj)).toEqual(['c']);
+			expect(util.objectValues(obj)).toEqual(['C']);
+		});
 	});
 
 	describe('validateJobParams', function() {
