@@ -15,7 +15,8 @@
   },
   "scripts": {
     "test": "mocha --bail --recursive --require ./test/setup.js ./test/index.js",
-    "docs": "npm run docs-api; npm run docs-api-protected",
+    "docs": "npm run docs-readme; npm run docs-api; npm run docs-api-protected",
+    "docs-readme": "node docs/.bin/index.js README.md --readme --overwrite",
     "docs-api": "node docs/.bin/index.js docs/api --overwrite",
     "docs-api-protected": "node docs/.bin/index.js docs/api-protected --overwrite --protected",
     "lint": "eslint lib"

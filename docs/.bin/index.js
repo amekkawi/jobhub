@@ -7,15 +7,16 @@ var dmd = require('dmd');
 
 var cliArgs = minimist(process.argv.slice(2), {
 	'--': false,
-	boolean: ['unified', 'protected', 'private']
+	boolean: ['readme', 'unified', 'protected', 'private', 'overwrite']
 });
 
 var SYNTAX = 'SYNTAX: node ' + path.relative(process.cwd(), process.argv[1])
-	+ ' [--unified] [--protected|--private] [--overwrite] <output-path>\n';
+	+ '[--readme|--unified] [--protected|--private] [--overwrite] <output-path>\n';
 
 var outputPath = cliArgs._[0];
 var overwrite = cliArgs.overwrite;
 var unifiedOutput = cliArgs.unified;
+var projectREADME = cliArgs.readme;
 var includeProtected = cliArgs.protected || cliArgs.private;
 var includePrivate = cliArgs.private;
 
@@ -38,7 +39,7 @@ function main() {
 	var options = Object.assign({}, baseOptions);
 	checkOutputPath()
 		.then(function(stat) {
-			if (!unifiedOutput) {
+			if (!projectREADME && !unifiedOutput) {
 				if (stat && stat.isDirectory()) {
 					return removeOutputDir();
 				}
@@ -61,7 +62,10 @@ function main() {
 			return getTemplateData(options)
 				.then(filterTemplateData)
 				.then(function(templateData) {
-					if (unifiedOutput) {
+					if (projectREADME) {
+						return buildProjectREADME(templateData, options);
+					}
+					else if (unifiedOutput) {
 						return buildUnified(templateData, options);
 					}
 					else {
@@ -93,10 +97,10 @@ function checkOutputPath() {
 			else if (!overwrite) {
 				reject(new Error('<output-path> already exists'));
 			}
-			else if (unifiedOutput && !stat.isFile()) {
+			else if ((unifiedOutput || projectREADME) && !stat.isFile()) {
 				reject(new Error('<output-path> exists and is not a file'));
 			}
-			else if (!unifiedOutput && !stat.isDirectory()) {
+			else if (!unifiedOutput && !projectREADME && !stat.isDirectory()) {
 				reject(new Error('<output-path> exists and is not a directory'));
 			}
 			else {
@@ -144,6 +148,49 @@ function filterTemplateData(templateData) {
 	});
 }
 
+function buildProjectREADME(templateData, options) {
+	var additionalOptions = {
+		helper: [
+			path.join(__dirname, 'helpers.js'),
+			path.join(__dirname, 'helpers-readme.js')
+		],
+		partial: [
+			path.join(__dirname, 'partials/*.hbs'),
+			path.join(__dirname, 'partials-readme/*.hbs')
+		]
+	};
+
+	return new Promise(function(resolve, reject) {
+		fs.readFile(path.join(__dirname, 'README.hbs'), { encoding: 'utf8' }, function(err, data) {
+			if (err) {
+				reject(err);
+			}
+			else {
+				resolve(data);
+			}
+		});
+	})
+		.then(function(templateREADME) {
+			// Create project README
+			return dmd.async(templateData, Object.assign({}, options, additionalOptions, {
+				data: templateData,
+				template: templateREADME
+			}))
+		})
+		.then(function(output) {
+			return new Promise(function(resolve, reject) {
+				fs.writeFile(outputPath, output, function(err) {
+					if (err) {
+						reject(err);
+					}
+					else {
+						resolve();
+					}
+				});
+			});
+		});
+}
+
 function buildUnified(templateData, options) {
 	return dmd.async(templateData, Object.assign({}, options, {
 		data: templateData
@@ -168,7 +215,7 @@ function buildSplit(templateData, options) {
 		partial: path.join(__dirname, 'partials/*.hbs')
 	};
 
-	// Create main README
+	// Create main index file
 	return dmd.async(templateData, Object.assign({}, options, additionalOptions, {
 		data: templateData,
 		template: '{{>main-index}}'

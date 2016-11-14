@@ -4,6 +4,10 @@ if (!handlebars.helpers.inlineLinks) {
 	throw new Error('inlineLinks helper not registered -- might not be the correct handlebars instance');
 }
 
+exports.linkPrefix = function() {
+	return '';
+};
+
 exports.typedef = function(options) {
 	options.hash.kind = 'typedef';
 	var result = handlebars.helpers._identifier(options);
@@ -112,13 +116,13 @@ function _link(input, options) {
 			throw new Error('Failed to find root member for ' + linked.longname);
 		}
 		else if (rootMember.kind === 'class') {
-			output.url = rootMember.name + '.md' + output.url;
+			output.url = handlebars.helpers.linkPrefix() + rootMember.name + '.md' + output.url;
 		}
 		else if (rootMember.kind === 'module') {
-			output.url = 'module_' + rootMember.name.replace(/\//g, '_') + '.md' + output.url;
+			output.url = handlebars.helpers.linkPrefix() + 'module_' + rootMember.name.replace(/\//g, '_') + '.md' + output.url;
 		}
 		else if (rootMember.kind === 'typedef') {
-			output.url = rootMember.name + '.md' + output.url;
+			output.url = handlebars.helpers.linkPrefix() + rootMember.name + '.md' + output.url;
 		}
 		else {
 			throw new Error('Unsupported root kind: ' + rootMember.kind + ' for ' + rootMember.longname);
