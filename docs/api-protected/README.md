@@ -1,3 +1,5 @@
+# jobhub Extended API
+
 ## Typedef
 
 <dl>

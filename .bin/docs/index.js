@@ -218,7 +218,7 @@ function buildSplit(templateData, options) {
 	// Create main index file
 	return dmd.async(templateData, Object.assign({}, options, additionalOptions, {
 		data: templateData,
-		template: '{{>main-index}}'
+		template: '# jobhub ' + (includeProtected ? 'Extended API' : 'API') + '\n\n{{>main-index}}'
 	}))
 		.then(function(output) {
 			return new Promise(function(resolve, reject) {
@@ -242,7 +242,7 @@ function buildSplit(templateData, options) {
 
 			return dmd.async(templateData, Object.assign({}, options, additionalOptions, {
 				data: templateData,
-				template: '{{#globals kind="function" category="middleware" ~}}{{>docs}}{{/globals}}'
+				template: '# Middleware\n\n{{#globals kind="function" category="middleware" ~}}{{>docs}}{{/globals}}'
 			}))
 				.then(function(output) {
 					return new Promise(function(resolve, reject) {
