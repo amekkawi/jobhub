@@ -32,7 +32,7 @@ Install the library using NPM into your existing node project:
 npm install jobhub
 ```
 
-At a minimum you need to instantiate and start the [HubManager](docs/api/HubManager.md#HubManager), which we will add to a file named `index.js`.
+At a minimum you need to instantiate and start the {{#link "HubManager"}}[{{{name}}}]({{{url}}}){{/link}}, which we will add to a file named `index.js`.
 The only required configuration for HubManager is the path to the file which defines your jobs.
 
 ```javascript
@@ -50,9 +50,11 @@ var hub = new HubManager({
 hub.start();
 ```
 
-## Defining Jobs ##
+### Defining Jobs ###
 
-Jobs are defined within the module specified by [jobsModulePath](docs/api/HubManagerOptions.md#HubManagerOptions#jobsModulePath), in this case its `jobs.js`. Let's create that file and define some jobs:
+Jobs are defined within the module specified by {{#link "HubManagerOptions#jobsModulePath"}}[{{{name}}}]({{{url}}}){{/link}} and export {{#link "JobConfig"}}[{{{name}}}]({{{url}}}){{/link}}.
+
+In the [Quick start](#quick-start) above we defined it as `jobs.js`, so let's create that file and define some jobs:
 
 ```javascript
 /* Contents of jobs.js */
@@ -115,9 +117,9 @@ exports['get-gremlins-wet'] = {
 };
 ```
 
-## Queuing Jobs ##
+### Queuing Jobs ###
 
-We can test out our jobs by adding some more code to `index.js`:
+We can test out our jobs by adding some more code to `index.js` that calls {{#link "HubManager#queueJob"}}[hub.queueJob]({{{url}}}){{/link}}:
 
 ```javascript
 /* Add to the end of index.js */
@@ -287,36 +289,6 @@ Then run the tests on the command line:
 ```
 node client.js
 ```
-
-## Job Config ##
-
-{{#typedef name="JobConfig"~}}
-
-{{>description~}}
-{{>summary~}}
-{{>augments~}}
-{{>implements~}}
-{{>fires~}}
-{{>params~}}
-{{>properties~}}
-
-{{>members~}}
-{{/typedef}}
-
-## Job Run Arg ##
-
-{{#typedef name="JobRunArg"~}}
-
-{{>description~}}
-{{>summary~}}
-{{>augments~}}
-{{>implements~}}
-{{>fires~}}
-{{>params~}}
-{{>properties~}}
-
-{{>members~}}
-{{/typedef}}
 
 ## Change Log ##
 

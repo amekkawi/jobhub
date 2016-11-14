@@ -50,9 +50,11 @@ var hub = new HubManager({
 hub.start();
 ```
 
-## Defining Jobs ##
+### Defining Jobs ###
 
-Jobs are defined within the module specified by [jobsModulePath](docs/api/HubManagerOptions.md#HubManagerOptions#jobsModulePath), in this case its `jobs.js`. Let's create that file and define some jobs:
+Jobs are defined within the module specified by [jobsModulePath](docs/api/HubManagerOptions.md#HubManagerOptions+jobsModulePath) and export [JobConfig](docs/api/JobConfig.md#JobConfig).
+
+In the [Quick start](#quick-start) above we defined it as `jobs.js`, so let's create that file and define some jobs:
 
 ```javascript
 /* Contents of jobs.js */
@@ -115,9 +117,9 @@ exports['get-gremlins-wet'] = {
 };
 ```
 
-## Queuing Jobs ##
+### Queuing Jobs ###
 
-We can test out our jobs by adding some more code to `index.js`:
+We can test out our jobs by adding some more code to `index.js` that calls [hub.queueJob](docs/api/HubManager.md#HubManager+queueJob):
 
 ```javascript
 /* Add to the end of index.js */
@@ -287,162 +289,6 @@ Then run the tests on the command line:
 ```
 node client.js
 ```
-
-## Job Config ##
-
-Configuration for a job.
-
-A job can be defined in two ways:
-
-1. Just a function, which is the code that will run in the child process.
-2. An object that has at a minimum of a [JobConfig#run](docs/api/JobConfig.md#JobConfig+run) function, which is the code that will run in the child process.
-
-<a name="JobConfig+unique"></a>
-
-### jobConfig.unique : <code>boolean</code>
-Optional. Set to `true` to only allow one instance of the job to run at a time.
-Attempts to queue the job while one is still running will return the [TrackedJob](docs/api/TrackedJob.md#TrackedJob) instance of the already running job.
-This option is ignored if [JobConfig#uniqueKey](docs/api/JobConfig.md#JobConfig+uniqueKey) is set.
-
-**Default**: <code>false</code>  
-<a name="JobConfig+meta"></a>
-
-### jobConfig.meta : <code>object</code>
-User-defined data that can be stored with the JobConfig.
-
-**Default**: <code>{}</code>  
-<a name="JobConfig+jobName"></a>
-
-### jobConfig.jobName : <code>string</code>
-Set by jobhub after the job config is registered with a [JobConfigStore](docs/api/JobConfigStore.md#JobConfigStore).
-
-<a name="JobConfig+run"></a>
-
-### jobConfig.run(job)
-Required. This function will be executed in the child process to run the job.
-
-
-| Param | Type |
-| --- | --- |
-| job | <code>[JobRunArg](docs/api/JobRunArg.md#JobRunArg)</code> | 
-
-<a name="JobConfig+uniqueKey"></a>
-
-### jobConfig.uniqueKey(params) ⇒ <code>void</code> &#124; <code>null</code> &#124; <code>String</code>
-Optional. Provides a unique key used to only allow one instance of the job to run at a time for that key.
-
-The unique key returned must be a string, but the function can also return null/undefined to allow that job to run
-without being unique. This function runs in the same process the [HubManager](docs/api/HubManager.md#HubManager) is started in.
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| params | <code>\*</code> | Value provided to [HubManager#queueJob](docs/api/HubManager.md#HubManager+queueJob). |
-
-<a name="JobConfig+validate"></a>
-
-### jobConfig.validate(params, InvalidJobParamError) ⇒ <code>void</code> &#124; <code>Promise</code>
-Optional. Validates the params value provided to [HubManager#queueJob](docs/api/HubManager.md#HubManager+queueJob).
-The function will receive two arguments, the params value provided to [HubManager#queueJob](docs/api/HubManager.md#HubManager+queueJob) and the
-[InvalidJobParamError](docs/api/InvalidJobParamError.md#InvalidJobParamError) constructor. The function should throw an Error
-(preferably [InvalidJobParamError](docs/api/InvalidJobParamError.md#InvalidJobParamError)) if the params are invalid. The function can return a
-Promise to validate the params asynchronously.
-
-**Throws**:
-
-- <code>Error</code><code>[InvalidJobParamError](docs/api/InvalidJobParamError.md#InvalidJobParamError)</code> 
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| params | <code>\*</code> |  |
-| InvalidJobParamError | <code>[InvalidJobParamError](docs/api/InvalidJobParamError.md#InvalidJobParamError)</code> | Error constructor that should be used to throw validation errors. |
-
-<a name="JobConfig+onCreate"></a>
-
-### jobConfig.onCreate(trackedJob)
-Called when a job for this config is created, similar to the [HubManager#event:jobCreated](docs/api/HubManager.md#HubManager+event_jobCreated) event.
-
-**See**: [HubManager#queueJob](docs/api/HubManager.md#HubManager+queueJob)  
-
-| Param | Type |
-| --- | --- |
-| trackedJob | <code>[TrackedJob](docs/api/TrackedJob.md#TrackedJob)</code> | 
-
-<a name="JobConfig+quickRun"></a>
-
-### jobConfig.quickRun(job, next)
-Optional. This function will be executed in the [HubManager](docs/api/HubManager.md#HubManager) process to optionally allow a job
-to be quickly resolved/rejected without starting a child process.
-
-
-| Param | Type | Description |
-| --- | --- | --- |
-| job | <code>[JobRunArg](docs/api/JobRunArg.md#JobRunArg)</code> |  |
-| next | <code>function</code> | Call to skip "quickRun", continuing to "run" the worker. |
-
-
-## Job Run Arg ##
-
-Passed to [JobConfig#run](docs/api/JobConfig.md#JobConfig+run) and [JobConfig#quickRun](docs/api/JobConfig.md#JobConfig+quickRun)
-to provide information about the job and facilitate communicate progress/success/failure.
-
-<a name="JobRunArg+jobId"></a>
-
-### jobRunArg.jobId : <code>string</code>
-The unique identifier for the job.
-
-<a name="JobRunArg+params"></a>
-
-### jobRunArg.params : <code>\*</code>
-The params passed to [HubManager#queueJob](docs/api/HubManager.md#HubManager+queueJob).
-
-<a name="JobRunArg+resolve"></a>
-
-### jobRunArg.resolve(result)
-Call to resolve the job.
-
-**See**
-
-- [TrackedJob#event:jobSuccess](docs/api/TrackedJob.md#TrackedJob+event_jobSuccess)
-- [HubManager#event:jobSuccess](HubManager#event:jobSuccess)
-
-
-| Param | Type |
-| --- | --- |
-| result | <code>\*</code> | 
-
-<a name="JobRunArg+reject"></a>
-
-### jobRunArg.reject(error)
-Call to reject the job.
-
-**See**
-
-- [TrackedJob#event:jobFailure](docs/api/TrackedJob.md#TrackedJob+event_jobFailure)
-- [HubManager#event:jobFailure](HubManager#event:jobFailure)
-
-
-| Param | Type |
-| --- | --- |
-| error | <code>Error</code> | 
-
-<a name="JobRunArg+sendProgress"></a>
-
-### jobRunArg.sendProgress(progress) ⇒ <code>Promise</code>
-Send progress data.
-
-**Returns**: <code>Promise</code> - Resolves once the progress is sent, and rejects if there was an error sending the progress.  
-**See**
-
-- [TrackedJob#event:jobProgress](docs/api/TrackedJob.md#TrackedJob+event_jobProgress)
-- [HubManager#event:jobProgress](HubManager#event:jobProgress)
-
-
-| Param | Type |
-| --- | --- |
-| progress | <code>\*</code> | 
-
 
 ## Change Log ##
 
