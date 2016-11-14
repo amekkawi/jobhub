@@ -233,6 +233,31 @@ function buildSplit(templateData, options) {
 			});
 		})
 		.then(function() {
+			if (!templateData.find(function(doclet) {
+				return doclet.kind === 'function' && doclet.category === 'middleware';
+			})) {
+				// Skip middlware file if none were found.
+				return;
+			}
+
+			return dmd.async(templateData, Object.assign({}, options, additionalOptions, {
+				data: templateData,
+				template: '{{#globals kind="function" category="middleware" ~}}{{>docs}}{{/globals}}'
+			}))
+				.then(function(output) {
+					return new Promise(function(resolve, reject) {
+						fs.writeFile(path.join(outputPath, 'middleware.md'), output, function(err) {
+							if (err) {
+								reject(err);
+							}
+							else {
+								resolve();
+							}
+						});
+					});
+				})
+		})
+		.then(function() {
 			// Create individual files for classes, modules, etc
 			return promiseForEach(templateData, function(doclet) {
 				if (doclet.memberof) {
@@ -253,6 +278,10 @@ function buildSplit(templateData, options) {
 				else if (doclet.kind === 'typedef') {
 					template = '{{#typedef name="' + doclet.name + '"}}{{>docs}}{{/typedef}}';
 					outputName = doclet.name;
+				}
+				else if (doclet.kind === 'function' && doclet.category === 'middleware') {
+					// Skip middleware
+					return;
 				}
 				else {
 					throw new Error('Unsupported orphan doclet kind "' + doclet.kind + '": ' + doclet.name);

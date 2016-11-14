@@ -124,6 +124,9 @@ function _link(input, options) {
 		else if (rootMember.kind === 'typedef') {
 			output.url = handlebars.helpers.linkPrefix() + rootMember.name + '.md' + output.url;
 		}
+		else if (rootMember.kind === 'function' && rootMember.category === 'middleware') {
+			output.url = 'middleware.md' + output.url;
+		}
 		else {
 			throw new Error('Unsupported root kind: ' + rootMember.kind + ' for ' + rootMember.longname);
 		}

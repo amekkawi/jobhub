@@ -33,3 +33,15 @@
 
 {{/if~}}
 {{/globals~}}
+
+{{#globals kind="function" category="middleware" ~}}
+{{#if @first~}}{{>heading-indent}}Middleware
+
+<dl>
+{{/if~}}
+<dt>{{>sig-link-html}}</dt>
+<dd>{{{md (inlineLinks description)}}}</dd>
+{{#if @last~}}</dl>
+
+{{/if~}}
+{{/globals~}}
