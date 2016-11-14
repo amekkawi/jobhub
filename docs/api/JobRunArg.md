@@ -34,7 +34,7 @@ Call to resolve the job.
 **See**
 
 - [TrackedJob#event:jobSuccess](TrackedJob.md#TrackedJob+event_jobSuccess)
-- [HubManager#event:jobSuccess](HubManager#event:jobSuccess)
+- [HubManager#event:jobSuccess](HubManager.md#HubManager+event_jobSuccess)
 
 
 | Param | Type |
@@ -50,7 +50,7 @@ Call to reject the job.
 **See**
 
 - [TrackedJob#event:jobFailure](TrackedJob.md#TrackedJob+event_jobFailure)
-- [HubManager#event:jobFailure](HubManager#event:jobFailure)
+- [HubManager#event:jobFailure](HubManager.md#HubManager+event_jobFailure)
 
 
 | Param | Type |
@@ -67,7 +67,7 @@ Send progress data.
 **See**
 
 - [TrackedJob#event:jobProgress](TrackedJob.md#TrackedJob+event_jobProgress)
-- [HubManager#event:jobProgress](HubManager#event:jobProgress)
+- [HubManager#event:jobProgress](HubManager.md#HubManager+event_jobProgress)
 
 
 | Param | Type |

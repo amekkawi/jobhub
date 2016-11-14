@@ -36,50 +36,58 @@ Tracks a job that has not yet completed.
 | Param | Type | Description |
 | --- | --- | --- |
 | manager | <code>[HubManager](HubManager.md#HubManager)</code> |  |
-| jobId | <code>string</code> | ID for the tracked job. |
+| jobId | <code>string</code> | Unique ID for the tracked job. |
 | jobConfig | <code>[JobConfig](JobConfig.md#JobConfig)</code> |  |
 | [params] | <code>\*</code> |  |
 
 <a name="TrackedJob+created"></a>
 
 ### trackedJob.created : <code>Date</code>
-When the TrackedJob was created.
+Date when the TrackedJob was created.
 
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+stage"></a>
 
 ### trackedJob.stage : <code>string</code> &#124; <code>null</code>
-TODO
-null until run is called, after which it is the name of the stage of running a job that is executing,
-or for a job that resolved/rejected it is the stage that was run just before resolving or rejecting.
+The name of the stage of the tracked job's lifecycle that is executing, or for a job
+that resolved/rejected it is the stage that was run just before resolving or rejecting.
+
+Stage values:
+
+* `null` - Initial value until [TrackedJob#run](TrackedJob.md#TrackedJob+run) is called.
+* `"validateParams"` - Set just before validating the params.
+* `"quickRun"` - Set just before attempting to quick run the job (even if [JobConfig#quickRun](JobConfig.md#JobConfig+quickRun) is not defined).
+* `"run"` - Set just before starting the child worker.
 
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+manager"></a>
 
 ### trackedJob.manager : <code>[HubManager](HubManager.md#HubManager)</code>
-TODO
+The [HubManager](HubManager.md#HubManager) that is tracking this job.
 
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+jobId"></a>
 
 ### trackedJob.jobId : <code>string</code>
-ID for the tracked job.
+Unique ID for the tracked job.
 
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+jobConfig"></a>
 
 ### trackedJob.jobConfig : <code>[JobConfig](JobConfig.md#JobConfig)</code>
+The [JobConfig](JobConfig.md#JobConfig) used to create this job.
+
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+params"></a>
 
 ### trackedJob.params : <code>\*</code>
-Parameters passed to the job handler.
+Parameters for this job passed from [HubManager#queueJob](HubManager.md#HubManager+queueJob).
 
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+isRunning"></a>
 
 ### trackedJob.isRunning : <code>boolean</code>
-true once run() is called and false after the job succeeds or fails.
+Set to `true` once [JobConfig#run](JobConfig.md#JobConfig+run) is called and false after the job succeeds or fails.
 
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+promise"></a>
@@ -137,7 +145,7 @@ preceeding arguments with an argument for this TrackedJob instance.
 <a name="TrackedJob+event_jobStarted"></a>
 
 ### "jobStarted"
-Fires when the tracked job is started using [TrackedJob#start](TrackedJob#start).
+Fires when the tracked job is started using [TrackedJob#run](TrackedJob.md#TrackedJob+run).
 
 **Kind**: event emitted by <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+event_jobForked"></a>

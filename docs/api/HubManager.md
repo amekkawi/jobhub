@@ -4,7 +4,7 @@
 Manages the lifecyle of jobs.
 
 **Kind**: global class  
-**Emits**: <code>[managerStarted](HubManager.md#HubManager+event_managerStarted)</code>, <code>[jobCreated](HubManager.md#HubManager+event_jobCreated)</code>, <code>[jobTerminate](HubManager.md#HubManager+event_jobTerminate)</code>  
+**Emits**: <code>[managerStarted](HubManager.md#HubManager+event_managerStarted)</code>, <code>[jobCreated](HubManager.md#HubManager+event_jobCreated)</code>, <code>[jobStarted](HubManager.md#HubManager+event_jobStarted)</code>, <code>[jobForked](HubManager.md#HubManager+event_jobForked)</code>, <code>[jobProgress](HubManager.md#HubManager+event_jobProgress)</code>, <code>[jobSuccess](HubManager.md#HubManager+event_jobSuccess)</code>, <code>[jobFailure](HubManager.md#HubManager+event_jobFailure)</code>, <code>[jobTerminate](HubManager.md#HubManager+event_jobTerminate)</code>  
 
 * [HubManager](HubManager.md#HubManager)
     * [new HubManager(options)](HubManager.md#HubManager)
@@ -22,6 +22,11 @@ Manages the lifecyle of jobs.
     * ["managerStarted"](HubManager.md#HubManager+event_managerStarted)
     * ["jobCreated" (trackedJob)](HubManager.md#HubManager+event_jobCreated)
     * ["jobTerminate" (trackedJob, isForceKill)](HubManager.md#HubManager+event_jobTerminate)
+    * ["jobStarted" (trackedJob)](HubManager.md#HubManager+event_jobStarted)
+    * ["jobForked" (trackedJob)](HubManager.md#HubManager+event_jobForked)
+    * ["jobProgress" (trackedJob, progress)](HubManager.md#HubManager+event_jobProgress)
+    * ["jobSuccess" (trackedJob, result)](HubManager.md#HubManager+event_jobSuccess)
+    * ["jobFailure" (trackedJob, error)](HubManager.md#HubManager+event_jobFailure)
 
 <a name="new_HubManager_new"></a>
 
@@ -40,10 +45,14 @@ Parsed options provided to HubManager.
 <a name="HubManager+middleware"></a>
 
 ### hubManager.middleware : <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>
+Middleware store used by the HubManager.
+
 **Kind**: instance property of <code>[HubManager](HubManager.md#HubManager)</code>  
 <a name="HubManager+jobs"></a>
 
 ### hubManager.jobs : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
+Stores [JobConfig](JobConfig.md#JobConfig) registered for the HubManager.
+
 **Kind**: instance property of <code>[HubManager](HubManager.md#HubManager)</code>  
 <a name="HubManager+start"></a>
 
@@ -186,4 +195,62 @@ Fired when a job that has not gracefully excited is being terminated.
 | --- | --- | --- |
 | trackedJob | <code>[TrackedJob](TrackedJob.md#TrackedJob)</code> |  |
 | isForceKill | <code>boolean</code> | If the job is being forced to exit (i.e. kill -9) |
+
+<a name="HubManager+event_jobStarted"></a>
+
+### "jobStarted" (trackedJob)
+Fires when a job is started using [TrackedJob#run](TrackedJob.md#TrackedJob+run).
+
+**Kind**: event emitted by <code>[HubManager](HubManager.md#HubManager)</code>  
+
+| Param | Type |
+| --- | --- |
+| trackedJob | <code>[TrackedJob](TrackedJob.md#TrackedJob)</code> | 
+
+<a name="HubManager+event_jobForked"></a>
+
+### "jobForked" (trackedJob)
+Fires when a job forks its child worker process.
+
+**Kind**: event emitted by <code>[HubManager](HubManager.md#HubManager)</code>  
+
+| Param | Type |
+| --- | --- |
+| trackedJob | <code>[TrackedJob](TrackedJob.md#TrackedJob)</code> | 
+
+<a name="HubManager+event_jobProgress"></a>
+
+### "jobProgress" (trackedJob, progress)
+Fires when a job sends its 'progress'.
+
+**Kind**: event emitted by <code>[HubManager](HubManager.md#HubManager)</code>  
+
+| Param | Type |
+| --- | --- |
+| trackedJob | <code>[TrackedJob](TrackedJob.md#TrackedJob)</code> | 
+| progress | <code>\*</code> | 
+
+<a name="HubManager+event_jobSuccess"></a>
+
+### "jobSuccess" (trackedJob, result)
+Fires when a job reports success.
+
+**Kind**: event emitted by <code>[HubManager](HubManager.md#HubManager)</code>  
+
+| Param | Type |
+| --- | --- |
+| trackedJob | <code>[TrackedJob](TrackedJob.md#TrackedJob)</code> | 
+| result | <code>\*</code> | 
+
+<a name="HubManager+event_jobFailure"></a>
+
+### "jobFailure" (trackedJob, error)
+Fires when a job reports failure.
+
+**Kind**: event emitted by <code>[HubManager](HubManager.md#HubManager)</code>  
+
+| Param | Type |
+| --- | --- |
+| trackedJob | <code>[TrackedJob](TrackedJob.md#TrackedJob)</code> | 
+| error | <code>Error</code> | 
 

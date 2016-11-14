@@ -87,6 +87,30 @@ while handling the successful or failed result of a job.</p>
 </dd>
 </dl>
 
+## Middleware
+
+<dl>
+<dt><a href="middleware.md#loadJobs">loadJobs(jobs, next)</a></dt>
+<dd><p>Intercepts loading and registering of jobs from
+<a href="HubManagerOptions.md#HubManagerOptions+jobsModulePath">HubManagerOptions#jobsModulePath</a> by <a href="HubManager.md#HubManager+start">HubManager#start</a>.</p>
+</dd>
+<dt><a href="middleware.md#createJob">createJob(jobId, jobConfig, params, next)</a></dt>
+<dd><p>Intercepts creating a <a href="TrackedJob.md#TrackedJob">TrackedJob</a> instance.</p>
+</dd>
+<dt><a href="middleware.md#forkJobProcess">forkJobProcess(forkModulePath, forkArgs, forkOpts, next)</a> ⇒ <code>ChildProcess</code></dt>
+<dd><p>Intercepts forking the local child process using <code>require(&quot;child_process&quot;).fork</code>.</p>
+</dd>
+<dt><a href="middleware.md#buildForkArgs">buildForkArgs(trackedJob, next)</a> ⇒ <code>Array.&lt;string&gt;</code></dt>
+<dd><p>Intercepts creation of args provided to <a href="middleware.md#forkJobProcess">forkJobProcess</a>.</p>
+</dd>
+<dt><a href="middleware.md#buildForkOpts">buildForkOpts(trackedJob, next)</a> ⇒ <code>object</code></dt>
+<dd><p>Intercepts creation of opts provided to <a href="middleware.md#forkJobProcess">forkJobProcess</a>.</p>
+</dd>
+<dt><a href="middleware.md#createWorkerMediator">createWorkerMediator(trackedJob, next)</a> ⇒ <code><a href="JobWorkerMediator.md#JobWorkerMediator">JobWorkerMediator</a></code></dt>
+<dd><p>Intercepts creation of the <a href="JobWorkerMediator.md#JobWorkerMediator">JobWorkerMediator</a> set to <a href="TrackedJob.md#TrackedJob+workerMediator">TrackedJob#workerMediator</a>.</p>
+</dd>
+</dl>
+
 ## Modules
 
 <dl>
