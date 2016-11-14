@@ -329,7 +329,7 @@ describe('JobWorkerIPCMediator', function() {
 			expect(arguments[0].jobName).toBe(trackedJob.jobConfig.jobName);
 			expect(arguments[0].jobId).toBe(trackedJob.jobId);
 			expect(arguments[0].error).toBe(expectedError);
-			expect(arguments[0].stack).toBe(expectedError.stack);
+			expect(arguments[0].error.stack).toBe(expectedError.stack);
 		});
 
 		var childProcess = mediator.childProcess = createChildProcessFixture();
