@@ -4,8 +4,8 @@ Move your heavy work loads into fully managed child processes.
 
 ## Features ##
 
-* Jobs are forked to run in child processes and terminate when they are complete.
-* Actively running jobs are fully managed and tracked.
+* Jobs run in child processes and terminate when they are complete.
+* Actively running jobs are centrally managed and tracked.
 * Jobs can be optionally configured to:
     * Validate job params.
     * Quickly handle a job before a child process is forked.
