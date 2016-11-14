@@ -1,3 +1,23 @@
+## Typedef
+
+<dl>
+<dt><a href="HubManagerOptions.md#HubManagerOptions">HubManagerOptions</a> : <code>object</code></dt>
+<dd><p>Configuration options for the <a href="HubManager.md#HubManager">HubManager</a>.</p>
+</dd>
+<dt><a href="JobConfig.md#JobConfig">JobConfig</a> : <code>object</code></dt>
+<dd><p>Configuration for a job.</p>
+<p>A job can be defined in two ways:</p>
+<ol>
+<li>Just a function, which is the code that will run in the child process.</li>
+<li>An object that has at a minimum of a <a href="JobConfig.md#JobConfig+run">JobConfig#run</a> function, which is the code that will run in the child process.</li>
+</ol>
+</dd>
+<dt><a href="JobRunArg.md#JobRunArg">JobRunArg</a> : <code>object</code></dt>
+<dd><p>Passed to <a href="JobConfig.md#JobConfig+run">JobConfig#run</a> and <a href="JobConfig.md#JobConfig+quickRun">JobConfig#quickRun</a>
+to provide information about the job and facilitate communicate progress/success/failure.</p>
+</dd>
+</dl>
+
 ## Classes
 
 <dl>
@@ -64,26 +84,6 @@ was attempted to be used that is not supported.</p>
 <dt><a href="JobWorkerHandlerError.md#JobWorkerHandlerError">JobWorkerHandlerError</a> ⇐ <code>Error</code></dt>
 <dd><p>A JobWorkerHandlerError indicates that an error was caught
 while handling the successful or failed result of a job.</p>
-</dd>
-</dl>
-
-## Typedef
-
-<dl>
-<dt><a href="HubManagerOptions.md#HubManagerOptions">HubManagerOptions</a> : <code>object</code></dt>
-<dd><p>Configuration options for the <a href="HubManager.md#HubManager">HubManager</a>.</p>
-</dd>
-<dt><a href="JobConfig.md#JobConfig">JobConfig</a> : <code>object</code></dt>
-<dd><p>Configuration for a job.</p>
-<p>A job can be defined in two ways:</p>
-<ol>
-<li>Just a function, which is the code that will run in the child process.</li>
-<li>An object that has at a minimum of a <a href="JobConfig.md#JobConfig+run">JobConfig#run</a> function, which is the code that will run in the child process.</li>
-</ol>
-</dd>
-<dt><a href="JobRunArg.md#JobRunArg">JobRunArg</a> : <code>object</code></dt>
-<dd><p>Passed to <a href="JobConfig.md#JobConfig+run">JobConfig#run</a> and <a href="JobConfig.md#JobConfig+quickRun">JobConfig#quickRun</a>
-to provide information about the job and facilitate communicate progress/success/failure.</p>
 </dd>
 </dl>
 
