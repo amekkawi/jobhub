@@ -1,3 +1,5 @@
+# [jobhub Extended API](README.md): Module:
+
 <a name="module_jobhub/lib/worker"></a>
 
 ## jobhub/lib/worker

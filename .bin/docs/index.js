@@ -242,7 +242,8 @@ function buildSplit(templateData, options) {
 
 			return dmd.async(templateData, Object.assign({}, options, additionalOptions, {
 				data: templateData,
-				template: '# Middleware\n\n{{#globals kind="function" category="middleware" ~}}{{>docs}}{{/globals}}'
+				template: '# [jobhub ' + (includeProtected ? 'Extended API' : 'API') + '](README.md): Middleware:\n\n'
+					+ '{{#globals kind="function" category="middleware" ~}}{{>docs}}{{/globals}}'
 			}))
 				.then(function(output) {
 					return new Promise(function(resolve, reject) {
@@ -268,15 +269,18 @@ function buildSplit(templateData, options) {
 				var outputName;
 
 				if (doclet.kind === 'class') {
-					template = '{{#class name="' + doclet.name + '"}}{{>docs}}{{/class}}';
+					template = '# [jobhub ' + (includeProtected ? 'Extended API' : 'API') + '](README.md): Class:\n\n'
+						+ '{{#class name="' + doclet.name + '"}}{{>docs}}{{/class}}';
 					outputName = doclet.name;
 				}
 				else if (doclet.kind === 'module') {
-					template = '{{#module name="' + doclet.name + '"}}{{>docs}}{{/module}}';
+					template = '# [jobhub ' + (includeProtected ? 'Extended API' : 'API') + '](README.md): Module:\n\n'
+						+ '{{#module name="' + doclet.name + '"}}{{>docs}}{{/module}}';
 					outputName = 'module_' + doclet.name.replace(/\//g, '_');
 				}
 				else if (doclet.kind === 'typedef') {
-					template = '{{#typedef name="' + doclet.name + '"}}{{>docs}}{{/typedef}}';
+					template = '# [jobhub ' + (includeProtected ? 'Extended API' : 'API') + '](README.md): Typedef:\n\n'
+						+ '{{#typedef name="' + doclet.name + '"}}{{>docs}}{{/typedef}}';
 					outputName = doclet.name;
 				}
 				else if (doclet.kind === 'function' && doclet.category === 'middleware') {

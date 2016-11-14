@@ -1,3 +1,5 @@
+# [jobhub Extended API](README.md): Class:
+
 <a name="InvalidJobParamError"></a>
 
 ## InvalidJobParamError ⇐ <code>Error</code>

@@ -1,3 +1,5 @@
+# [jobhub API](README.md): Class:
+
 <a name="JobWorkerIPC"></a>
 
 ## JobWorkerIPC ⇐ <code>[JobWorker](JobWorker.md#JobWorker)</code>

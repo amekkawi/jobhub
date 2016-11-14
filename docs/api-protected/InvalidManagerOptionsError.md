@@ -1,3 +1,5 @@
+# [jobhub Extended API](README.md): Class:
+
 <a name="InvalidManagerOptionsError"></a>
 
 ## InvalidManagerOptionsError ⇐ <code>Error</code>

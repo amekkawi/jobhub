@@ -1,3 +1,5 @@
+# [jobhub Extended API](README.md): Class:
+
 <a name="JobWorkerHandlerError"></a>
 
 ## JobWorkerHandlerError ⇐ <code>Error</code>

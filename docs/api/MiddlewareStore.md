@@ -1,3 +1,5 @@
+# [jobhub API](README.md): Class:
+
 <a name="MiddlewareStore"></a>
 
 ## MiddlewareStore

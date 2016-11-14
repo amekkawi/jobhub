@@ -1,3 +1,5 @@
+# [jobhub API](README.md): Typedef:
+
 <a name="HubManagerOptions"></a>
 
 ## HubManagerOptions : <code>object</code>

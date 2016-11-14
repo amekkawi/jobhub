@@ -1,4 +1,4 @@
-# Middleware
+# [jobhub Extended API](README.md): Middleware:
 
 <a name="loadJobs"></a>
 

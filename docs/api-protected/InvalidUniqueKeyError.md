@@ -1,3 +1,5 @@
+# [jobhub Extended API](README.md): Class:
+
 <a name="InvalidUniqueKeyError"></a>
 
 ## InvalidUniqueKeyError ⇐ <code>Error</code>

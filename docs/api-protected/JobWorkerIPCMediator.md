@@ -1,3 +1,5 @@
+# [jobhub Extended API](README.md): Class:
+
 <a name="JobWorkerIPCMediator"></a>
 
 ## JobWorkerIPCMediator ⇐ <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>

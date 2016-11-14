@@ -1,3 +1,5 @@
+# [jobhub API](README.md): Class:
+
 <a name="JobWorkerMediator"></a>
 
 ## JobWorkerMediator ⇐ <code>EventEmitter</code>

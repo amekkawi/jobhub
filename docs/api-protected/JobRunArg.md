@@ -1,3 +1,5 @@
+# [jobhub Extended API](README.md): Typedef:
+
 <a name="JobRunArg"></a>
 
 ## JobRunArg : <code>object</code>

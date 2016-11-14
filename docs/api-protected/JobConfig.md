@@ -1,3 +1,5 @@
+# [jobhub Extended API](README.md): Typedef:
+
 <a name="JobConfig"></a>
 
 ## JobConfig : <code>object</code>

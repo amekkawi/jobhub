@@ -1,3 +1,5 @@
+# [jobhub Extended API](README.md): Class:
+
 <a name="JobAlreadyExistsError"></a>
 
 ## JobAlreadyExistsError ⇐ <code>Error</code>
