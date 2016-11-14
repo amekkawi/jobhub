@@ -1,6 +1,6 @@
 # jobhub #
 
-Move your heavy work loads into fully managed child processes.
+Move your heavy workloads into fully managed child processes.
 
 ## Features ##
 

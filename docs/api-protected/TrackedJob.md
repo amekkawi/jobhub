@@ -113,7 +113,7 @@ The last emitted progress value.
 <a name="TrackedJob+then"></a>
 
 ### trackedJob.then() ⇒ <code>Promise</code>
-Convinence method for `TrackedJob.promise.then`.
+Convenience method for `TrackedJob.promise.then`.
 
 Only usable after [TrackedJob#run](TrackedJob.md#TrackedJob+run) is called.
 
@@ -121,7 +121,7 @@ Only usable after [TrackedJob#run](TrackedJob.md#TrackedJob+run) is called.
 <a name="TrackedJob+catch"></a>
 
 ### trackedJob.catch() ⇒ <code>Promise</code>
-Convinence method for `TrackedJob.promise.catch`.
+Convenience method for `TrackedJob.promise.catch`.
 
 Only usable after [TrackedJob#run](TrackedJob.md#TrackedJob+run) is called.
 
@@ -136,7 +136,7 @@ Start the job, if it has not already started.
 
 ### trackedJob.reEmitTo(eventEmitter) ⇒ <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>
 Re-emit TrackedJob events to another EventEmitter,
-preceeding arguments with an argument for this TrackedJob instance.
+preceding arguments with an argument for this TrackedJob instance.
 
 **Kind**: instance method of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 

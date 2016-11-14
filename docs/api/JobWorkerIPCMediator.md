@@ -3,7 +3,7 @@
 <a name="JobWorkerIPCMediator"></a>
 
 ## JobWorkerIPCMediator ⇐ <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>
-Manages a job's forked process during it's normal life cycle.
+Manages a job's forked process during it's normal lifecycle.
 
 **Kind**: global class  
 **Extends:** <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>  

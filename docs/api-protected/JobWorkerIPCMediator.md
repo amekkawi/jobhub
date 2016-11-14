@@ -3,7 +3,7 @@
 <a name="JobWorkerIPCMediator"></a>
 
 ## JobWorkerIPCMediator ⇐ <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>
-Manages a job's forked process during it's normal life cycle.
+Manages a job's forked process during it's normal lifecycle.
 
 **Kind**: global class  
 **Extends:** <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>  
@@ -82,7 +82,7 @@ Add event listeners to ChildProcess.
 <a name="JobWorkerIPCMediator+handleStartupConfirmation"></a>
 
 ### jobWorkerIPCMediator.handleStartupConfirmation()
-Called when the job sends the 'startup' message signalling it
+Called when the job sends the 'startup' message signaling it
 has successfully initialized and is ready for the params payload.
 
 **Kind**: instance method of <code>[JobWorkerIPCMediator](JobWorkerIPCMediator.md#JobWorkerIPCMediator)</code>  

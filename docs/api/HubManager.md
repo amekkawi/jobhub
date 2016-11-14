@@ -3,7 +3,7 @@
 <a name="HubManager"></a>
 
 ## HubManager
-Manages the lifecyle of jobs.
+Manages the lifecycle of jobs.
 
 **Kind**: global class  
 **Emits**: <code>[managerStarted](HubManager.md#HubManager+event_managerStarted)</code>, <code>[jobCreated](HubManager.md#HubManager+event_jobCreated)</code>, <code>[jobStarted](HubManager.md#HubManager+event_jobStarted)</code>, <code>[jobForked](HubManager.md#HubManager+event_jobForked)</code>, <code>[jobProgress](HubManager.md#HubManager+event_jobProgress)</code>, <code>[jobSuccess](HubManager.md#HubManager+event_jobSuccess)</code>, <code>[jobFailure](HubManager.md#HubManager+event_jobFailure)</code>, <code>[jobTerminate](HubManager.md#HubManager+event_jobTerminate)</code>  

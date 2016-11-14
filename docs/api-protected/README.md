@@ -24,7 +24,7 @@ to provide information about the job and facilitate communicate progress/success
 
 <dl>
 <dt><a href="HubManager.md#HubManager">HubManager</a></dt>
-<dd><p>Manages the lifecyle of jobs.</p>
+<dd><p>Manages the lifecycle of jobs.</p>
 </dd>
 <dt><a href="JobConfigStore.md#JobConfigStore">JobConfigStore</a></dt>
 <dd><p>Manages registered job config.</p>
@@ -37,7 +37,7 @@ to provide information about the job and facilitate communicate progress/success
 receiving configuration and sending events via an IPC messages.</p>
 </dd>
 <dt><a href="JobWorkerIPCMediator.md#JobWorkerIPCMediator">JobWorkerIPCMediator</a> ⇐ <code><a href="JobWorkerMediator.md#JobWorkerMediator">JobWorkerMediator</a></code></dt>
-<dd><p>Manages a job&#39;s forked process during it&#39;s normal life cycle.</p>
+<dd><p>Manages a job&#39;s forked process during it&#39;s normal lifecycle.</p>
 </dd>
 <dt><a href="JobWorkerMediator.md#JobWorkerMediator">JobWorkerMediator</a> ⇐ <code>EventEmitter</code></dt>
 <dd><p>Mediates communication with the tracked job&#39;s worker process.</p>
