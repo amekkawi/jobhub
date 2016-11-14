@@ -143,7 +143,7 @@
     "no-useless-computed-key": "error",
     "template-curly-spacing": "error",
     "jsdoc/check-param-names": "error",
-    "jsdoc/check-tag-names": "error",
+    "jsdoc/check-tag-names": "off",
     "jsdoc/newline-after-description": "error",
     "jsdoc/require-hyphen-before-param-description": "error",
     "jsdoc/require-param": "error",
