@@ -764,7 +764,99 @@ describe('util', function() {
 	});
 
 	describe('dehydrateError', function() {
-		it('should convert a string to an object with a message property');
-		it('should get all "own" properties that have primitive values');
+		it('should convert a string to an object with a message property', function() {
+			var dehydrated = util.dehydrateError('msg');
+			expect(dehydrated).toBeA(Object);
+			expect(dehydrated.name).toBe('Error');
+			expect(dehydrated.message).toBe('msg');
+		});
+
+		it('should get all "own" properties', function() {
+			var err = new Error('msg');
+			Object.defineProperty(err, 'foo', {
+				enumerable: false,
+				value: 'bar'
+			});
+
+			var dehydrated = util.dehydrateError(err);
+			expect(Object.keys(dehydrated)).toEqual(['name', 'message', 'stack', 'foo']);
+			expect(dehydrated.foo).toBe('bar');
+		});
+
+		it('should skip function properties', function() {
+			var err = new Error('msg');
+			err.foo = function() {};
+
+			var dehydrated = util.dehydrateError(err);
+			expect(Object.keys(dehydrated)).toEqual(['name', 'message', 'stack']);
+		});
+
+		it('should skip regexp properties', function() {
+			var err = new Error('msg');
+			err.foo = /./;
+
+			var dehydrated = util.dehydrateError(err);
+			expect(Object.keys(dehydrated)).toEqual(['name', 'message', 'stack']);
+		});
+
+		it('should dehydrate nested arrays', function() {
+			var err = new Error('msg');
+			err.foo = ['bar', [500]];
+
+			var dehydrated = util.dehydrateError(err);
+			expect(Object.keys(dehydrated)).toEqual(['name', 'message', 'stack', 'foo']);
+			expect(dehydrated.foo).toNotBe(err.foo);
+			expect(dehydrated.foo).toBeA(Array);
+			expect(dehydrated.foo.length).toEqual(2);
+			expect(dehydrated.foo[0]).toBe('bar');
+			expect(dehydrated.foo[1]).toNotBe(err.foo[1]);
+			expect(dehydrated.foo[1]).toBeA(Array);
+			expect(dehydrated.foo[1].length).toEqual(1);
+			expect(dehydrated.foo[1][0]).toBe(500);
+
+		});
+
+		it('should dehydrate nested objects', function() {
+			var err = new Error('msg');
+			err.foo = {
+				rab: 500,
+				bar: {
+					oof: 200
+				}
+			};
+
+			var dehydrated = util.dehydrateError(err);
+			expect(Object.keys(dehydrated)).toEqual(['name', 'message', 'stack', 'foo']);
+			expect(dehydrated.foo).toNotBe(err.foo);
+			expect(dehydrated.foo).toBeA(Object);
+			expect(Object.keys(dehydrated.foo)).toEqual(['rab', 'bar']);
+			expect(dehydrated.foo.rab).toBe(500);
+			expect(dehydrated.foo.bar).toNotBe(err.foo.bar);
+			expect(dehydrated.foo.bar).toBeA(Object);
+			expect(Object.keys(dehydrated.foo.bar)).toEqual(['oof']);
+			expect(dehydrated.foo.bar.oof).toBe(200);
+		});
+
+		it('should dehydrate nested Error (or instanceof Error)', function() {
+			var err = new Error('msg');
+			err.foo = new Error('innermsg');
+
+			var dehydrated = util.dehydrateError(err);
+			expect(dehydrated.foo).toBeA(Object);
+			expect(dehydrated.foo).toNotBe(err.foo);
+			expect(Object.keys(dehydrated.foo)).toEqual(['name', 'message', 'stack']);
+			expect(dehydrated.foo.name).toBe('Error');
+			expect(dehydrated.foo.message).toBe('innermsg');
+		});
+
+		it('should skip duplicate arrays/objects', function() {
+			var err = new Error('msg');
+			var dupeObj = {};
+			err.foo = dupeObj;
+			err.bar = dupeObj;
+
+			var dehydrated = util.dehydrateError(err);
+			expect(Object.keys(dehydrated)).toEqual(['name', 'message', 'stack', 'foo']);
+		});
 	});
 });
