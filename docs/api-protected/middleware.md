@@ -6,7 +6,7 @@ Intercepts loading and registering of jobs from
 
 **Kind**: global function  
 **Category**: middleware  
-**this**: <code>{HubManager}</code>  
+**this**: <code>[HubManager](HubManager.md#HubManager)</code>  
 **Access:** protected  
 
 | Param | Type |
@@ -35,7 +35,7 @@ Intercepts creating a [TrackedJob](TrackedJob.md#TrackedJob) instance.
 
 **Kind**: global function  
 **Category**: middleware  
-**this**: <code>{HubManager}</code>  
+**this**: <code>[HubManager](HubManager.md#HubManager)</code>  
 **Access:** protected  
 
 | Param | Type |
@@ -64,7 +64,7 @@ Intercepts forking the local child process using `require("child_process").fork`
 
 **Kind**: global function  
 **Category**: middleware  
-**this**: <code>{TrackedJob}</code>  
+**this**: <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 **Access:** protected  
 
 | Param | Type | Description |
@@ -89,7 +89,7 @@ Intercepts creation of args provided to [forkJobProcess](middleware.md#forkJobPr
 
 **Kind**: global function  
 **Category**: middleware  
-**this**: <code>{TrackedJob}</code>  
+**this**: <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 **Access:** protected  
 
 | Param | Type |
@@ -112,7 +112,7 @@ Intercepts creation of opts provided to [forkJobProcess](middleware.md#forkJobPr
 
 **Kind**: global function  
 **Category**: middleware  
-**this**: <code>{TrackedJob}</code>  
+**this**: <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 **Access:** protected  
 
 | Param | Type |
@@ -138,7 +138,7 @@ Intercepts creation of the [JobWorkerMediator](JobWorkerMediator.md#JobWorkerMed
 **Kind**: global function  
 **Returns**: <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code> - - Implementation of [JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator), which is [JobWorkerIPCMediator](JobWorkerIPCMediator.md#JobWorkerIPCMediator) by default.  
 **Category**: middleware  
-**this**: <code>{TrackedJob}</code>  
+**this**: <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 **Access:** protected  
 
 | Param | Type |
