@@ -21,7 +21,7 @@ var includeProtected = cliArgs.protected || cliArgs.private;
 var includePrivate = cliArgs.private;
 
 var baseOptions = {
-	files: path.join(__dirname, '../../lib/*.js')
+	files: path.join(__dirname, '../lib/*.js')
 };
 
 if (includePrivate) {
