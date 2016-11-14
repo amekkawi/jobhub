@@ -15,7 +15,9 @@
   },
   "scripts": {
     "test": "mocha --bail --recursive --require ./test/setup.js ./test/index.js",
-    "jsdoc": "jsdoc -r lib -d docs/api -a undefined -c .jsdoc -t node_modules/jaguarjs-jsdoc",
+    "docs": "npm run docs-api; npm run docs-api-protected",
+    "docs-api": "node docs/.bin/index.js docs/api --overwrite",
+    "docs-api-protected": "node docs/.bin/index.js docs/api-protected --overwrite --protected",
     "lint": "eslint lib"
   },
   "dependencies": {
@@ -23,11 +25,13 @@
     "uuid": "^2.0.0"
   },
   "devDependencies": {
+    "dmd": "2.1.2",
     "eslint": "^3.9.1",
     "eslint-plugin-jsdoc": "^2.3.1",
     "expect": "^1.20.2",
-    "jaguarjs-jsdoc": "^1.0.1",
-    "jsdoc": "^3.4.2",
+    "handlebars": "3.0.3",
+    "jsdoc-api": "2.0.5",
+    "jsdoc-parse": "2.0.5",
     "mocha": "^3.0.2",
     "object-inspect": "^1.2.1"
   }
