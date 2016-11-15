@@ -20,7 +20,7 @@ Move your heavy workloads into fully managed child processes.
 There are two forms of the API docs:
 
 * [Normal API docs](docs/api/README.md) - Use this if you using jobhub as-is and not customizing/extending it's functionality.
-* [Extended API docs](docs/api-protected/README.md) - Use this to also view `protected` classes and methods that you can use to customize/extend jobhub.
+* [Extended API docs](docs/api-protected/README.md) - Use this to also view [middleware](docs/api-protected/middleware.md) and `protected` classes and methods that you can use to customize/extend jobhub.
 
 Examples are also available in the [examples](examples) dir.
 
