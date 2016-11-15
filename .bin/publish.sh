@@ -49,7 +49,7 @@ npm run docs
 [ $? -ne 0 ] && echo "Failed to run docs" 1>&2 && exit 1
 
 # Allow docs to finish writing -- Need to look into why this is needed
-sleep 5
+sleep 10
 
 git diff-index --quiet HEAD
 [ $? -ne 0 ] && echo "Failed: Generated docs resulted in uncommitted changes in the working tree and/or index" 1>&2 && exit 1
