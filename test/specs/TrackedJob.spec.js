@@ -120,7 +120,7 @@ describe('TrackedJob', function() {
 		expect(trackedJob.isRunning).toBe(true, 'Expected TrackedJob#isRunning %s to be %s');
 		expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
 		expect(trackedJob.promise).toBeA(Promise, 'Expected TrackedJob#promise %s to be a Promise');
-		expect(spyStartedEvent.calls.length).toBe(1, 'Expected "jobStarted" emit count %s to be %s');
+		expect(spyStartedEvent.calls.length).toBe(0, 'Expected "jobStarted" emit count %s to be %s');
 
 		return trackedJob.promise.then(function() {
 			throw new Error('Expected not to resolve');
@@ -198,7 +198,7 @@ describe('TrackedJob', function() {
 		// Synchronous checks
 		trackedJob.run();
 		expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
-		expect(spyStartedEvent.calls.length).toBe(1, 'Expected "jobStarted" emit count %s to be %s');
+		expect(spyStartedEvent.calls.length).toBe(0, 'Expected "jobStarted" emit count %s to be %s');
 		expect(spyFailureEvent.calls.length).toBe(0, 'Expected "jobFailure" emit count %s to be %s');
 		expect(jobConfig.validate.calls.length).toBe(0, 'Expected validate call count %s to be %s');
 
