@@ -52,7 +52,8 @@ hub.start();
 
 ### Defining Jobs ###
 
-Jobs are defined within the module specified by [jobsModulePath](docs/api/HubManagerOptions.md#HubManagerOptions+jobsModulePath) and export [JobConfig](docs/api/JobConfig.md#JobConfig).
+Jobs are defined within the module specified by [jobsModulePath](docs/api/HubManagerOptions.md#HubManagerOptions+jobsModulePath)
+with each export following the [JobConfig](docs/api/JobConfig.md#JobConfig) object type definition.
 
 In the [Quick start](#quick-start) above we defined it as `jobs.js`, so let's create that file and define some jobs:
 
@@ -60,7 +61,7 @@ In the [Quick start](#quick-start) above we defined it as `jobs.js`, so let's cr
 /* Contents of jobs.js */
 
 // The simplest form of a job is a function, which is executed in the child process.
-exports['feed-gremlins'] = function(job) {
+exports.feedGremlins = function(job) {
 	var numberOfGremlins = job.params.numberOfGremlins;
 	if (numberOfGremlins < 1) {
 		job.resolve('No gremlins to feed, which is probably for the best.');
@@ -96,7 +97,7 @@ exports['feed-gremlins'] = function(job) {
 };
 
 // If a job is an object, we can add additional configuration.
-exports['get-gremlins-wet'] = {
+exports.geGremlinsWet = {
 	// For example, let's validate the params.
 	// The validation is performed in both the parent and child process.
 	validate: function(params, InvalidJobParamError) {
@@ -125,7 +126,7 @@ We can test out our jobs by adding some more code to `index.js` that calls [hub.
 /* Add to the end of index.js */
 
 // Queue a job to be run, which returns an object that lets us track the job.
-var trackedJob = hub.queueJob('feed-gremlins', { numberOfGremlins: 1 });
+var trackedJob = hub.queueJob('feedGremlins', { numberOfGremlins: 1 });
 
 // We can listen for events, such as when a progress message is received. 
 trackedJob.on('jobProgress', function(progress) {
@@ -136,11 +137,11 @@ trackedJob.on('jobProgress', function(progress) {
 trackedJob
 	.then(function(feedingResult) {
 		console.log('[first feeding result] ' + feedingResult.message);
-		return hub.queueJob('get-gremlins-wet', { numberOfGremlins: feedingResult.numberOfGremlins });
+		return hub.queueJob('getGremlinsWet', { numberOfGremlins: feedingResult.numberOfGremlins });
 	})
 	.then(function(washingResult) {
 		console.log('[washing result] ' + washingResult.message);
-		return hub.queueJob('feed-gremlins', { numberOfGremlins: washingResult.numberOfGremlins });
+		return hub.queueJob('feedGremlins', { numberOfGremlins: washingResult.numberOfGremlins });
 	})
 	.then(function(feedingResult) {
 		console.log('[second feeding result] ' + feedingResult.message);
