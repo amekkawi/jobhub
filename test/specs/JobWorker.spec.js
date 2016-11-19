@@ -3,6 +3,7 @@ var path = require('path');
 var expect = require('expect');
 var errors = require('../../lib/errors');
 var constants = require('../../lib/constants');
+var EventEmitter = require('events').EventEmitter;
 var util = require('../../lib/util');
 var JobWorker = require('../../lib/JobWorker');
 var MiddlewareStore = require('../../lib/MiddlewareStore');
@@ -13,6 +14,8 @@ describe('JobWorker', function() {
 		var expecteParams = {};
 		var expectedOptions = {};
 		var worker = new JobWorker('foo', 'bar', expecteParams, expectedOptions);
+
+		expect(worker instanceof EventEmitter).toBe(true, 'Expected JobWorker to be instance of EventEmitter');
 
 		expect(worker.jobId).toBe('foo');
 		expect(worker.jobName).toBe('bar');
