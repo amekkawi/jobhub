@@ -8,4 +8,5 @@ require('./specs/TrackedJob.spec');
 require('./specs/JobWorkerMediator.spec');
 require('./specs/JobWorkerIPCMediator.spec');
 require('./specs/JobWorker.spec');
+require('./specs/JobWorkerIPC.spec');
 require('./specs/HubManager.spec');
