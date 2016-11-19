@@ -10,6 +10,7 @@ receiving configuration and sending events via an IPC messages.
 **Extends:** <code>[JobWorker](JobWorker.md#JobWorker)</code>  
 
 * [JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC) ⇐ <code>[JobWorker](JobWorker.md#JobWorker)</code>
+    * [.payloadMessageTimeout](JobWorkerIPC.md#JobWorkerIPC+payloadMessageTimeout) : <code>number</code>
     * [.jobId](JobWorkerIPC.md#JobWorker+jobId) : <code>string</code>
     * [.jobName](JobWorkerIPC.md#JobWorker+jobName) : <code>string</code>
     * [.params](JobWorkerIPC.md#JobWorker+params) : <code>\*</code>
@@ -18,6 +19,7 @@ receiving configuration and sending events via an IPC messages.
     * [.promise](JobWorkerIPC.md#JobWorker+promise) : <code>null</code> &#124; <code>Promise</code>
     * [.middleware](JobWorkerIPC.md#JobWorker+middleware) : <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>
     * [.jobs](JobWorkerIPC.md#JobWorker+jobs) : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
+    * [.init()](JobWorkerIPC.md#JobWorkerIPC+init) ⇒ <code>Promise</code>
     * [.requestIPCPayload()](JobWorkerIPC.md#JobWorkerIPC+requestIPCPayload) ⇒ <code>Promise</code>
     * [.attachIPCChecks()](JobWorkerIPC.md#JobWorkerIPC+attachIPCChecks)
     * [.detachIPCChecks()](JobWorkerIPC.md#JobWorkerIPC+detachIPCChecks)
@@ -25,12 +27,18 @@ receiving configuration and sending events via an IPC messages.
     * [.handleSuccess(result)](JobWorkerIPC.md#JobWorkerIPC+handleSuccess) ⇒ <code>Promise</code>
     * [.handleError(err)](JobWorkerIPC.md#JobWorkerIPC+handleError) ⇒ <code>Promise</code>
     * [.handleProgress(progress)](JobWorkerIPC.md#JobWorkerIPC+handleProgress) ⇒ <code>Promise</code>
+    * [.handleIPCDisconnect()](JobWorkerIPC.md#JobWorkerIPC+handleIPCDisconnect)
+    * [.handleIPCMessage(message)](JobWorkerIPC.md#JobWorkerIPC+handleIPCMessage)
     * [.start()](JobWorkerIPC.md#JobWorker+start) ⇒ <code>Promise</code>
     * [.getSupportedSyncMiddleware()](JobWorkerIPC.md#JobWorker+getSupportedSyncMiddleware) ⇒ <code>Array.&lt;string&gt;</code>
-    * [.init()](JobWorkerIPC.md#JobWorker+init) ⇒ <code>Promise</code>
     * [.loadJob()](JobWorkerIPC.md#JobWorker+loadJob) ⇒ <code>Promise</code>
     * [.buildJobArg(resolve, reject)](JobWorkerIPC.md#JobWorker+buildJobArg) ⇒ <code>[JobRunArg](JobRunArg.md#JobRunArg)</code>
 
+<a name="JobWorkerIPC+payloadMessageTimeout"></a>
+
+### jobWorkerIPC.payloadMessageTimeout : <code>number</code>
+**Kind**: instance property of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
+**Default**: <code>20000</code>  
 <a name="JobWorker+jobId"></a>
 
 ### jobWorkerIPC.jobId : <code>string</code>
@@ -70,24 +78,49 @@ Set to a Promise the first time [JobWorker#start](JobWorker.md#JobWorker+start) 
 
 ### jobWorkerIPC.jobs : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
 **Kind**: instance property of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
+<a name="JobWorkerIPC+init"></a>
+
+### jobWorkerIPC.init() ⇒ <code>Promise</code>
+Overrides [JobWorker#init](JobWorker.md#JobWorker+init) to first request the following to be sent via a IPC message:
+
+* [JobWorker#options](JobWorker.md#JobWorker+options)
+* [JobWorker#jobId](JobWorker.md#JobWorker+jobId)
+* [JobWorker#jobName](JobWorker.md#JobWorker+jobName)
+* [JobWorker#params](JobWorker.md#JobWorker+params)
+
+**Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
+**Overrides:** <code>[init](JobWorker.md#JobWorker+init)</code>  
+**See**
+
+- [JobWorkerIPC#attachIPCChecks](JobWorkerIPC.md#JobWorkerIPC+attachIPCChecks)
+- [JobWorkerIPC#watchUncaughtException](JobWorkerIPC.md#JobWorkerIPC+watchUncaughtException)
+- [JobWorkerIPC#requestIPCPayload](JobWorkerIPC.md#JobWorkerIPC+requestIPCPayload)
+
 <a name="JobWorkerIPC+requestIPCPayload"></a>
 
 ### jobWorkerIPC.requestIPCPayload() ⇒ <code>Promise</code>
 Request the job payload via IPC, deferring the start of the job until after it is received.
 
+Called by [JobWorkerIPC#init](JobWorkerIPC.md#JobWorkerIPC+init).
+
 **Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
 **Access:** protected  
+**Fulfil**: <code>object</code> Payload data that includes manager options, jobId, jobName and params.  
+**Reject**: <code>Error</code> If timeout specified by [JobWorkerIPC#payloadMessageTimeout](JobWorkerIPC.md#JobWorkerIPC+payloadMessageTimeout) is exceeded  
+**Reject**: <code>Error</code> If failed to send the startup IPC message  
 <a name="JobWorkerIPC+attachIPCChecks"></a>
 
 ### jobWorkerIPC.attachIPCChecks()
-Check that the IPC connection is valid and listen for a disconnect.
+Check that the IPC connection is valid and listen for IPC messages and disconnect.
+
+Called by [JobWorkerIPC#init](JobWorkerIPC.md#JobWorkerIPC+init).
 
 **Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
 **Access:** protected  
 <a name="JobWorkerIPC+detachIPCChecks"></a>
 
 ### jobWorkerIPC.detachIPCChecks()
-Remove IPC checks (i.e. listening for 'disconnect').
+Remove IPC listeners (i.e. listening for 'disconnect' and 'message').
 
 **Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
 **Access:** protected  
@@ -95,6 +128,8 @@ Remove IPC checks (i.e. listening for 'disconnect').
 
 ### jobWorkerIPC.watchUncaughtException()
 Catch uncaught exceptions and pass them to [JobWorkerIPC#handleError](JobWorkerIPC.md#JobWorkerIPC+handleError).
+
+Called by [JobWorkerIPC#init](JobWorkerIPC.md#JobWorkerIPC+init).
 
 **Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
 **Access:** protected  
@@ -140,6 +175,27 @@ Called when the job sends progress, sending an IPC message if still connected.
 | --- | --- |
 | progress | <code>\*</code> | 
 
+<a name="JobWorkerIPC+handleIPCDisconnect"></a>
+
+### jobWorkerIPC.handleIPCDisconnect()
+Called when the process emits a 'disconnect' event.
+
+**Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
+**Access:** protected  
+<a name="JobWorkerIPC+handleIPCMessage"></a>
+
+### jobWorkerIPC.handleIPCMessage(message)
+Called when the process emits a 'message' event.
+
+If `message.type` is a string, the event is re-emitted to this instance as `` `ipc-message::${message.type}` ``.
+
+**Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
+**Access:** protected  
+
+| Param | Type |
+| --- | --- |
+| message | <code>\*</code> | 
+
 <a name="JobWorker+start"></a>
 
 ### jobWorkerIPC.start() ⇒ <code>Promise</code>
@@ -152,14 +208,6 @@ Starts the job, loads job config, validates params and executes [JobConfig#run](
 Get the list of supported sync middleware types.
 
 **Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
-**Access:** protected  
-<a name="JobWorker+init"></a>
-
-### jobWorkerIPC.init() ⇒ <code>Promise</code>
-Initialize worker options and load jobs.
-
-**Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
-**Overrides:** <code>[init](JobWorker.md#JobWorker+init)</code>  
 **Access:** protected  
 <a name="JobWorker+loadJob"></a>
 

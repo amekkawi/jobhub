@@ -10,6 +10,7 @@ receiving configuration and sending events via an IPC messages.
 **Extends:** <code>[JobWorker](JobWorker.md#JobWorker)</code>  
 
 * [JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC) ⇐ <code>[JobWorker](JobWorker.md#JobWorker)</code>
+    * [.payloadMessageTimeout](JobWorkerIPC.md#JobWorkerIPC+payloadMessageTimeout) : <code>number</code>
     * [.jobId](JobWorkerIPC.md#JobWorker+jobId) : <code>string</code>
     * [.jobName](JobWorkerIPC.md#JobWorker+jobName) : <code>string</code>
     * [.params](JobWorkerIPC.md#JobWorker+params) : <code>\*</code>
@@ -18,8 +19,14 @@ receiving configuration and sending events via an IPC messages.
     * [.promise](JobWorkerIPC.md#JobWorker+promise) : <code>null</code> &#124; <code>Promise</code>
     * [.middleware](JobWorkerIPC.md#JobWorker+middleware) : <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>
     * [.jobs](JobWorkerIPC.md#JobWorker+jobs) : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
+    * [.init()](JobWorkerIPC.md#JobWorkerIPC+init) ⇒ <code>Promise</code>
     * [.start()](JobWorkerIPC.md#JobWorker+start) ⇒ <code>Promise</code>
 
+<a name="JobWorkerIPC+payloadMessageTimeout"></a>
+
+### jobWorkerIPC.payloadMessageTimeout : <code>number</code>
+**Kind**: instance property of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
+**Default**: <code>20000</code>  
 <a name="JobWorker+jobId"></a>
 
 ### jobWorkerIPC.jobId : <code>string</code>
@@ -59,6 +66,24 @@ Set to a Promise the first time [JobWorker#start](JobWorker.md#JobWorker+start) 
 
 ### jobWorkerIPC.jobs : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
 **Kind**: instance property of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
+<a name="JobWorkerIPC+init"></a>
+
+### jobWorkerIPC.init() ⇒ <code>Promise</code>
+Overrides [JobWorker#init](JobWorker#init) to first request the following to be sent via a IPC message:
+
+* [JobWorker#options](JobWorker.md#JobWorker+options)
+* [JobWorker#jobId](JobWorker.md#JobWorker+jobId)
+* [JobWorker#jobName](JobWorker.md#JobWorker+jobName)
+* [JobWorker#params](JobWorker.md#JobWorker+params)
+
+**Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
+**Overrides:** <code>JobWorker#init</code>  
+**See**
+
+- [JobWorkerIPC#attachIPCChecks](JobWorkerIPC#attachIPCChecks)
+- [JobWorkerIPC#watchUncaughtException](JobWorkerIPC#watchUncaughtException)
+- [JobWorkerIPC#requestIPCPayload](JobWorkerIPC#requestIPCPayload)
+
 <a name="JobWorker+start"></a>
 
 ### jobWorkerIPC.start() ⇒ <code>Promise</code>
