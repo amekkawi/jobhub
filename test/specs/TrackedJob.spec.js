@@ -54,6 +54,8 @@ describe('TrackedJob', function() {
 		};
 		var params = {};
 		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
+		expect(trackedJob.created).toBeA(Date, 'Expected TrackedJob#created %s to be a %s');
+		expect(trackedJob.stage).toBe(null, 'Expected TrackedJob#stage %s to be a %s');
 		expect(trackedJob.manager).toBe(manager, 'Expected TrackedJob#manager %s to be %s');
 		expect(trackedJob.jobId).toBe('FOO', 'Expected TrackedJob#jobId %s to be %s');
 		expect(trackedJob.jobConfig).toBe(jobConfig, 'Expected TrackedJob#jobConfig %s to be %s');
@@ -63,6 +65,7 @@ describe('TrackedJob', function() {
 		expect(trackedJob.error).toBe(null, 'Expected TrackedJob#error %s to be %s');
 		expect(trackedJob.promise).toBe(null, 'Expected TrackedJob#promise %s to be %s');
 		expect(trackedJob.workerMediator).toBe(null, 'Expected TrackedJob#workerMediator %s to be %s');
+		expect(trackedJob.progress).toBe(null, 'Expected TrackedJob#progress %s to be %s');
 		expect(trackedJob instanceof EventEmitter).toBe(true, 'Expected TrackedJob to be instance of EventEmitter');
 	});
 
