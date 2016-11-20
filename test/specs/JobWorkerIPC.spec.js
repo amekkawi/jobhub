@@ -393,15 +393,47 @@ describe('JobWorkerIPC', function() {
 			expect(timeoutSpy.calls[0].arguments[1]).toBe(worker.payloadMessageTimeout);
 			expect(timeoutUnrefSpy.calls.length).toBe(1);
 			expect(timeoutUnrefSpy.calls[0].arguments.length).toBe(0);
-			expect(workerOnceSpy.calls.length).toBe(1);
+			expect(workerOnceSpy.calls.length).toBe(2);
 			expect(workerOnceSpy.calls[0].arguments.length).toBe(2);
-			expect(workerOnceSpy.calls[0].arguments[0]).toBe('ipc-message::' + constants.JOB_MESSAGE_PAYLOAD);
+			expect(workerOnceSpy.calls[0].arguments[0]).toBe(constants.EVENT_JOB_ABORT);
 			expect(workerOnceSpy.calls[0].arguments[1]).toBeA(Function);
+			expect(workerOnceSpy.calls[1].arguments.length).toBe(2);
+			expect(workerOnceSpy.calls[1].arguments[0]).toBe('ipc-message::' + constants.JOB_MESSAGE_PAYLOAD);
+			expect(workerOnceSpy.calls[1].arguments[1]).toBeA(Function);
 			expect(processSendSpy.calls.length).toBe(1);
 			expect(processSendSpy.calls[0].arguments.length).toBe(2);
 			expect(processSendSpy.calls[0].arguments[0]).toBeA(Object);
 			expect(processSendSpy.calls[0].arguments[0].type).toBe(constants.JOB_MESSAGE_STARTUP);
 			expect(processSendSpy.calls[0].arguments[1]).toBeA(Function);
+		});
+
+		it('should reject if abort received before payload', function() {
+			expect(Object.prototype.hasOwnProperty.call(process, 'send')).toBe(false);
+			process.send = function(data, cb) {
+				cb();
+			};
+
+			expect(Object.prototype.hasOwnProperty.call(process, 'connected')).toBe(false);
+			expect(!process.connected).toBe(true);
+			process.connected = true;
+
+			var worker = new JobWorkerIPC();
+
+			var promise = worker.requestIPCPayload()
+				.then(function() {
+					delete process.send;
+					delete process.connected;
+					throw new Error('Expected to not resolve');
+				}, function(err) {
+					delete process.send;
+					delete process.connected;
+
+					expect(err.message).toBe('Received abort message before job payload');
+				});
+
+			worker.emit(constants.EVENT_JOB_ABORT);
+
+			return promise;
 		});
 
 		it('should reject with timeout error if payload message isn\'t received', function() {
@@ -421,7 +453,11 @@ describe('JobWorkerIPC', function() {
 			worker.payloadMessageTimeout = 200;
 
 			return worker.requestIPCPayload()
-				.catch(function(err) {
+				.then(function() {
+					delete process.send;
+					delete process.connected;
+					throw new Error('Expected to not resolve');
+				}, function(err) {
 					delete process.send;
 					delete process.connected;
 

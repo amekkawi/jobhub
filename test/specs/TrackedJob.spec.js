@@ -63,6 +63,8 @@ describe('TrackedJob', function() {
 		expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
 		expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
 		expect(trackedJob.error).toBe(null, 'Expected TrackedJob#error %s to be %s');
+		expect(trackedJob.aborted).toBe(false, 'Expected TrackedJob#aborted %s to be %s');
+		expect(trackedJob.abortReason).toBe(null, 'Expected TrackedJob#abortReason %s to be %s');
 		expect(trackedJob.promise).toBe(null, 'Expected TrackedJob#promise %s to be %s');
 		expect(trackedJob.workerMediator).toBe(null, 'Expected TrackedJob#workerMediator %s to be %s');
 		expect(trackedJob.progress).toBe(null, 'Expected TrackedJob#progress %s to be %s');
@@ -87,6 +89,15 @@ describe('TrackedJob', function() {
 			expect(err).toBeA(Error);
 			expect(err.message).toBe('Cannot use TackedJob#catch as Promise until TrackedJob#run is called');
 		});
+	});
+
+	it('should ignore calls to abort if not running', function() {
+		var manager = createManagerFixture();
+		var trackedJob = new TrackedJob(manager, 'FOO', { run: function() {} }, {});
+
+		trackedJob.abort('foo');
+		expect(trackedJob.aborted).toBe(false);
+		expect(trackedJob.abortReason).toBe(null);
 	});
 
 	it('should set props and emit "jobStarted" when run', function() {
@@ -262,6 +273,313 @@ describe('TrackedJob', function() {
 		});
 	});
 
+	it('should allow job to be aborted immediately after called run', function() {
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			validate: expect.createSpy(),
+			quickRun: function() {
+				throw new Error('Expected not to be called');
+			},
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var params = {};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
+
+		var spyAbortEvent = expect.createSpy();
+		trackedJob.on(constants.EVENT_JOB_ABORT, spyAbortEvent);
+
+		var emitter = new EventEmitter();
+		trackedJob.reEmitTo(emitter);
+
+		var spyAbortReEmit = expect.createSpy().andCall(function() {
+			expect(this).toBe(emitter, 'Expected re-emit "jobAbort" context %s to be emitter');
+			expect(arguments.length).toBe(2, 'Expected re-emit "jobAbort" arguments count %s to be %s');
+			expect(arguments[0]).toBe(trackedJob, 'Expected re-emit "jobAbort" arguments[0] %s to be trackedJob');
+			expect(arguments[1]).toBe(trackedJob.abortReason, 'Expected re-emit "jobAbort" arguments[1] %s to be abort reason');
+		});
+		emitter.on(constants.EVENT_JOB_ABORT, spyAbortReEmit);
+
+		trackedJob.run();
+
+		trackedJob.abort('foo');
+		expect(trackedJob.aborted).toBe(true);
+		expect(trackedJob.abortReason).toBe('foo');
+
+		expect(spyAbortEvent.calls.length).toBe(1);
+		expect(spyAbortEvent.calls[0].arguments.length).toBe(1);
+		expect(spyAbortEvent.calls[0].arguments[0]).toBe('foo');
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (!(err instanceof errors.JobAbortedError)) {
+				throw err;
+			}
+
+			expect(jobConfig.validate.calls.length).toBe(0);
+			expect(err.jobName).toBe(trackedJob.jobConfig.jobName);
+			expect(err.jobId).toBe(trackedJob.jobId);
+			expect(err.abortReason).toBe('foo');
+			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
+			expect(spyAbortEvent.calls.length).toBe(1);
+		});
+	});
+
+	it('should default abort reason', function() {
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			quickRun: function() {
+				throw new Error('Expected not to be called');
+			},
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var params = {};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
+
+		var spyAbortEvent = expect.createSpy();
+		trackedJob.on(constants.EVENT_JOB_ABORT, spyAbortEvent);
+
+		trackedJob.run();
+
+		trackedJob.abort();
+		expect(trackedJob.aborted).toBe(true);
+		expect(trackedJob.abortReason).toBe('No reason specified');
+
+		expect(spyAbortEvent.calls.length).toBe(1);
+		expect(spyAbortEvent.calls[0].arguments.length).toBe(1);
+		expect(spyAbortEvent.calls[0].arguments[0]).toBe('No reason specified');
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (!(err instanceof errors.JobAbortedError)) {
+				throw err;
+			}
+
+			expect(err.jobName).toBe(trackedJob.jobConfig.jobName);
+			expect(err.jobId).toBe(trackedJob.jobId);
+			expect(err.abortReason).toBe('No reason specified');
+			expect(spyAbortEvent.calls.length).toBe(1);
+		});
+	});
+
+	it('should ignore further abort calls', function() {
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var params = {};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
+
+		var spyAbortEvent = expect.createSpy();
+		trackedJob.on(constants.EVENT_JOB_ABORT, spyAbortEvent);
+
+		trackedJob.run();
+
+		trackedJob.abort('foo');
+		expect(trackedJob.aborted).toBe(true);
+		expect(trackedJob.abortReason).toBe('foo');
+
+		trackedJob.abort('bar');
+		expect(trackedJob.aborted).toBe(true);
+		expect(trackedJob.abortReason).toBe('foo');
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (!(err instanceof errors.JobAbortedError)) {
+				throw err;
+			}
+
+			expect(err.abortReason).toBe('foo');
+			expect(spyAbortEvent.calls.length).toBe(1);
+		});
+	});
+
+	it('should allow abort during validate', function() {
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			validate: expect.createSpy().andCall(function() {
+				return new Promise(function() {
+					expect(trackedJob.aborted).toBe(false);
+					expect(spyAbortEvent.calls.length).toBe(0);
+
+					// Abort job and never resolve validation
+					trackedJob.abort('foo');
+
+					expect(trackedJob.aborted).toBe(true);
+					expect(trackedJob.abortReason).toBe('foo');
+					expect(spyAbortEvent.calls.length).toBe(1);
+					expect(spyAbortEvent.calls[0].arguments.length).toBe(1);
+					expect(spyAbortEvent.calls[0].arguments[0]).toBe('foo');
+				});
+			}),
+			quickRun: function() {
+				throw new Error('Expected not to be called');
+			},
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var params = {};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
+
+		var spyAbortEvent = expect.createSpy();
+		trackedJob.on(constants.EVENT_JOB_ABORT, spyAbortEvent);
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (!(err instanceof errors.JobAbortedError)) {
+				throw err;
+			}
+
+			expect(err.jobName).toBe(trackedJob.jobConfig.jobName);
+			expect(err.jobId).toBe(trackedJob.jobId);
+			expect(err.abortReason).toBe('foo');
+			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
+			expect(spyAbortEvent.calls.length).toBe(1);
+		});
+	});
+
+	it('should ignore abort if job no longer running', function() {
+		var expectedError = new errors.InvalidJobParamError('nope!', 'foo', void 0);
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			validate: expect.createSpy().andCall(function() {
+				throw expectedError;
+			}),
+			quickRun: function() {
+				throw new Error('Expected not to be called');
+			},
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var params = {};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
+
+		var spyAbortEvent = expect.createSpy();
+		trackedJob.on(constants.EVENT_JOB_ABORT, spyAbortEvent);
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (err !== expectedError) {
+				throw err;
+			}
+
+			trackedJob.abort('bar');
+
+			expect(trackedJob.aborted).toBe(false);
+			expect(trackedJob.abortReason).toBe(null);
+			expect(spyAbortEvent.calls.length).toBe(0);
+		});
+	});
+
+	it('should not abort if validate already rejected', function() {
+		var manager = createManagerFixture();
+		var expectedError = new errors.InvalidJobParamError('nope!', 'foo', void 0);
+
+		var jobConfig = {
+			validate: expect.createSpy().andCall(function() {
+				return new Promise(function(resolve, reject) {
+					reject(expectedError);
+
+					// Abort job
+					trackedJob.abort('foo');
+				})
+					.catch(function(err) {
+						// Add an extra step to verify enough time is given.
+						throw err;
+					})
+					.catch(function(err) {
+						// Add an extra step to verify enough time is given.
+						throw err;
+					});
+			}),
+			quickRun: function() {
+				throw new Error('Expected not to be called');
+			},
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var params = {};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (err !== expectedError && !(err instanceof errors.JobAbortedError)) {
+				throw err;
+			}
+
+			expect(err).toBe(expectedError);
+			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
+		});
+	});
+
+	it('should still abort if validate already resolved', function() {
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			validate: expect.createSpy().andCall(function() {
+				return new Promise(function(resolve) {
+					resolve();
+
+					// Abort job
+					trackedJob.abort('foo');
+				});
+			}),
+			quickRun: function() {
+				throw new Error('Expected not to be called');
+			},
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var params = {};
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, params);
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (!(err instanceof errors.JobAbortedError)) {
+				throw err;
+			}
+
+			// Should be the next stage, since validation was resolved.
+			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
+		});
+	});
+
 	it('should call quickRun and allow it to resolve', function() {
 		var expectedResult = {};
 		var manager = createManagerFixture();
@@ -295,6 +613,7 @@ describe('TrackedJob', function() {
 				expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 				expect(arguments.length).toBe(2, 'Expected quickRun arguments count %s to be %s');
 				expect(arguments[0]).toBeA(Object, 'Expected quickRun arguments[0] type %s to be an object');
+				expect(Object.keys(arguments[0]).length).toBe(6);
 				expect(arguments[0].jobId).toBe('FOO', 'Expected quickRun arguments[0].jobId %s to be %s');
 				expect(arguments[0].params).toBeA(Object, 'Expected quickRun arguments[0].params type %s to be an object');
 				expect(Object.keys(arguments[0].params)).toEqual(Object.keys(paramsCleaned), 'Expected quickRun arguments[0].params keys %s to equal %s');
@@ -302,6 +621,7 @@ describe('TrackedJob', function() {
 				expect(arguments[0].resolve).toBeA(Function, 'Expected quickRun arguments[0].resolve %s to be a function');
 				expect(arguments[0].reject).toBeA(Function, 'Expected quickRun arguments[0].reject %s to be a function');
 				expect(arguments[0].sendProgress).toBeA(Function, 'Expected quickRun arguments[0].sendProgress %s to be a function');
+				expect(arguments[0].onAbort).toBeA(Function, 'Expected quickRun arguments[0].onAbort %s to be a function');
 				expect(arguments[1]).toBeA(Function, 'Expected quickRun arguments[1] %s to be a function');
 				arguments[0].resolve(expectedResult);
 			}),
@@ -429,6 +749,135 @@ describe('TrackedJob', function() {
 			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
 			expect(trackedJob.error).toBe(expectedError, 'Expected TrackedJob#error %s to be %s');
 			expect(spyFailureEvent.calls.length).toBe(1, 'Expected "jobFailure" emit count %s to be %s');
+		});
+	});
+
+	it('should allow abort during quickRun and allow quickRun to listen to jobAbort event', function() {
+		var manager = createManagerFixture();
+		var spyOnAbort = expect.createSpy();
+
+		var jobConfig = {
+			quickRun: function() {
+				arguments[0].onAbort(spyOnAbort);
+				trackedJob.abort('foo');
+
+				expect(spyOnAbort.calls.length).toBe(1);
+				expect(spyOnAbort.calls[0].arguments.length).toBe(1);
+				expect(spyOnAbort.calls[0].arguments[0]).toBe('foo');
+			},
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (!(err instanceof errors.JobAbortedError)) {
+				throw err;
+			}
+
+			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
+			expect(spyOnAbort.calls.length).toBe(1);
+			expect(spyOnAbort.calls[0].arguments.length).toBe(1);
+			expect(spyOnAbort.calls[0].arguments[0]).toBe('foo');
+
+			// Should only be called once.
+			trackedJob.emit(constants.EVENT_JOB_ABORT, 'bar');
+			expect(spyOnAbort.calls.length).toBe(1);
+		});
+	});
+
+	it('should not abort if quickRun already rejected', function() {
+		var expectedError = new Error();
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			quickRun: function(job) {
+				job.reject(expectedError);
+
+				trackedJob.abort('foo');
+				expect(trackedJob.aborted).toBe(true);
+				expect(trackedJob.abortReason).toBe('foo');
+			},
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (err !== expectedError) {
+				throw err;
+			}
+
+			expect(trackedJob.aborted).toBe(true);
+			expect(trackedJob.abortReason).toBe('foo');
+		});
+	});
+
+	it('should not abort if quickRun already resolved', function() {
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			quickRun: function(job) {
+				job.resolve();
+
+				trackedJob.abort('foo');
+				expect(trackedJob.aborted).toBe(true);
+				expect(trackedJob.abortReason).toBe('foo');
+			},
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function() {
+			expect(trackedJob.aborted).toBe(true);
+			expect(trackedJob.abortReason).toBe('foo');
+		});
+	});
+
+	it('should still abort if quickRun already called next', function() {
+		var manager = createManagerFixture();
+
+		var jobConfig = {
+			quickRun: function(job, next) {
+				next();
+				trackedJob.abort('foo');
+			},
+			run: function() {
+				throw new Error('Expected not to be called');
+			}
+		};
+
+		var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (!(err instanceof errors.JobAbortedError)) {
+				throw err;
+			}
+
+			// Should be the next stage.
+			expect(trackedJob.stage).toBe(constants.JOB_STAGE_RUN, 'Expected TrackedJob#stage %s to be %s');
+			expect(trackedJob.workerMediator).toBe(null, 'Expected TrackedJob#workerMediator %s to be %s');
 		});
 	});
 
@@ -707,6 +1156,132 @@ describe('TrackedJob', function() {
 			if (err !== expectedError) {
 				throw err;
 			}
+		});
+	});
+
+	it('should not abort if mediator already handled success', function() {
+		var manager = createManagerFixture();
+		var expectedResult = {};
+
+		manager.middleware.addSyncMiddlware(
+			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
+			function() {
+				return createJobWorkerMediatorFixture(this, {
+					startWorker: function() {
+						return Promise.resolve();
+					}
+				});
+			}
+		);
+
+		var jobConfig = {
+			jobName: 'FOO',
+			run: function() {
+				throw new Error('Expected to not call JobConfig#run');
+			}
+		};
+
+		var trackedJob = new TrackedJob(manager, 'BAR', jobConfig, {});
+
+		trackedJob.on(constants.EVENT_JOB_FORKED, function() {
+			trackedJob.workerMediator.settled = true;
+			trackedJob.workerMediator.emit(constants.EVENT_JOB_SUCCESS, expectedResult);
+			trackedJob.abort('foo');
+		});
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function(ret) {
+			expect(ret).toBe(expectedResult, 'Expected job result %s to be %s');
+			expect(trackedJob.aborted).toBe(true);
+			expect(trackedJob.abortReason).toBe('foo');
+		});
+	});
+
+	it('should not abort if mediator already handled error', function() {
+		var manager = createManagerFixture();
+		var expectedError = new Error();
+
+		manager.middleware.addSyncMiddlware(
+			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
+			function() {
+				return createJobWorkerMediatorFixture(this, {
+					startWorker: function() {
+						return Promise.resolve();
+					}
+				});
+			}
+		);
+
+		var jobConfig = {
+			jobName: 'FOO',
+			run: function() {
+				throw new Error('Expected to not call JobConfig#run');
+			}
+		};
+
+		var trackedJob = new TrackedJob(manager, 'BAR', jobConfig, {});
+
+		trackedJob.on(constants.EVENT_JOB_FORKED, function() {
+			trackedJob.workerMediator.settled = true;
+			trackedJob.workerMediator.emit(constants.EVENT_JOB_FAILURE, expectedError);
+			trackedJob.abort('foo');
+		});
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			// Rethrow error if not the expected one
+			if (err !== expectedError) {
+				throw err;
+			}
+
+			expect(trackedJob.aborted).toBe(true);
+			expect(trackedJob.abortReason).toBe('foo');
+		});
+	});
+
+	it('should send abort message after worker forked', function() {
+		var manager = createManagerFixture();
+
+		manager.middleware.addSyncMiddlware(
+			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
+			function() {
+				return createJobWorkerMediatorFixture(this, {
+					startWorker: function() {
+						return trackedJob.abort('foo');
+					},
+					sendAbortMessage: expect.createSpy()
+				});
+			}
+		);
+
+		var jobConfig = {
+			jobName: 'FOO',
+			run: function() {
+				throw new Error('Expected to not call JobConfig#run');
+			}
+		};
+
+		var trackedJob = new TrackedJob(manager, 'BAR', jobConfig, {});
+
+		trackedJob.run();
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (!(err instanceof errors.JobAbortedError)) {
+				throw err;
+			}
+
+			expect(trackedJob.stage).toBe(constants.JOB_STAGE_RUN, 'Expected TrackedJob#stage %s to be %s');
+			expect(trackedJob.aborted).toBe(true, 'Expected TrackedJob#aborted %s to be %s');
+			expect(trackedJob.abortReason).toBe('foo', 'Expected TrackedJob#abortReason %s to be %s');
+			expect(trackedJob.workerMediator).toExist();
+			expect(trackedJob.workerMediator.sendAbortMessage.calls.length).toBe(1, 'Expected JobWorkerMediator#sendAbortMessage call count %s to be %s');
+			expect(trackedJob.workerMediator.sendAbortMessage.calls[0].arguments.length).toBe(0, 'Expected JobWorkerMediator#sendAbortMessage call[0] arguments count %s to be %s');
 		});
 	});
 

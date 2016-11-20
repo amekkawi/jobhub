@@ -76,6 +76,16 @@ describe('JobWorkerMediator', function() {
 				if (!(err instanceof Error) || err.message !== 'JobWorkerMediator#terminate is abstract and must be overridden') {
 					throw err;
 				}
+			}),
+			new Promise(function(resolve, reject) {
+				mediator.sendAbortMessage();
+				reject(new Error('Expected to throw error for JobWorkerMediator#sendAbortMessage'))
+			}).then(function() {
+				throw new Error('Expected to not resolve for JobWorkerMediator#sendAbortMessage');
+			}, function(err) {
+				if (!(err instanceof Error) || err.message !== 'JobWorkerMediator#sendAbortMessage is abstract and must be overridden') {
+					throw err;
+				}
 			})
 		]);
 	});

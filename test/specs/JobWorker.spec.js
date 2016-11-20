@@ -292,23 +292,35 @@ describe('JobWorker', function() {
 			});
 
 			expect.spyOn(worker, 'handleProgress').andCallThrough();
+			expect.spyOn(worker, 'once').andCallThrough();
 
 			var jobArg = worker.buildJobArg(expectedResolve, expectedReject);
 			expect(jobArg).toBeA(Object, 'Expected return value %s to be a object');
-			expect(Object.keys(jobArg).length).toBe(5, 'Expected return value key count %s to be %s');
+			expect(Object.keys(jobArg).length).toBe(6, 'Expected return value key count %s to be %s');
 			expect(jobArg.jobId).toBe('foo', 'Expected return value prop jobId %s to be %s');
 			expect(jobArg.params).toBe(expectedParams, 'Expected return value prop params %s to be %s');
 			expect(jobArg.resolve).toBe(expectedResolve, 'Expected return value prop resolve %s to be %s');
 			expect(jobArg.reject).toBe(expectedReject, 'Expected return value prop reject %s to be %s');
 			expect(jobArg.sendProgress).toBeA(Function, 'Expected return value prop sendProgress %s to be a function');
+			expect(jobArg.onAbort).toBeA(Function, 'Expected return value prop onAbort %s to be a function');
 
 			expect(worker.handleProgress.calls.length).toBe(0);
+			expect(worker.once.calls.length).toBe(0);
+
 			var progressRet = jobArg.sendProgress(expectedProgress);
 			expect(progressRet).toBeA(Promise);
 			expect(worker.handleProgress.calls.length).toBe(1);
 			expect(worker.handleProgress.calls[0].context).toBe(worker);
 			expect(worker.handleProgress.calls[0].arguments.length).toBe(1);
 			expect(worker.handleProgress.calls[0].arguments[0]).toBe(expectedProgress);
+
+			var expectedCb = function(){};
+			expect(worker.once.calls.length).toBe(0);
+			jobArg.onAbort(expectedCb);
+			expect(worker.once.calls.length).toBe(1);
+			expect(worker.once.calls[0].arguments.length).toBe(2);
+			expect(worker.once.calls[0].arguments[0]).toBe(constants.EVENT_JOB_ABORT);
+			expect(worker.once.calls[0].arguments[1]).toBe(expectedCb);
 		});
 
 		it('should support "workerBuildJobArg" middleware', function() {
@@ -323,18 +335,22 @@ describe('JobWorker', function() {
 			});
 
 			expect.spyOn(worker, 'handleProgress').andCallThrough();
+			expect.spyOn(worker, 'once').andCallThrough();
 
 			var spyWorkerBuildJobArg = expect.createSpy().andCall(function() {
 				expect(this).toBe(worker);
-				expect(arguments.length).toBe(6);
+				expect(arguments.length).toBe(7);
 				expect(arguments[0]).toBe('foo');
 				expect(arguments[1]).toBe(expectedParams);
 				expect(arguments[2]).toBe(expectedResolve);
 				expect(arguments[3]).toBe(expectedReject);
 				expect(arguments[4]).toBeA(Function);
 				expect(arguments[5]).toBeA(Function);
+				expect(arguments[6]).toBeA(Function);
 
 				expect(worker.handleProgress.calls.length).toBe(0);
+				expect(worker.once.calls.length).toBe(0);
+
 				var progressRet = arguments[4](expectedProgress);
 				expect(progressRet).toBeA(Promise);
 				expect(worker.handleProgress.calls.length).toBe(1);
@@ -342,14 +358,23 @@ describe('JobWorker', function() {
 				expect(worker.handleProgress.calls[0].arguments.length).toBe(1);
 				expect(worker.handleProgress.calls[0].arguments[0]).toBe(expectedProgress);
 
-				var nextRet = arguments[5]();
+				var expectedCb = function(){};
+				expect(worker.once.calls.length).toBe(0);
+				arguments[5](expectedCb);
+				expect(worker.once.calls.length).toBe(1);
+				expect(worker.once.calls[0].arguments.length).toBe(2);
+				expect(worker.once.calls[0].arguments[0]).toBe(constants.EVENT_JOB_ABORT);
+				expect(worker.once.calls[0].arguments[1]).toBe(expectedCb);
+
+				var nextRet = arguments[6]();
 				expect(nextRet).toBeA(Object, 'Expected next() return value %s to be a object');
-				expect(Object.keys(nextRet).length).toBe(5, 'Expected next() return value key count %s to be %s');
+				expect(Object.keys(nextRet).length).toBe(6, 'Expected next() return value key count %s to be %s');
 				expect(nextRet.jobId).toBe('foo', 'Expected next().jobId %s to be %s');
 				expect(nextRet.params).toBe(expectedParams, 'Expected next().params %s to be %s');
 				expect(nextRet.resolve).toBe(expectedResolve, 'Expected next().resolve %s to be %s');
 				expect(nextRet.reject).toBe(expectedReject, 'Expected next().reject %s to be %s');
 				expect(nextRet.sendProgress).toBeA(Function, 'Expected next().sendProgress %s to be a function');
+				expect(nextRet.onAbort).toBeA(Function, 'Expected next().onAbort %s to be a function');
 
 				return expectedRet;
 			});
@@ -531,7 +556,7 @@ describe('JobWorker', function() {
 
 			var spyBuildJobArg = expect.createSpy().andCall(function() {
 				expect(spyRun.calls.length).toBe(0);
-				return jobArg = arguments[5](); // Next
+				return jobArg = arguments[6](); // Next
 			});
 
 			var spyRun = expect.createSpy().andCall(function() {
@@ -892,6 +917,24 @@ describe('JobWorker', function() {
 				expect(err.original).toBe(expectedOrigError, 'Expected prop "original" %s to be %s');
 				expect(err.error).toBe(expectedHandlerError, 'Expected prop "error" %s to be %s');
 			});
+		});
+
+		it('should emit "jobAbort" when JobWorker#handleAbort is called, but only when JobWorker#running is true', function() {
+			var worker = new JobWorker('foo', 'bar', {}, {
+				jobsModulePath: path.join(__dirname, '../fixtures/jobs.js')
+			});
+
+			// Check event again but without throwing an error
+			var spyAbortEvent = expect.createSpy();
+			worker.on(constants.EVENT_JOB_ABORT, spyAbortEvent);
+
+			worker.handleAbort();
+			expect(spyAbortEvent.calls.length).toBe(0);
+
+			worker.running = true;
+			worker.handleAbort();
+			expect(spyAbortEvent.calls.length).toBe(1);
+			expect(spyAbortEvent.calls[0].arguments.length).toBe(0);
 		});
 	});
 });
