@@ -53,6 +53,7 @@ describe('JobWorkerIPCMediator', function() {
 		};
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect(mediator.trackedJob).toBe(trackedJob, 'Expected JobWorkerIPCMediator#trackedJob %s to be the tracked job');
+		expect(mediator.forked).toBe(false, 'Expected JobWorkerIPCMediator#forked %s to be %s');
 		expect(mediator.started).toBe(false, 'Expected JobWorkerIPCMediator#started %s to be %s');
 		expect(mediator.exited).toBe(false, 'Expected JobWorkerIPCMediator#exited %s to be %s');
 		expect(mediator.childProcess).toBe(null, 'Expected JobWorkerIPCMediator#childProcess %s to be %s');
@@ -289,6 +290,8 @@ describe('JobWorkerIPCMediator', function() {
 
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 
+		expect.spyOn(mediator, 'handleStartupConfirmation').andCallThrough();
+
 		var childProcess = mediator.childProcess = createChildProcessFixture();
 		expect.spyOn(childProcess, 'send').andCall(function() {
 			expect(arguments.length).toBe(2, 'Expected arguments length %s to be %s');
@@ -304,10 +307,15 @@ describe('JobWorkerIPCMediator', function() {
 			return true;
 		});
 
+		expect(mediator.started).toBe(false, 'Expected JobWorkerIPCMediator#started %s to be %s');
+		expect(mediator.handleStartupConfirmation.calls.length).toBe(0, 'Expected JobWorkerIPCMediator#handleStartupConfirmation call count %s to be %s');
+
 		mediator.handleChildMessage({
 			type: constants.JOB_MESSAGE_STARTUP
 		});
 
+		expect(mediator.handleStartupConfirmation.calls.length).toBe(1, 'Expected JobWorkerIPCMediator#handleStartupConfirmation call count %s to be %s');
+		expect(mediator.started).toBe(true, 'Expected JobWorkerIPCMediator#started %s to be %s');
 		expect(childProcess.send.calls.length).toBe(1, 'Expected childProcess#send call count %s to be %s');
 	});
 
@@ -584,7 +592,7 @@ describe('JobWorkerIPCMediator', function() {
 		mediator.terminate(true);
 		expect(childProcess.kill.calls.length).toBe(0);
 
-		mediator.started = true;
+		mediator.forked = true;
 		mediator.terminate();
 		mediator.terminate(true);
 		expect(mediator.childProcess.kill.calls.length).toBe(2);
