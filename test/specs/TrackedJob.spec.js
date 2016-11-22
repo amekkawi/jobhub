@@ -59,6 +59,8 @@ describe('TrackedJob', function() {
 		expect(trackedJob.jobConfig).toBe(jobConfig, 'Expected TrackedJob#jobConfig %s to be %s');
 		expect(trackedJob.params).toBe(params, 'Expected TrackedJob#params %s to be %s');
 		expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+		expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
+		expect(trackedJob.error).toBe(null, 'Expected TrackedJob#error %s to be %s');
 		expect(trackedJob.promise).toBe(null, 'Expected TrackedJob#promise %s to be %s');
 		expect(trackedJob.workerMediator).toBe(null, 'Expected TrackedJob#workerMediator %s to be %s');
 		expect(trackedJob instanceof EventEmitter).toBe(true, 'Expected TrackedJob to be instance of EventEmitter');
@@ -105,6 +107,8 @@ describe('TrackedJob', function() {
 		var spyStartedEvent = expect.createSpy().andCall(function() {
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage in event %s to be %s');
 			expect(trackedJob.isRunning).toBe(true, 'Expected TrackedJob#isRunning in event %s to be %s');
+			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
+			expect(trackedJob.error).toBe(null, 'Expected TrackedJob#error %s to be %s');
 
 			expect(this).toBe(trackedJob, 'Expected context %s to be trackedJob');
 			expect(arguments.length).toBe(0, 'Expected arguments count %s to be %s');
@@ -130,6 +134,8 @@ describe('TrackedJob', function() {
 			}
 
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
+			expect(trackedJob.error).toBe(expectedError, 'Expected TrackedJob#error %s to be %s');
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
 			expect(spyStartedEvent.calls.length).toBe(1, 'Expected "validateParams" emit count %s to be %s');
 		});
@@ -211,6 +217,8 @@ describe('TrackedJob', function() {
 			}
 
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
+			expect(trackedJob.error).toBe(expectedError, 'Expected TrackedJob#error %s to be %s');
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
 			expect(jobConfig.validate.calls.length).toBe(1, 'Expected validate call count %s to be %s');
 			expect(spyStartedEvent.calls.length).toBe(1, 'Expected "jobStarted" emit count %s to be %s');
@@ -333,6 +341,8 @@ describe('TrackedJob', function() {
 			expect(spySuccessReEmit.calls.length).toBe(1, 'Expected "jobSuccess" re-emit count %s to be %s');
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.result).toBe(expectedResult, 'Expected TrackedJob#result %s to be %s');
+			expect(trackedJob.error).toBe(null, 'Expected TrackedJob#error %s to be %s');
 			expect(val).toBe(expectedResult, 'Expected result %s to be %s');
 		});
 	});
@@ -372,6 +382,8 @@ describe('TrackedJob', function() {
 
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
+			expect(trackedJob.error).toBe(expectedError, 'Expected TrackedJob#error %s to be %s');
 			expect(spyFailureEvent.calls.length).toBe(1, 'Expected "jobFailure" emit count %s to be %s');
 		});
 	});
@@ -411,6 +423,8 @@ describe('TrackedJob', function() {
 
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
+			expect(trackedJob.error).toBe(expectedError, 'Expected TrackedJob#error %s to be %s');
 			expect(spyFailureEvent.calls.length).toBe(1, 'Expected "jobFailure" emit count %s to be %s');
 		});
 	});
