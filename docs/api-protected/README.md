@@ -29,7 +29,7 @@ to provide information about the job and facilitate communicate progress/success
 <dt><a href="JobConfigStore.md#JobConfigStore">JobConfigStore</a></dt>
 <dd><p>Manages registered job config.</p>
 </dd>
-<dt><a href="JobWorker.md#JobWorker">JobWorker</a></dt>
+<dt><a href="JobWorker.md#JobWorker">JobWorker</a> ⇐ <code>EventEmitter</code></dt>
 <dd><p>Responsible for running the job in the forked worker process.</p>
 </dd>
 <dt><a href="JobWorkerIPC.md#JobWorkerIPC">JobWorkerIPC</a> ⇐ <code><a href="JobWorker.md#JobWorker">JobWorker</a></code></dt>
@@ -74,6 +74,9 @@ an invalid value for a specific property.</p>
 </dd>
 <dt><a href="JobForkError.md#JobForkError">JobForkError</a> ⇐ <code>Error</code></dt>
 <dd><p>A JobForkError object indicates that a forked job encountered an error.</p>
+</dd>
+<dt><a href="JobAbortedError.md#JobAbortedError">JobAbortedError</a> ⇐ <code>Error</code></dt>
+<dd><p>A JobAbortedError object indicates that a forked job has been aborted by calling <a href="TrackedJob.md#TrackedJob+abort">TrackedJob#abort</a>.</p>
 </dd>
 <dt><a href="InvalidJobParamError.md#InvalidJobParamError">InvalidJobParamError</a> ⇐ <code>Error</code></dt>
 <dd><p>A InvalidJobParamError object indicates that params

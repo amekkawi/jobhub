@@ -33,6 +33,8 @@ receiving configuration and sending events via an IPC messages.
     * [.getSupportedSyncMiddleware()](JobWorkerIPC.md#JobWorker+getSupportedSyncMiddleware) ⇒ <code>Array.&lt;string&gt;</code>
     * [.loadJob()](JobWorkerIPC.md#JobWorker+loadJob) ⇒ <code>Promise</code>
     * [.buildJobArg(resolve, reject)](JobWorkerIPC.md#JobWorker+buildJobArg) ⇒ <code>[JobRunArg](JobRunArg.md#JobRunArg)</code>
+    * [.handleAbort()](JobWorkerIPC.md#JobWorker+handleAbort)
+    * ["jobAbort"](JobWorkerIPC.md#JobWorker+event_jobAbort)
 
 <a name="JobWorkerIPC+payloadMessageTimeout"></a>
 
@@ -229,3 +231,18 @@ Build the "job" argument for [JobConfig#run](JobConfig.md#JobConfig+run).
 | resolve | <code>function</code> | 
 | reject | <code>function</code> | 
 
+<a name="JobWorker+handleAbort"></a>
+
+### jobWorkerIPC.handleAbort()
+Called when the JobWorker is notified of an abort.
+
+Emits a [JobWorker#event:jobAbort](JobWorker.md#JobWorker+event_jobAbort) only if [JobWorker#running](JobWorker.md#JobWorker+running) is true.
+
+**Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
+**Access:** protected  
+<a name="JobWorker+event_jobAbort"></a>
+
+### "jobAbort"
+Fires when the job is told to abort.
+
+**Kind**: event emitted by <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  

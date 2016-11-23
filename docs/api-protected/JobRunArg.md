@@ -14,6 +14,7 @@ to provide information about the job and facilitate communicate progress/success
     * [.resolve(result)](JobRunArg.md#JobRunArg+resolve)
     * [.reject(error)](JobRunArg.md#JobRunArg+reject)
     * [.sendProgress(progress)](JobRunArg.md#JobRunArg+sendProgress) ⇒ <code>Promise</code>
+    * [.onAbort(handler)](JobRunArg.md#JobRunArg+onAbort)
 
 <a name="JobRunArg+jobId"></a>
 
@@ -75,4 +76,20 @@ Send progress data.
 | Param | Type |
 | --- | --- |
 | progress | <code>\*</code> | 
+
+<a name="JobRunArg+onAbort"></a>
+
+### jobRunArg.onAbort(handler)
+Add a listener for an abort event.
+
+**Kind**: instance method of <code>[JobRunArg](JobRunArg.md#JobRunArg)</code>  
+**See**
+
+- [TrackedJob#abort](TrackedJob.md#TrackedJob+abort)
+- [TrackedJob#event:jobAbort](TrackedJob.md#TrackedJob+event_jobAbort)
+
+
+| Param | Type |
+| --- | --- |
+| handler | <code>function</code> | 
 

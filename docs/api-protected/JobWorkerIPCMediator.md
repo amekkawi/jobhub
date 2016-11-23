@@ -12,6 +12,7 @@ Manages a job's forked process during it's normal lifecycle.
     * [new JobWorkerIPCMediator(trackedJob)](JobWorkerIPCMediator.md#JobWorkerIPCMediator)
     * [.childProcess](JobWorkerIPCMediator.md#JobWorkerIPCMediator+childProcess) : <code>ChildProcess</code> &#124; <code>null</code>
     * [.trackedJob](JobWorkerIPCMediator.md#JobWorkerMediator+trackedJob) : <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>
+    * [.forked](JobWorkerIPCMediator.md#JobWorkerMediator+forked) : <code>boolean</code>
     * [.started](JobWorkerIPCMediator.md#JobWorkerMediator+started) : <code>boolean</code>
     * [.settled](JobWorkerIPCMediator.md#JobWorkerMediator+settled) : <code>boolean</code>
     * [.exited](JobWorkerIPCMediator.md#JobWorkerMediator+exited) : <code>boolean</code>
@@ -26,6 +27,7 @@ Manages a job's forked process during it's normal lifecycle.
     * [.startWorker()](JobWorkerIPCMediator.md#JobWorkerMediator+startWorker) ⇒ <code>Promise</code>
     * [.stopMediation()](JobWorkerIPCMediator.md#JobWorkerMediator+stopMediation) ⇒ <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>
     * *[.terminate([forceKill])](JobWorkerIPCMediator.md#JobWorkerMediator+terminate)*
+    * *[.sendAbortMessage()](JobWorkerIPCMediator.md#JobWorkerMediator+sendAbortMessage)*
     * *[.execWorker()](JobWorkerIPCMediator.md#JobWorkerMediator+execWorker) ⇒ <code>void</code> &#124; <code>Promise</code>*
     * [.initStartupTimeout()](JobWorkerIPCMediator.md#JobWorkerMediator+initStartupTimeout)
     * [.beginStartupTimeout(timeout)](JobWorkerIPCMediator.md#JobWorkerMediator+beginStartupTimeout)
@@ -55,9 +57,17 @@ Manages a job's forked process during it's normal lifecycle.
 
 ### jobWorkerIPCMediator.trackedJob : <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>
 **Kind**: instance property of <code>[JobWorkerIPCMediator](JobWorkerIPCMediator.md#JobWorkerIPCMediator)</code>  
+<a name="JobWorkerMediator+forked"></a>
+
+### jobWorkerIPCMediator.forked : <code>boolean</code>
+Set to true once [JobWorkerMediator#execWorker](JobWorkerMediator.md#JobWorkerMediator+execWorker) resolves.
+
+**Kind**: instance property of <code>[JobWorkerIPCMediator](JobWorkerIPCMediator.md#JobWorkerIPCMediator)</code>  
 <a name="JobWorkerMediator+started"></a>
 
 ### jobWorkerIPCMediator.started : <code>boolean</code>
+Set to true once [JobWorkerMediator#handleStartupConfirmation](JobWorkerMediator.md#JobWorkerMediator+handleStartupConfirmation) is called.
+
 **Kind**: instance property of <code>[JobWorkerIPCMediator](JobWorkerIPCMediator.md#JobWorkerIPCMediator)</code>  
 <a name="JobWorkerMediator+settled"></a>
 
@@ -145,6 +155,7 @@ Handle an 'exit' ChildProcess event.
 Execute job's worker process and begin mediation of communication with it.
 
 **Kind**: instance method of <code>[JobWorkerIPCMediator](JobWorkerIPCMediator.md#JobWorkerIPCMediator)</code>  
+**Fulfil**: <code>void</code> Resolves after the worker process has been forked.  
 <a name="JobWorkerMediator+stopMediation"></a>
 
 ### jobWorkerIPCMediator.stopMediation() ⇒ <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>
@@ -164,6 +175,15 @@ Terminate the job's worker process.
 | --- | --- | --- |
 | [forceKill] | <code>boolean</code> | <code>false</code> | 
 
+<a name="JobWorkerMediator+sendAbortMessage"></a>
+
+### *jobWorkerIPCMediator.sendAbortMessage()*
+Notify the job's worker process that the job is being aborted.
+
+Should not be called directly. Instead use [TrackedJob#abort](TrackedJob.md#TrackedJob+abort).
+
+**Kind**: instance abstract method of <code>[JobWorkerIPCMediator](JobWorkerIPCMediator.md#JobWorkerIPCMediator)</code>  
+**Overrides:** <code>[sendAbortMessage](JobWorkerMediator.md#JobWorkerMediator+sendAbortMessage)</code>  
 <a name="JobWorkerMediator+execWorker"></a>
 
 ### *jobWorkerIPCMediator.execWorker() ⇒ <code>void</code> &#124; <code>Promise</code>*
