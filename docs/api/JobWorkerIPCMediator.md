@@ -60,7 +60,7 @@ Manages a job's forked process during it's normal lifecycle.
 <a name="JobWorkerMediator+startWorker"></a>
 
 ### jobWorkerIPCMediator.startWorker() ⇒ <code>Promise</code>
-Execute and monitor the job's worker process.
+Execute job's worker process and begin mediation of communication with it.
 
 **Kind**: instance method of <code>[JobWorkerIPCMediator](JobWorkerIPCMediator.md#JobWorkerIPCMediator)</code>  
 <a name="JobWorkerMediator+stopMediation"></a>

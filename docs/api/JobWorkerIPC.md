@@ -69,7 +69,7 @@ Set to a Promise the first time [JobWorker#start](JobWorker.md#JobWorker+start) 
 <a name="JobWorkerIPC+init"></a>
 
 ### jobWorkerIPC.init() ⇒ <code>Promise</code>
-Overrides [JobWorker#init](JobWorker#init) to first request the following to be sent via a IPC message:
+Overrides [JobWorker#init](JobWorker#init) to first request the following to be sent via an IPC message:
 
 * [JobWorker#options](JobWorker.md#JobWorker+options)
 * [JobWorker#jobId](JobWorker.md#JobWorker+jobId)

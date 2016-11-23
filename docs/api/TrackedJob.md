@@ -20,6 +20,8 @@ Tracks a job that has not yet completed.
     * [.isRunning](TrackedJob.md#TrackedJob+isRunning) : <code>boolean</code>
     * [.promise](TrackedJob.md#TrackedJob+promise) : <code>null</code> &#124; <code>Promise</code>
     * [.workerMediator](TrackedJob.md#TrackedJob+workerMediator) : <code>null</code> &#124; <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>
+    * [.result](TrackedJob.md#TrackedJob+result) : <code>\*</code>
+    * [.error](TrackedJob.md#TrackedJob+error) : <code>null</code> &#124; <code>Error</code>
     * [.progress](TrackedJob.md#TrackedJob+progress) : <code>\*</code>
     * [.then()](TrackedJob.md#TrackedJob+then) ⇒ <code>Promise</code>
     * [.catch()](TrackedJob.md#TrackedJob+catch) ⇒ <code>Promise</code>
@@ -102,6 +104,19 @@ Set to a Promise after run() is called, and is fulfilled once the job succeeds o
 
 ### trackedJob.workerMediator : <code>null</code> &#124; <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>
 Set to the worker mediator instance if a worker is started.
+
+**Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
+<a name="TrackedJob+result"></a>
+
+### trackedJob.result : <code>\*</code>
+Set to the result returned by the job, if the job completes successfully.
+
+**Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
+**See**: [JobRunArg#resolve](JobRunArg.md#JobRunArg+resolve)  
+<a name="TrackedJob+error"></a>
+
+### trackedJob.error : <code>null</code> &#124; <code>Error</code>
+Set to an error, if the job completes in failure.
 
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+progress"></a>

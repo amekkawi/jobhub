@@ -3,7 +3,7 @@
 <a name="JobWorkerMediator"></a>
 
 ## JobWorkerMediator ⇐ <code>EventEmitter</code>
-Mediates communication with the tracked job's worker process.
+Responsible for forking the job's child worker process and mediating communication with it.
 
 **Kind**: global class  
 **Extends:** <code>EventEmitter</code>  
@@ -55,7 +55,7 @@ Mediates communication with the tracked job's worker process.
 <a name="JobWorkerMediator+startWorker"></a>
 
 ### jobWorkerMediator.startWorker() ⇒ <code>Promise</code>
-Execute and monitor the job's worker process.
+Execute job's worker process and begin mediation of communication with it.
 
 **Kind**: instance method of <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>  
 <a name="JobWorkerMediator+stopMediation"></a>

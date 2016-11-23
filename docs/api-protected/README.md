@@ -40,7 +40,7 @@ receiving configuration and sending events via an IPC messages.</p>
 <dd><p>Manages a job&#39;s forked process during it&#39;s normal lifecycle.</p>
 </dd>
 <dt><a href="JobWorkerMediator.md#JobWorkerMediator">JobWorkerMediator</a> ⇐ <code>EventEmitter</code></dt>
-<dd><p>Mediates communication with the tracked job&#39;s worker process.</p>
+<dd><p>Responsible for forking the job&#39;s child worker process and mediating communication with it.</p>
 </dd>
 <dt><a href="MiddlewareStore.md#MiddlewareStore">MiddlewareStore</a></dt>
 <dd><p>Plugins to customize functionality of jobhub.</p>
