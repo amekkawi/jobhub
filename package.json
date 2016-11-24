@@ -1,6 +1,6 @@
 {
   "name": "jobhub",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Move your heavy workloads into fully managed child processes",
   "main": "lib/index.js",
   "author": "Andre Mekkawi <github@andremekkawi.com>",
