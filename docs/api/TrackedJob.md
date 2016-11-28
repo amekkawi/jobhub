@@ -18,6 +18,7 @@ Tracks a job that has not yet completed.
     * [.jobConfig](TrackedJob.md#TrackedJob+jobConfig) : <code>[JobConfig](JobConfig.md#JobConfig)</code>
     * [.params](TrackedJob.md#TrackedJob+params) : <code>\*</code>
     * [.isRunning](TrackedJob.md#TrackedJob+isRunning) : <code>boolean</code>
+    * [.isSettled](TrackedJob.md#TrackedJob+isSettled) : <code>boolean</code>
     * [.promise](TrackedJob.md#TrackedJob+promise) : <code>null</code> &#124; <code>Promise</code>
     * [.workerMediator](TrackedJob.md#TrackedJob+workerMediator) : <code>null</code> &#124; <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>
     * [.result](TrackedJob.md#TrackedJob+result) : <code>\*</code>
@@ -92,6 +93,12 @@ Parameters for this job passed from [HubManager#queueJob](HubManager.md#HubManag
 
 ### trackedJob.isRunning : <code>boolean</code>
 Set to `true` once [JobConfig#run](JobConfig.md#JobConfig+run) is called and false after the job succeeds or fails.
+
+**Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
+<a name="TrackedJob+isSettled"></a>
+
+### trackedJob.isSettled : <code>boolean</code>
+Set to `true` once the job succeeds or fails.
 
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+promise"></a>
