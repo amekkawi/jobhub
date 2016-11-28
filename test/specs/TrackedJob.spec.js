@@ -61,6 +61,7 @@ describe('TrackedJob', function() {
 		expect(trackedJob.jobConfig).toBe(jobConfig, 'Expected TrackedJob#jobConfig %s to be %s');
 		expect(trackedJob.params).toBe(params, 'Expected TrackedJob#params %s to be %s');
 		expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+		expect(trackedJob.isSettled).toBe(false, 'Expected TrackedJob#isSettled %s to be %s');
 		expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
 		expect(trackedJob.error).toBe(null, 'Expected TrackedJob#error %s to be %s');
 		expect(trackedJob.aborted).toBe(false, 'Expected TrackedJob#aborted %s to be %s');
@@ -69,26 +70,6 @@ describe('TrackedJob', function() {
 		expect(trackedJob.workerMediator).toBe(null, 'Expected TrackedJob#workerMediator %s to be %s');
 		expect(trackedJob.progress).toBe(null, 'Expected TrackedJob#progress %s to be %s');
 		expect(trackedJob instanceof EventEmitter).toBe(true, 'Expected TrackedJob to be instance of EventEmitter');
-	});
-
-	it('should return a rejected promise from TrackedJob#then if not yet started', function() {
-		var trackedJob = new TrackedJob({}, 'FOO', {}, {});
-		expect(trackedJob.promise).toBe(null);
-		return trackedJob.then(function() {
-			throw new Error('Expected to not resolve');
-		}, function(err) {
-			expect(err).toBeA(Error);
-			expect(err.message).toBe('Cannot use TackedJob#then as Promise until TrackedJob#run is called');
-		});
-	});
-
-	it('should return a rejected promise from TrackedJob#catch if not yet started', function() {
-		var trackedJob = new TrackedJob({}, 'FOO', {}, {});
-		expect(trackedJob.promise).toBe(null);
-		return trackedJob.catch(function(err) {
-			expect(err).toBeA(Error);
-			expect(err.message).toBe('Cannot use TackedJob#catch as Promise until TrackedJob#run is called');
-		});
 	});
 
 	it('should ignore calls to abort if not running', function() {
@@ -121,6 +102,7 @@ describe('TrackedJob', function() {
 		var spyStartedEvent = expect.createSpy().andCall(function() {
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage in event %s to be %s');
 			expect(trackedJob.isRunning).toBe(true, 'Expected TrackedJob#isRunning in event %s to be %s');
+			expect(trackedJob.isSettled).toBe(false, 'Expected TrackedJob#isSettled in event %s to be %s');
 			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
 			expect(trackedJob.error).toBe(null, 'Expected TrackedJob#error %s to be %s');
 
@@ -136,6 +118,7 @@ describe('TrackedJob', function() {
 		expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
 		expect(trackedJob.run()).toBe(trackedJob, 'Expected return of TrackedJob#run() %s to be trackedJob (i.e. this)');
 		expect(trackedJob.isRunning).toBe(true, 'Expected TrackedJob#isRunning %s to be %s');
+		expect(trackedJob.isSettled).toBe(false, 'Expected TrackedJob#isSettled in event %s to be %s');
 		expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
 		expect(trackedJob.promise).toBeA(Promise, 'Expected TrackedJob#promise %s to be a Promise');
 		expect(spyStartedEvent.calls.length).toBe(0, 'Expected "jobStarted" emit count %s to be %s');
@@ -148,6 +131,7 @@ describe('TrackedJob', function() {
 			}
 
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.isSettled).toBe(true, 'Expected TrackedJob#isSettled in event %s to be %s');
 			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
 			expect(trackedJob.error).toBe(expectedError, 'Expected TrackedJob#error %s to be %s');
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
@@ -201,6 +185,7 @@ describe('TrackedJob', function() {
 		var spyFailureEvent = expect.createSpy().andCall(function(err) {
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.isSettled).toBe(true, 'Expected TrackedJob#isSettled in event %s to be %s');
 			expect(this).toBe(trackedJob, 'Expected context %s to be trackedJob');
 			expect(arguments.length).toBe(1, 'Expected arguments count %s to be %s');
 			expect(arguments[0]).toBe(expectedError, 'Expected arguments[0] %s to be thrown error');
@@ -231,6 +216,7 @@ describe('TrackedJob', function() {
 			}
 
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.isSettled).toBe(true, 'Expected TrackedJob#isSettled in event %s to be %s');
 			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
 			expect(trackedJob.error).toBe(expectedError, 'Expected TrackedJob#error %s to be %s');
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_VALIDATE_PARAMS, 'Expected TrackedJob#stage %s to be %s');
@@ -634,6 +620,7 @@ describe('TrackedJob', function() {
 
 		var spySuccessEvent = expect.createSpy().andCall(function() {
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.isSettled).toBe(true, 'Expected TrackedJob#isSettled in event %s to be %s');
 			expect(this).toBe(trackedJob, 'Expected context %s to be trackedJob');
 			expect(arguments.length).toBe(1, 'Expected arguments count %s to be %s');
 			expect(arguments[0]).toBe(expectedResult, 'Expected arguments[0] %s to be %s');
@@ -664,6 +651,7 @@ describe('TrackedJob', function() {
 			expect(spySuccessReEmit.calls.length).toBe(1, 'Expected "jobSuccess" re-emit count %s to be %s');
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.isSettled).toBe(true, 'Expected TrackedJob#isSettled in event %s to be %s');
 			expect(trackedJob.result).toBe(expectedResult, 'Expected TrackedJob#result %s to be %s');
 			expect(trackedJob.error).toBe(null, 'Expected TrackedJob#error %s to be %s');
 			expect(val).toBe(expectedResult, 'Expected result %s to be %s');
@@ -687,6 +675,7 @@ describe('TrackedJob', function() {
 		var spyFailureEvent = expect.createSpy().andCall(function(err) {
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.isSettled).toBe(true, 'Expected TrackedJob#isSettled in event %s to be %s');
 			expect(this).toBe(trackedJob, 'Expected context %s to be trackedJob');
 			expect(arguments.length).toBe(1, 'Expected arguments count %s to be %s');
 			expect(arguments[0]).toBe(expectedError, 'Expected arguments[0] %s to be thrown error');
@@ -705,6 +694,7 @@ describe('TrackedJob', function() {
 
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.isSettled).toBe(true, 'Expected TrackedJob#isSettled in event %s to be %s');
 			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
 			expect(trackedJob.error).toBe(expectedError, 'Expected TrackedJob#error %s to be %s');
 			expect(spyFailureEvent.calls.length).toBe(1, 'Expected "jobFailure" emit count %s to be %s');
@@ -728,6 +718,7 @@ describe('TrackedJob', function() {
 		var spyFailureEvent = expect.createSpy().andCall(function(err) {
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.isSettled).toBe(true, 'Expected TrackedJob#isSettled in event %s to be %s');
 			expect(this).toBe(trackedJob, 'Expected context %s to be trackedJob');
 			expect(arguments.length).toBe(1, 'Expected arguments count %s to be %s');
 			expect(arguments[0]).toBe(expectedError, 'Expected arguments[0] %s to be thrown error');
@@ -746,6 +737,7 @@ describe('TrackedJob', function() {
 
 			expect(trackedJob.stage).toBe(constants.JOB_STAGE_QUICK_RUN, 'Expected TrackedJob#stage %s to be %s');
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.isSettled).toBe(true, 'Expected TrackedJob#isSettled in event %s to be %s');
 			expect(trackedJob.result).toBe(null, 'Expected TrackedJob#result %s to be %s');
 			expect(trackedJob.error).toBe(expectedError, 'Expected TrackedJob#error %s to be %s');
 			expect(spyFailureEvent.calls.length).toBe(1, 'Expected "jobFailure" emit count %s to be %s');
@@ -899,7 +891,7 @@ describe('TrackedJob', function() {
 			throw expectedError;
 		});
 
-		return trackedJob.run()
+		return trackedJob.run().promise
 			.then(function() {
 				throw new Error('Expected to not resolve');
 			}, function(err) {
@@ -928,7 +920,7 @@ describe('TrackedJob', function() {
 			throw expectedError;
 		});
 
-		return trackedJob.run()
+		return trackedJob.run().promise
 			.then(function() {
 				throw new Error('Expected to not resolve');
 			}, function(err) {
@@ -1403,7 +1395,7 @@ describe('TrackedJob', function() {
 		});
 		emitter.on(constants.EVENT_JOB_PROGRESS, spyProgressReEmit);
 
-		return trackedJob.run()
+		return trackedJob.run().promise
 			.then(function() {
 				expect(spyJobProgressEvent.calls.length).toBe(1, 'Expected "jobForked" emit count %s to be %s');
 				expect(spyProgressReEmit.calls.length).toBe(1, 'Expected "jobForked" re-emit count %s to be %s');
@@ -1443,6 +1435,213 @@ describe('TrackedJob', function() {
 			}
 
 			expect(trackedJob.isRunning).toBe(false, 'Expected TrackedJob#isRunning %s to be %s');
+			expect(trackedJob.isSettled).toBe(true, 'Expected TrackedJob#isSettled in event %s to be %s');
+		});
+	});
+
+	describe('TrackedJob#then', function() {
+		it('should listen for started event if job not running', function() {
+			var manager = createManagerFixture();
+
+			var jobConfig = {
+				quickRun: function(job) {
+					job.resolve(500);
+				},
+				run: function() {
+					throw new Error('Expected not to be called');
+				}
+			};
+
+			var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+
+			expect.spyOn(trackedJob, 'on').andCallThrough();
+
+			var promise = trackedJob.then(function(result) {
+				expect(result).toBe(500);
+			});
+
+			expect(trackedJob.on.calls.length).toBe(2);
+			expect(trackedJob.on.calls[0].arguments.length).toBe(2);
+			expect(trackedJob.on.calls[0].arguments[0]).toBe(constants.EVENT_JOB_STARTED);
+			expect(trackedJob.on.calls[1].arguments.length).toBe(2);
+			expect(trackedJob.on.calls[1].arguments[0]).toBe(constants.EVENT_JOB_FAILURE);
+
+			trackedJob.run();
+
+			return promise;
+		});
+
+		it('should listen for failure event if job not running', function() {
+			var manager = createManagerFixture();
+			var expectedError = new Error();
+
+			var jobConfig = {
+				quickRun: function(job) {
+					job.reject(expectedError);
+				},
+				run: function() {
+					throw new Error('Expected not to be called');
+				}
+			};
+
+			var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+
+			expect.spyOn(trackedJob, 'on').andCallThrough();
+
+			var promise = trackedJob.then(function() {
+				throw new Error('Expected to not resolve');
+			}, function(err) {
+				if (err !== expectedError) {
+					throw err;
+				}
+			});
+
+			expect(trackedJob.on.calls.length).toBe(2);
+			expect(trackedJob.on.calls[0].arguments.length).toBe(2);
+			expect(trackedJob.on.calls[0].arguments[0]).toBe(constants.EVENT_JOB_STARTED);
+			expect(trackedJob.on.calls[1].arguments.length).toBe(2);
+			expect(trackedJob.on.calls[1].arguments[0]).toBe(constants.EVENT_JOB_FAILURE);
+
+			trackedJob.run();
+
+			return promise;
+		});
+
+		it('should chain directly off of TrackedJob#promise if job running', function() {
+			var manager = createManagerFixture();
+
+			var jobConfig = {
+				quickRun: function(job) {
+					job.resolve(500);
+				},
+				run: function() {
+					throw new Error('Expected not to be called');
+				}
+			};
+
+			var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+
+			expect.spyOn(trackedJob, 'on').andCallThrough();
+
+			trackedJob.run();
+
+			var promise = trackedJob.then(function(result) {
+				expect(result).toBe(500);
+			});
+
+			expect(trackedJob.on.calls.length).toBe(0);
+
+			return promise;
+		});
+	});
+
+	describe('TrackedJob#catch', function() {
+		it('should listen for started event if job not running', function() {
+			var manager = createManagerFixture();
+			var expectedError = new Error();
+
+			var jobConfig = {
+				quickRun: function(job) {
+					job.reject(expectedError);
+				},
+				run: function() {
+					throw new Error('Expected not to be called');
+				}
+			};
+
+			var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+
+			expect.spyOn(trackedJob, 'on').andCallThrough();
+
+			var promise = trackedJob.catch(function(err) {
+				if (err !== expectedError) {
+					throw err;
+				}
+			});
+
+			expect(trackedJob.on.calls.length).toBe(2);
+			expect(trackedJob.on.calls[0].arguments.length).toBe(2);
+			expect(trackedJob.on.calls[0].arguments[0]).toBe(constants.EVENT_JOB_STARTED);
+			expect(trackedJob.on.calls[1].arguments.length).toBe(2);
+			expect(trackedJob.on.calls[1].arguments[0]).toBe(constants.EVENT_JOB_FAILURE);
+
+			trackedJob.run();
+
+			return promise;
+		});
+
+		it('should listen for failure event if job not running', function() {
+			var manager = createManagerFixture();
+			var expectedError = new Error();
+
+			var jobConfig = {
+				quickRun: function(job) {
+					job.reject(expectedError);
+				},
+				run: function() {
+					throw new Error('Expected not to be called');
+				}
+			};
+
+			var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+
+			expect.spyOn(trackedJob, 'on').andCallThrough();
+
+			var promise = new Promise(function(resolve, reject) {
+				trackedJob.catch(function(err) {
+					if (err !== expectedError) {
+						reject(err);
+					}
+					else {
+						resolve();
+					}
+				});
+			});
+
+			expect(trackedJob.on.calls.length).toBe(2);
+			expect(trackedJob.on.calls[0].arguments.length).toBe(2);
+			expect(trackedJob.on.calls[0].arguments[0]).toBe(constants.EVENT_JOB_STARTED);
+			expect(trackedJob.on.calls[1].arguments.length).toBe(2);
+			expect(trackedJob.on.calls[1].arguments[0]).toBe(constants.EVENT_JOB_FAILURE);
+
+			trackedJob.run();
+
+			return promise;
+		});
+
+		it('should chain directly off of TrackedJob#promise if job running', function() {
+			var manager = createManagerFixture();
+			var expectedError = new Error();
+
+			var jobConfig = {
+				quickRun: function(job) {
+					job.reject(expectedError);
+				},
+				run: function() {
+					throw new Error('Expected not to be called');
+				}
+			};
+
+			var trackedJob = new TrackedJob(manager, 'FOO', jobConfig, {});
+
+			expect.spyOn(trackedJob, 'on').andCallThrough();
+
+			trackedJob.run();
+
+			var promise = new Promise(function(resolve, reject) {
+				trackedJob.catch(function(err) {
+					if (err !== expectedError) {
+						reject(err);
+					}
+					else {
+						resolve();
+					}
+				});
+			});
+
+			expect(trackedJob.on.calls.length).toBe(0);
+
+			return promise;
 		});
 	});
 });

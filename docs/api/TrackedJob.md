@@ -18,6 +18,7 @@ Tracks a job that has not yet completed.
     * [.jobConfig](TrackedJob.md#TrackedJob+jobConfig) : <code>[JobConfig](JobConfig.md#JobConfig)</code>
     * [.params](TrackedJob.md#TrackedJob+params) : <code>\*</code>
     * [.isRunning](TrackedJob.md#TrackedJob+isRunning) : <code>boolean</code>
+    * [.isSettled](TrackedJob.md#TrackedJob+isSettled) : <code>boolean</code>
     * [.aborted](TrackedJob.md#TrackedJob+aborted) : <code>boolean</code>
     * [.abortReason](TrackedJob.md#TrackedJob+abortReason) : <code>null</code> &#124; <code>string</code>
     * [.promise](TrackedJob.md#TrackedJob+promise) : <code>null</code> &#124; <code>Promise</code>
@@ -98,6 +99,12 @@ Parameters for this job passed from [HubManager#queueJob](HubManager.md#HubManag
 Set to `true` once [JobConfig#run](JobConfig.md#JobConfig+run) is called and false after the job succeeds or fails.
 
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
+<a name="TrackedJob+isSettled"></a>
+
+### trackedJob.isSettled : <code>boolean</code>
+Set to `true` once the job succeeds or fails.
+
+**Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+aborted"></a>
 
 ### trackedJob.aborted : <code>boolean</code>
@@ -146,17 +153,13 @@ The last emitted progress value.
 <a name="TrackedJob+then"></a>
 
 ### trackedJob.then() ⇒ <code>Promise</code>
-Convenience method for `TrackedJob.promise.then`.
-
-Only usable after [TrackedJob#run](TrackedJob.md#TrackedJob+run) is called.
+Promise-like `then` method.
 
 **Kind**: instance method of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+catch"></a>
 
 ### trackedJob.catch() ⇒ <code>Promise</code>
-Convenience method for `TrackedJob.promise.catch`.
-
-Only usable after [TrackedJob#run](TrackedJob.md#TrackedJob+run) is called.
+Promise-like `catch` method.
 
 **Kind**: instance method of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+run"></a>
