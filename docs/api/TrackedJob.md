@@ -128,17 +128,13 @@ The last emitted progress value.
 <a name="TrackedJob+then"></a>
 
 ### trackedJob.then() ⇒ <code>Promise</code>
-Convenience method for `TrackedJob.promise.then`.
-
-Only usable after [TrackedJob#run](TrackedJob.md#TrackedJob+run) is called.
+Promise-like `then` method.
 
 **Kind**: instance method of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+catch"></a>
 
 ### trackedJob.catch() ⇒ <code>Promise</code>
-Convenience method for `TrackedJob.promise.catch`.
-
-Only usable after [TrackedJob#run](TrackedJob.md#TrackedJob+run) is called.
+Promise-like `catch` method.
 
 **Kind**: instance method of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+run"></a>

@@ -695,7 +695,7 @@ describe('HubManager', function() {
 		var queuedJob = manager.queueJob('foo', {});
 		expect(manager.getTrackedJob(queuedJob.jobId)).toBe(queuedJob);
 
-		return queuedJob.promise.then(function() {
+		return queuedJob.then(function() {
 			expect(manager.getTrackedJob(queuedJob.jobId)).toBe(null);
 		});
 	});
@@ -731,7 +731,7 @@ describe('HubManager', function() {
 		expect(queuedJobA).toBe(queuedJobB);
 		expect(manager.findUniqueTrackedJob('foo', 'uniq')).toBe(queuedJobA);
 
-		return queuedJobA.promise.then(function() {
+		return queuedJobA.then(function() {
 			expect(manager.findUniqueTrackedJob('foo', 'uniq')).toBe(null);
 			var queuedJobC = manager.queueJob('foo', {});
 			expect(queuedJobA).toNotBe(queuedJobC);
@@ -779,7 +779,7 @@ describe('HubManager', function() {
 
 		var trackedJob = manager.queueJob('foo', {});
 
-		return trackedJob.promise.then(function() {
+		return trackedJob.then(function() {
 			expect(manager.handleSettledJob.calls.length).toBe(0);
 			expect(manager.queueForTermination.calls.length).toBe(1);
 		});
