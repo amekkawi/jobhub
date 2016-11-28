@@ -72,13 +72,39 @@ describe('TrackedJob', function() {
 		expect(trackedJob instanceof EventEmitter).toBe(true, 'Expected TrackedJob to be instance of EventEmitter');
 	});
 
-	it('should ignore calls to abort if not running', function() {
+	it('should abort job if not yet running', function() {
 		var manager = createManagerFixture();
 		var trackedJob = new TrackedJob(manager, 'FOO', { run: function() {} }, {});
 
+		var spyAbortEvent = expect.createSpy().andCall(function() {
+			expect(trackedJob.isSettled).toBe(false, 'Expected TrackedJob#isSettled %s to be %s');
+			expect(trackedJob.error).toBe(null, 'Expected TrackedJob#error %s to be %s');
+			expect(trackedJob.promise).toBe(null, 'Expected TrackedJob#promise %s to be %s');
+		});
+		trackedJob.on(constants.EVENT_JOB_ABORT, spyAbortEvent);
+
 		trackedJob.abort('foo');
-		expect(trackedJob.aborted).toBe(false);
-		expect(trackedJob.abortReason).toBe(null);
+
+		expect(spyAbortEvent.calls.length).toBe(1);
+		expect(spyAbortEvent.calls[0].arguments.length).toBe(1);
+		expect(spyAbortEvent.calls[0].arguments[0]).toBe('foo');
+		expect(trackedJob.promise).toBeA(Promise, 'Expected TrackedJob#promise %s to be a Promise');
+		expect(trackedJob.stage).toBe(null, 'Expected TrackedJob#stage %s to be %s');
+		expect(trackedJob.aborted).toBe(true);
+		expect(trackedJob.abortReason).toBe('foo');
+		expect(trackedJob.isSettled).toBe(true);
+		expect(trackedJob.error).toBeA(errors.JobAbortedError);
+		expect(trackedJob.error.jobName).toBe(trackedJob.jobConfig.jobName);
+		expect(trackedJob.error.jobId).toBe(trackedJob.jobId);
+		expect(trackedJob.error.abortReason).toBe('foo');
+
+		return trackedJob.promise.then(function() {
+			throw new Error('Expected to not resolve');
+		}, function(err) {
+			if (err !== trackedJob.error) {
+				throw err;
+			}
+		})
 	});
 
 	it('should set props and emit "jobStarted" when run', function() {

@@ -171,7 +171,7 @@ Start the job, if it has not already started.
 <a name="TrackedJob+abort"></a>
 
 ### trackedJob.abort([reason]) ⇒ <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>
-Attempt to abort a running job. Calling this method does not mean the job will actually be aborted.
+Attempt to abort a job. Calling this method does not mean the job will actually be aborted.
 
 The abort will not actually happen if:
 
@@ -181,17 +181,17 @@ The abort will not actually happen if:
 
 To determine if a job was actually aborted either:
 
-* If [TrackedJob#isRunning](TrackedJob.md#TrackedJob+isRunning) is true,
+* If [TrackedJob#isSettled](TrackedJob.md#TrackedJob+isSettled) is `false`,
 add a catch to [TrackedJob#promise](TrackedJob.md#TrackedJob+promise) or listen for the [TrackedJob#event:jobFailure](TrackedJob.md#TrackedJob+event_jobFailure) event, and
 check if the error is an instance of [JobAbortedError](JobAbortedError.md#JobAbortedError).
 
     – or –
 
-* If [TrackedJob#isRunning](TrackedJob.md#TrackedJob+isRunning) is false,
+* If [TrackedJob#isSettled](TrackedJob.md#TrackedJob+isSettled) is `true`,
 check if [TrackedJob#error](TrackedJob.md#TrackedJob+error) is an instance of [JobAbortedError](JobAbortedError.md#JobAbortedError).
 
-Calling this method does nothing if [TrackedJob#running](TrackedJob#running) is false
-or [TrackedJob#aborted](TrackedJob.md#TrackedJob+aborted) is already true.
+Calling this method does nothing if either [TrackedJob#isSettled](TrackedJob.md#TrackedJob+isSettled)
+or [TrackedJob#aborted](TrackedJob.md#TrackedJob+aborted) are already `true`.
 
 **Kind**: instance method of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 **See**
