@@ -9,9 +9,35 @@ var HubManager = require('../../lib/HubManager');
 var MiddlewareStore = require('../../lib/MiddlewareStore');
 var JobConfigStore = require('../../lib/JobConfigStore');
 var TrackedJob = require('../../lib/TrackedJob');
+var JobExecutor = require('../../lib/JobExecutor');
+var JobExecutorBuiltin = require('../../lib/JobExecutorBuiltin');
 
 describe('HubManager', function() {
 	var jobsFixturePath = path.resolve(__dirname, '../fixtures/jobs.js');
+
+	function extendJobExecutor(constructor, proto, protoStatic) {
+		function JobExecutorFixture(options, manager) {
+			JobExecutor.call(this, options, manager);
+			constructor && constructor.apply(this, arguments);
+		}
+
+		inherits(JobExecutorFixture, JobExecutor);
+
+		Object.assign(JobExecutorFixture.prototype, {
+			add: function() {}
+		}, proto);
+
+		Object.assign(JobExecutorFixture, {
+			parseOptions: function() {
+				return {};
+			},
+			getDefaultOptions: function() {
+				return {};
+			}
+		}, protoStatic);
+
+		return JobExecutorFixture;
+	}
 
 	it('should throw InvalidManagerOptionsError if options not provided or missing options.jobsModulePath', function() {
 		var thrownError;
@@ -50,7 +76,7 @@ describe('HubManager', function() {
 
 		var defaultOptions = util.getDefaultManagerOptions();
 		Object.keys(defaultOptions).forEach(function(key) {
-			if (key !== 'jobsModulePath') {
+			if (key !== 'jobsModulePath' && key !== 'jobExecutorOptions') {
 				expect(manager.options[key]).toBe(defaultOptions[key], 'Expected HubManager#options.' + key + ' %s to be %s');
 			}
 		});
@@ -63,7 +89,43 @@ describe('HubManager', function() {
 		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_BUILD_FORK_ARGS)).toBe(true, 'Expected middleware support for "buildForkArgs"');
 		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_BUILD_FORK_OPTS)).toBe(true, 'Expected middleware support for "buildForkOpts"');
 		expect(manager.middleware.hasSyncSupport(constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR)).toBe(true, 'Expected middleware support for "createWorkerMediator"');
+
 		expect(manager.jobs).toBeA(JobConfigStore, 'Expected HubManager#jobs %s to be a %s');
+		expect(manager.jobExecutor).toBeA(JobExecutorBuiltin, 'Expected HubManager#jobExecutor %s to be a %s');
+	});
+
+	it('should use jobExecutorClass option to create jobExecutor', function() {
+		var defaultOptions = {};
+		var parsedOptions = {};
+		var optionOverrides = {};
+		var JobExecutorFixture = extendJobExecutor(function() {
+			this._spy = expect.createSpy();
+			this._spy.apply(this, arguments);
+		}, {}, {
+			parseOptions: expect.createSpy().andCall(function() {
+				expect(arguments.length).toBe(2);
+				expect(arguments[0]).toBe(optionOverrides);
+				expect(arguments[1]).toBe(defaultOptions);
+				return parsedOptions;
+			}),
+			getDefaultOptions: expect.createSpy().andCall(function() {
+				return defaultOptions;
+			})
+		});
+
+		var manager = new HubManager({
+			jobsModulePath: jobsFixturePath,
+			jobExecutorClass: JobExecutorFixture,
+			jobExecutorOptions: optionOverrides
+		});
+
+		expect(manager.jobExecutor).toBeA(JobExecutorFixture, 'Expected HubManager#jobExecutor %s to be a %s');
+		expect(manager.jobExecutor._spy.calls.length).toBe(1);
+		expect(manager.jobExecutor._spy.calls[0].arguments.length).toBe(2);
+		expect(manager.jobExecutor._spy.calls[0].arguments[0]).toBe(parsedOptions);
+		expect(manager.jobExecutor._spy.calls[0].arguments[1]).toBe(manager);
+		expect(JobExecutorFixture.parseOptions.calls.length).toBe(1);
+		expect(JobExecutorFixture.getDefaultOptions.calls.length).toBe(1);
 	});
 
 	it('should allow overriding built-in supported middleware', function() {
@@ -464,7 +526,55 @@ describe('HubManager', function() {
 		expect(spyOnCreate.calls.length).toBe(1);
 		expect(spyJobCreatedEvent.calls.length).toBe(1);
 		expect(trackedJob.reEmitTo.calls.length).toBe(1);
-		expect(trackedJob.run.calls.length).toBe(1);
+	});
+
+	it('should add created jobs to JobExecutor', function() {
+		var JobExecutorFixture = extendJobExecutor(function() {
+			expect.spyOn(this, 'add');
+		});
+
+		var options = {
+			jobsModulePath: jobsFixturePath,
+			jobExecutorClass: JobExecutorFixture
+		};
+
+		var manager = new HubManager(options);
+
+		manager.middleware.addSyncMiddlware(
+			constants.MIDDLEWARE_LOAD_JOBS,
+			function(jobStore) {
+				jobStore.registerJob('foo', {
+					quickRun: function(job) {
+						job.resolve(500);
+					},
+					run: function() {
+						throw new Error('Expected not to be called');
+					}
+				});
+			}
+		);
+
+		manager.middleware.addSyncMiddlware(
+			constants.MIDDLEWARE_CREATE_JOB,
+			function() {
+				var trackedJob = arguments[3](); // Next
+				expect.spyOn(trackedJob, 'run').andReturn(trackedJob);
+				return trackedJob;
+			}
+		);
+
+		manager.start();
+
+		var trackedJobA = manager.queueJob('foo', {});
+		var trackedJobB = manager.queueJob('foo', {});
+
+		expect(trackedJobA.run.calls.length).toBe(0);
+		expect(trackedJobB.run.calls.length).toBe(0);
+		expect(manager.jobExecutor.add.calls.length).toBe(2);
+		expect(manager.jobExecutor.add.calls[0].arguments.length).toBe(1);
+		expect(manager.jobExecutor.add.calls[0].arguments[0]).toBe(trackedJobA);
+		expect(manager.jobExecutor.add.calls[1].arguments.length).toBe(1);
+		expect(manager.jobExecutor.add.calls[1].arguments[0]).toBe(trackedJobB);
 	});
 
 	it('should allow getting running tracked job by ID', function() {

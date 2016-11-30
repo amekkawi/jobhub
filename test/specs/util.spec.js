@@ -27,6 +27,8 @@ describe('util', function() {
 	var managerOptions = [
 		'forkModulePath',
 		'jobsModulePath',
+		'jobExecutorClass',
+		'jobExecutorOptions',
 		'initModulePath',
 		'terminationSIGTERMTimeout',
 		'terminationSIGKILLTimeout',
@@ -46,6 +48,14 @@ describe('util', function() {
 
 		it('should have "jobsModulePath" default to null', function() {
 			expect(util.getDefaultManagerOptions().jobsModulePath).toBe(null);
+		});
+
+		it('should have "jobExecutorClass" default to null', function() {
+			expect(util.getDefaultManagerOptions().jobExecutorClass).toBe(null);
+		});
+
+		it('should have "jobExecutorOptions" default to null', function() {
+			expect(util.getDefaultManagerOptions().jobExecutorOptions).toBe(null);
 		});
 
 		it('should have "terminationSIGTERMTimeout" default to 60000', function() {
@@ -136,6 +146,28 @@ describe('util', function() {
 				}, util.getDefaultManagerOptions());
 			}).toThrowWithProps(errors.InvalidManagerOptionsError, {
 				propName: 'initModulePath'
+			});
+		});
+
+		it('should throw a InvalidManagerOptionsError if "jobExecutorClass" is not a function', function() {
+			expect(function() {
+				util.parseManagerOptions({
+					jobsModulePath: 'path/to/module',
+					jobExecutorClass: {}
+				}, util.getDefaultManagerOptions());
+			}).toThrowWithProps(errors.InvalidManagerOptionsError, {
+				propName: 'jobExecutorClass'
+			});
+		});
+
+		it('should throw a InvalidManagerOptionsError if "jobExecutorOptions" is not a function', function() {
+			expect(function() {
+				util.parseManagerOptions({
+					jobsModulePath: 'path/to/module',
+					jobExecutorOptions: 500
+				}, util.getDefaultManagerOptions());
+			}).toThrowWithProps(errors.InvalidManagerOptionsError, {
+				propName: 'jobExecutorOptions'
 			});
 		});
 
