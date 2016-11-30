@@ -18,6 +18,9 @@
 <dd><p>Passed to <a href="JobConfig.md#JobConfig+run">JobConfig#run</a> and <a href="JobConfig.md#JobConfig+quickRun">JobConfig#quickRun</a>
 to provide information about the job and facilitate communicate progress/success/failure.</p>
 </dd>
+<dt><a href="JobExecutorBuiltinOptions.md#JobExecutorBuiltinOptions">JobExecutorBuiltinOptions</a> : <code>object</code></dt>
+<dd><p>Configuration options for <a href="JobExecutorBuiltin.md#JobExecutorBuiltin">JobExecutorBuiltin</a>.</p>
+</dd>
 </dl>
 
 ## Classes
@@ -28,6 +31,12 @@ to provide information about the job and facilitate communicate progress/success
 </dd>
 <dt><a href="JobConfigStore.md#JobConfigStore">JobConfigStore</a></dt>
 <dd><p>Manages registered job config.</p>
+</dd>
+<dt><a href="JobExecutor.md#JobExecutor">JobExecutor</a></dt>
+<dd><p>Manages running jobs that have been queued using <a href="HubManager.md#HubManager+queueJob">HubManager#queueJob</a>.</p>
+</dd>
+<dt><a href="JobExecutorBuiltin.md#JobExecutorBuiltin">JobExecutorBuiltin</a> ⇐ <code><a href="JobExecutor.md#JobExecutor">JobExecutor</a></code></dt>
+<dd><p>Manages running jobs that have been queued using <a href="HubManager.md#HubManager+queueJob">HubManager#queueJob</a>.</p>
 </dd>
 <dt><a href="JobWorker.md#JobWorker">JobWorker</a> ⇐ <code>EventEmitter</code></dt>
 <dd><p>Responsible for running the job in the forked worker process.</p>

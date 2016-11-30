@@ -22,6 +22,7 @@ var util = require("jobhub/lib/util");
     * [.dehydrateError(err)](module_jobhub_lib_util.md#module_jobhub/lib/util.dehydrateError) ⇒ <code>object</code>
     * [.promiseTry(fn)](module_jobhub_lib_util.md#module_jobhub/lib/util.promiseTry) ⇒ <code>Promise</code>
     * [.objectValues(obj)](module_jobhub_lib_util.md#module_jobhub/lib/util.objectValues) ⇒ <code>Array</code>
+    * [.extendDefaultOptions(options, defaultOptions)](module_jobhub_lib_util.md#module_jobhub/lib/util.extendDefaultOptions) ⇒ <code>object</code>
 
 <a name="module_jobhub/lib/util.getDefaultManagerOptions"></a>
 
@@ -152,4 +153,17 @@ Polyfill for Object.values.
 | Param | Type |
 | --- | --- |
 | obj | <code>object</code> | 
+
+<a name="module_jobhub/lib/util.extendDefaultOptions"></a>
+
+### jobhub/lib/util.extendDefaultOptions(options, defaultOptions) ⇒ <code>object</code>
+Create an options object that only includes the props from a "default" options object.
+
+**Kind**: static method of <code>[jobhub/lib/util](module_jobhub_lib_util.md#module_jobhub/lib/util)</code>  
+**Access:** protected  
+
+| Param | Type |
+| --- | --- |
+| options | <code>object</code> | 
+| defaultOptions | <code>object</code> | 
 

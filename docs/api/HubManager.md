@@ -13,6 +13,7 @@ Manages the lifecycle of jobs.
     * [.options](HubManager.md#HubManager+options) : <code>[HubManagerOptions](HubManagerOptions.md#HubManagerOptions)</code>
     * [.middleware](HubManager.md#HubManager+middleware) : <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>
     * [.jobs](HubManager.md#HubManager+jobs) : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
+    * [.jobExecutor](HubManager.md#HubManager+jobExecutor) : <code>[JobExecutor](JobExecutor.md#JobExecutor)</code>
     * [.start()](HubManager.md#HubManager+start) ⇒ <code>[HubManager](HubManager.md#HubManager)</code>
     * [.addSyncMiddlware(type, middleware, [priority])](HubManager.md#HubManager+addSyncMiddlware) ⇒ <code>[HubManager](HubManager.md#HubManager)</code>
     * [.getUniqueKey(job, [params])](HubManager.md#HubManager+getUniqueKey) ⇒ <code>string</code> &#124; <code>null</code>
@@ -55,6 +56,12 @@ Middleware store used by the HubManager.
 
 ### hubManager.jobs : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
 Stores [JobConfig](JobConfig.md#JobConfig) registered for the HubManager.
+
+**Kind**: instance property of <code>[HubManager](HubManager.md#HubManager)</code>  
+<a name="HubManager+jobExecutor"></a>
+
+### hubManager.jobExecutor : <code>[JobExecutor](JobExecutor.md#JobExecutor)</code>
+Manages running queued jobs.
 
 **Kind**: instance property of <code>[HubManager](HubManager.md#HubManager)</code>  
 <a name="HubManager+start"></a>

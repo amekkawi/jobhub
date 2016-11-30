@@ -11,6 +11,8 @@ Configuration options for the [HubManager](HubManager.md#HubManager).
     * [.jobsModulePath](HubManagerOptions.md#HubManagerOptions+jobsModulePath) : <code>string</code>
     * [.initModulePath](HubManagerOptions.md#HubManagerOptions+initModulePath) : <code>null</code> &#124; <code>string</code>
     * [.forkModulePath](HubManagerOptions.md#HubManagerOptions+forkModulePath) : <code>string</code>
+    * [.jobExecutorClass](HubManagerOptions.md#HubManagerOptions+jobExecutorClass) : <code>function</code> &#124; <code>[JobExecutor](JobExecutor.md#JobExecutor)</code>
+    * [.jobExecutorOptions](HubManagerOptions.md#HubManagerOptions+jobExecutorOptions) : <code>object</code> &#124; <code>[JobExecutorBuiltinOptions](JobExecutorBuiltinOptions.md#JobExecutorBuiltinOptions)</code>
     * [.terminationSIGTERMTimeout](HubManagerOptions.md#HubManagerOptions+terminationSIGTERMTimeout) : <code>number</code>
     * [.terminationSIGKILLTimeout](HubManagerOptions.md#HubManagerOptions+terminationSIGKILLTimeout) : <code>number</code>
     * [.workerStartupTimeout](HubManagerOptions.md#HubManagerOptions+workerStartupTimeout) : <code>number</code>
@@ -36,6 +38,20 @@ Path to node script used to fork the child processes.
 
 **Kind**: instance property of <code>[HubManagerOptions](HubManagerOptions.md#HubManagerOptions)</code>  
 **Default**: <code>&quot;jobhub/lib/worker.js&quot;</code>  
+<a name="HubManagerOptions+jobExecutorClass"></a>
+
+### hubManagerOptions.jobExecutorClass : <code>function</code> &#124; <code>[JobExecutor](JobExecutor.md#JobExecutor)</code>
+Overrides class used for [HubManager#jobExecutor](HubManager.md#HubManager+jobExecutor).
+
+**Kind**: instance property of <code>[HubManagerOptions](HubManagerOptions.md#HubManagerOptions)</code>  
+**Default**: <code>require(&#x27;jobhub/lib/JobExecutorBuiltin&#x27;)</code>  
+<a name="HubManagerOptions+jobExecutorOptions"></a>
+
+### hubManagerOptions.jobExecutorOptions : <code>object</code> &#124; <code>[JobExecutorBuiltinOptions](JobExecutorBuiltinOptions.md#JobExecutorBuiltinOptions)</code>
+Option overrides passed to the [JobExecutor](JobExecutor.md#JobExecutor).
+
+**Kind**: instance property of <code>[HubManagerOptions](HubManagerOptions.md#HubManagerOptions)</code>  
+**Default**: <code>{}</code>  
 <a name="HubManagerOptions+terminationSIGTERMTimeout"></a>
 
 ### hubManagerOptions.terminationSIGTERMTimeout : <code>number</code>
