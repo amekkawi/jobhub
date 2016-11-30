@@ -21,6 +21,20 @@
     "docs-api-protected": "node .bin/docs/index.js docs/api-protected --overwrite --protected",
     "lint": "eslint lib"
   },
+  "keywords": [
+    "asynchronous",
+    "background",
+    "child",
+    "concurrency",
+    "farm",
+    "job",
+    "processing",
+    "queue",
+    "scale",
+    "service",
+    "task",
+    "worker"
+  ],
   "dependencies": {
     "minimist": "^1.2.0",
     "uuid": "^2.0.0"
