@@ -8,7 +8,7 @@ Helper utilities used by jobhub.
 **Access:** protected  
 **Example**  
 ```javascript
-var errors = require("jobhub/lib/util");
+var util = require("jobhub/lib/util");
 ```
 
 * [jobhub/lib/util](module_jobhub_lib_util.md#module_jobhub/lib/util)
