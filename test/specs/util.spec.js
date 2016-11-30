@@ -7,6 +7,7 @@ var errors = require('../../lib/errors');
 describe('util', function() {
 	var exportNames = [
 		'dehydrateError',
+		'extendDefaultOptions',
 		'getDefaultManagerOptions',
 		'getUniqueKey',
 		'objectValues',
@@ -857,6 +858,59 @@ describe('util', function() {
 
 			var dehydrated = util.dehydrateError(err);
 			expect(Object.keys(dehydrated)).toEqual(['name', 'message', 'stack', 'foo']);
+		});
+	});
+
+	describe('extendDefaultOptions', function() {
+		it('should include the defaults', function() {
+			var defaults = {
+				foo: 500,
+				bar: 300
+			};
+			var parsed = util.extendDefaultOptions({}, defaults);
+			expect(parsed).toBeA('object');
+			expect(Object.keys(parsed)).toEqual(Object.keys(defaults));
+			expect(parsed.foo).toBe(500);
+			expect(parsed.bar).toBe(300);
+		});
+
+		it('should override defaults and maintain same key order as defaults', function() {
+			var defaults = {
+				foo: 500,
+				bar: 200
+			};
+			var parsed = util.extendDefaultOptions({
+				bar: 200,
+				foo: 600
+			}, defaults);
+			expect(Object.keys(parsed)).toEqual(Object.keys(defaults));
+			expect(parsed.foo).toBe(600);
+			expect(parsed.bar).toBe(200);
+		});
+
+		it('should omit override props not in the defaults', function() {
+			var defaults = {
+				foo: 500
+			};
+			var parsed = util.extendDefaultOptions({
+				bar: 200
+			}, defaults);
+			expect(parsed).toBeA('object');
+			expect(Object.keys(parsed)).toEqual(Object.keys(defaults));
+		});
+
+		it('should omit override props that are not "own"', function() {
+			function Super() {
+				expect(this.foo).toBe(200);
+			}
+			Super.prototype.foo = 200;
+
+			var defaults = {
+				foo: 500
+			};
+
+			var parsed = util.extendDefaultOptions(new Super(), defaults);
+			expect(parsed.foo).toBe(500);
 		});
 	});
 });
