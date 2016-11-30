@@ -21,6 +21,7 @@ receiving configuration and sending events via an IPC messages.
     * [.jobs](JobWorkerIPC.md#JobWorker+jobs) : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
     * [.init()](JobWorkerIPC.md#JobWorkerIPC+init) ⇒ <code>Promise</code>
     * [.start()](JobWorkerIPC.md#JobWorker+start) ⇒ <code>Promise</code>
+    * ["jobAbort"](JobWorkerIPC.md#JobWorker+event_jobAbort)
 
 <a name="JobWorkerIPC+payloadMessageTimeout"></a>
 
@@ -90,3 +91,9 @@ Overrides [JobWorker#init](JobWorker#init) to first request the following to be 
 Starts the job, loads job config, validates params and executes [JobConfig#run](JobConfig.md#JobConfig+run).
 
 **Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
+<a name="JobWorker+event_jobAbort"></a>
+
+### "jobAbort"
+Fires when the job is told to abort.
+
+**Kind**: event emitted by <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  

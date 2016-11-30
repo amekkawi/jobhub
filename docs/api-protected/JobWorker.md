@@ -2,12 +2,14 @@
 
 <a name="JobWorker"></a>
 
-## JobWorker
+## JobWorker ⇐ <code>EventEmitter</code>
 Responsible for running the job in the forked worker process.
 
 **Kind**: global class  
+**Extends:** <code>EventEmitter</code>  
+**Emits**: <code>[jobAbort](JobWorker.md#JobWorker+event_jobAbort)</code>  
 
-* [JobWorker](JobWorker.md#JobWorker)
+* [JobWorker](JobWorker.md#JobWorker) ⇐ <code>EventEmitter</code>
     * [new JobWorker(jobId, jobName, params, options)](JobWorker.md#JobWorker)
     * [.jobId](JobWorker.md#JobWorker+jobId) : <code>string</code>
     * [.jobName](JobWorker.md#JobWorker+jobName) : <code>string</code>
@@ -25,6 +27,8 @@ Responsible for running the job in the forked worker process.
     * [.handleSuccess(result)](JobWorker.md#JobWorker+handleSuccess) ⇒ <code>Promise</code>
     * [.handleError(err)](JobWorker.md#JobWorker+handleError) ⇒ <code>Promise</code>
     * [.handleProgress(progress)](JobWorker.md#JobWorker+handleProgress) ⇒ <code>Promise</code>
+    * [.handleAbort()](JobWorker.md#JobWorker+handleAbort)
+    * ["jobAbort"](JobWorker.md#JobWorker+event_jobAbort)
 
 <a name="new_JobWorker_new"></a>
 
@@ -154,3 +158,18 @@ Called when the job sends progress.
 | --- | --- |
 | progress | <code>\*</code> | 
 
+<a name="JobWorker+handleAbort"></a>
+
+### jobWorker.handleAbort()
+Called when the JobWorker is notified of an abort.
+
+Emits a [JobWorker#event:jobAbort](JobWorker.md#JobWorker+event_jobAbort) only if [JobWorker#running](JobWorker.md#JobWorker+running) is true.
+
+**Kind**: instance method of <code>[JobWorker](JobWorker.md#JobWorker)</code>  
+**Access:** protected  
+<a name="JobWorker+event_jobAbort"></a>
+
+### "jobAbort"
+Fires when the job is told to abort.
+
+**Kind**: event emitted by <code>[JobWorker](JobWorker.md#JobWorker)</code>  

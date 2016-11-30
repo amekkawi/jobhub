@@ -53,6 +53,7 @@ describe('JobWorkerIPCMediator', function() {
 		};
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 		expect(mediator.trackedJob).toBe(trackedJob, 'Expected JobWorkerIPCMediator#trackedJob %s to be the tracked job');
+		expect(mediator.forked).toBe(false, 'Expected JobWorkerIPCMediator#forked %s to be %s');
 		expect(mediator.started).toBe(false, 'Expected JobWorkerIPCMediator#started %s to be %s');
 		expect(mediator.exited).toBe(false, 'Expected JobWorkerIPCMediator#exited %s to be %s');
 		expect(mediator.childProcess).toBe(null, 'Expected JobWorkerIPCMediator#childProcess %s to be %s');
@@ -289,6 +290,8 @@ describe('JobWorkerIPCMediator', function() {
 
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 
+		expect.spyOn(mediator, 'handleStartupConfirmation').andCallThrough();
+
 		var childProcess = mediator.childProcess = createChildProcessFixture();
 		expect.spyOn(childProcess, 'send').andCall(function() {
 			expect(arguments.length).toBe(2, 'Expected arguments length %s to be %s');
@@ -304,10 +307,15 @@ describe('JobWorkerIPCMediator', function() {
 			return true;
 		});
 
+		expect(mediator.started).toBe(false, 'Expected JobWorkerIPCMediator#started %s to be %s');
+		expect(mediator.handleStartupConfirmation.calls.length).toBe(0, 'Expected JobWorkerIPCMediator#handleStartupConfirmation call count %s to be %s');
+
 		mediator.handleChildMessage({
 			type: constants.JOB_MESSAGE_STARTUP
 		});
 
+		expect(mediator.handleStartupConfirmation.calls.length).toBe(1, 'Expected JobWorkerIPCMediator#handleStartupConfirmation call count %s to be %s');
+		expect(mediator.started).toBe(true, 'Expected JobWorkerIPCMediator#started %s to be %s');
 		expect(childProcess.send.calls.length).toBe(1, 'Expected childProcess#send call count %s to be %s');
 	});
 
@@ -584,7 +592,7 @@ describe('JobWorkerIPCMediator', function() {
 		mediator.terminate(true);
 		expect(childProcess.kill.calls.length).toBe(0);
 
-		mediator.started = true;
+		mediator.forked = true;
 		mediator.terminate();
 		mediator.terminate(true);
 		expect(mediator.childProcess.kill.calls.length).toBe(2);
@@ -597,5 +605,125 @@ describe('JobWorkerIPCMediator', function() {
 		mediator.terminate();
 		mediator.terminate(true);
 		expect(mediator.childProcess.kill.calls.length).toBe(2);
+	});
+
+	it('should defer sending the abort message until receiving startup confirmation', function() {
+		var trackedJob = {
+			jobId: 'BAR',
+			jobConfig: {
+				jobName: 'FOO'
+			},
+			params: {},
+			manager: createManagerFixture()
+		};
+
+		var childProcess = createChildProcessFixture({
+			connected: true,
+			send: expect.createSpy()
+		});
+
+		var mediator = new JobWorkerIPCMediator(trackedJob);
+
+		trackedJob.manager.middleware.addSyncMiddlware(
+			constants.MIDDLEWARE_FORK_JOB_PROCESS,
+			function() {
+				return childProcess;
+			}
+		);
+
+		mediator.startWorker().then(function() {
+			expect(mediator.started).toBe(false, 'Expected JobWorkerIPCMediator#started %s to be %s');
+			expect(mediator.handleStartupConfirmation.calls.length).toBe(0, 'Expected JobWorkerIPCMediator#handleStartupConfirmation call count %s to be %s');
+
+			mediator.sendAbortMessage();
+
+			expect(childProcess.send.calls.length).toBe(0, 'Expected childProcess#send call count %s to be %s');
+
+			mediator.handleStartupConfirmation();
+
+			expect(mediator.started).toBe(true, 'Expected JobWorkerIPCMediator#started %s to be %s');
+
+			expect(childProcess.send.calls.length).toBe(1, 'Expected childProcess#send call count %s to be %s');
+			expect(childProcess.send.calls.length).toBe(1);
+			expect(childProcess.send.calls[0].arguments.length).toBe(1);
+			expect(childProcess.send.calls[0].arguments[0]).toBeA(Object);
+			expect(Object.keys(childProcess.send.calls[0].arguments[0])).toEqual(['type']);
+			expect(childProcess.send.calls[0].arguments[0].type).toBe(constants.JOB_MESSAGE_ABORT);
+		});
+	});
+
+	it('should send the abort message if startup is confirmed and IPC is still connected', function() {
+		var trackedJob = {
+			jobId: 'BAR',
+			jobConfig: {
+				jobName: 'FOO'
+			},
+			params: {},
+			manager: createManagerFixture()
+		};
+
+		var childProcess = createChildProcessFixture({
+			connected: true,
+			send: expect.createSpy()
+		});
+
+		var mediator = new JobWorkerIPCMediator(trackedJob);
+
+		trackedJob.manager.middleware.addSyncMiddlware(
+			constants.MIDDLEWARE_FORK_JOB_PROCESS,
+			function() {
+				return childProcess;
+			}
+		);
+
+		mediator.startWorker().then(function() {
+			mediator.handleStartupConfirmation();
+			expect(childProcess.send.calls.length).toBe(0, 'Expected childProcess#send call count %s to be %s');
+			expect(mediator.started).toBe(true, 'Expected JobWorkerIPCMediator#started %s to be %s');
+
+			mediator.sendAbortMessage();
+
+			expect(childProcess.send.calls.length).toBe(1, 'Expected childProcess#send call count %s to be %s');
+			expect(childProcess.send.calls[0].arguments.length).toBe(1);
+			expect(childProcess.send.calls[0].arguments[0]).toBeA(Object);
+			expect(Object.keys(childProcess.send.calls[0].arguments[0])).toEqual(['type']);
+			expect(childProcess.send.calls[0].arguments[0].type).toBe(constants.JOB_MESSAGE_ABORT);
+		});
+	});
+
+	it('should not send the abort message if startup is confirmed but IPC is disconnected', function() {
+		var trackedJob = {
+			jobId: 'BAR',
+			jobConfig: {
+				jobName: 'FOO'
+			},
+			params: {},
+			manager: createManagerFixture()
+		};
+
+		var childProcess = createChildProcessFixture({
+			connected: true,
+			send: expect.createSpy()
+		});
+
+		var mediator = new JobWorkerIPCMediator(trackedJob);
+
+		trackedJob.manager.middleware.addSyncMiddlware(
+			constants.MIDDLEWARE_FORK_JOB_PROCESS,
+			function() {
+				return childProcess;
+			}
+		);
+
+		mediator.startWorker().then(function() {
+			mediator.handleStartupConfirmation();
+			expect(childProcess.send.calls.length).toBe(0, 'Expected childProcess#send call count %s to be %s');
+			expect(mediator.started).toBe(true, 'Expected JobWorkerIPCMediator#started %s to be %s');
+
+			childProcess.connected = false;
+
+			mediator.sendAbortMessage();
+			expect(childProcess.send.calls.length).toBe(0, 'Expected childProcess#send call count %s to be %s');
+		});
 	});
 });

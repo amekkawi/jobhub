@@ -2,12 +2,14 @@
 
 <a name="JobWorker"></a>
 
-## JobWorker
+## JobWorker ⇐ <code>EventEmitter</code>
 Responsible for running the job in the forked worker process.
 
 **Kind**: global class  
+**Extends:** <code>EventEmitter</code>  
+**Emits**: <code>[jobAbort](JobWorker.md#JobWorker+event_jobAbort)</code>  
 
-* [JobWorker](JobWorker.md#JobWorker)
+* [JobWorker](JobWorker.md#JobWorker) ⇐ <code>EventEmitter</code>
     * [new JobWorker(jobId, jobName, params, options)](JobWorker.md#JobWorker)
     * [.jobId](JobWorker.md#JobWorker+jobId) : <code>string</code>
     * [.jobName](JobWorker.md#JobWorker+jobName) : <code>string</code>
@@ -18,6 +20,7 @@ Responsible for running the job in the forked worker process.
     * [.middleware](JobWorker.md#JobWorker+middleware) : <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>
     * [.jobs](JobWorker.md#JobWorker+jobs) : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
     * [.start()](JobWorker.md#JobWorker+start) ⇒ <code>Promise</code>
+    * ["jobAbort"](JobWorker.md#JobWorker+event_jobAbort)
 
 <a name="new_JobWorker_new"></a>
 
@@ -74,3 +77,9 @@ Set to a Promise the first time [JobWorker#start](JobWorker.md#JobWorker+start) 
 Starts the job, loads job config, validates params and executes [JobConfig#run](JobConfig.md#JobConfig+run).
 
 **Kind**: instance method of <code>[JobWorker](JobWorker.md#JobWorker)</code>  
+<a name="JobWorker+event_jobAbort"></a>
+
+### "jobAbort"
+Fires when the job is told to abort.
+
+**Kind**: event emitted by <code>[JobWorker](JobWorker.md#JobWorker)</code>  

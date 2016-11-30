@@ -7,7 +7,7 @@ Tracks a job that has not yet completed.
 
 **Kind**: global class  
 **Extends:** <code>EventEmitter</code>  
-**Emits**: <code>[jobStarted](TrackedJob.md#TrackedJob+event_jobStarted)</code>, <code>[jobForked](TrackedJob.md#TrackedJob+event_jobForked)</code>, <code>[jobProgress](TrackedJob.md#TrackedJob+event_jobProgress)</code>, <code>[jobSuccess](TrackedJob.md#TrackedJob+event_jobSuccess)</code>, <code>[jobFailure](TrackedJob.md#TrackedJob+event_jobFailure)</code>  
+**Emits**: <code>[jobStarted](TrackedJob.md#TrackedJob+event_jobStarted)</code>, <code>[jobForked](TrackedJob.md#TrackedJob+event_jobForked)</code>, <code>[jobProgress](TrackedJob.md#TrackedJob+event_jobProgress)</code>, <code>[jobSuccess](TrackedJob.md#TrackedJob+event_jobSuccess)</code>, <code>[jobFailure](TrackedJob.md#TrackedJob+event_jobFailure)</code>, <code>[jobAbort](TrackedJob.md#TrackedJob+event_jobAbort)</code>  
 
 * [TrackedJob](TrackedJob.md#TrackedJob) ⇐ <code>EventEmitter</code>
     * [new TrackedJob(manager, jobId, jobConfig, [params])](TrackedJob.md#TrackedJob)
@@ -19,6 +19,8 @@ Tracks a job that has not yet completed.
     * [.params](TrackedJob.md#TrackedJob+params) : <code>\*</code>
     * [.isRunning](TrackedJob.md#TrackedJob+isRunning) : <code>boolean</code>
     * [.isSettled](TrackedJob.md#TrackedJob+isSettled) : <code>boolean</code>
+    * [.aborted](TrackedJob.md#TrackedJob+aborted) : <code>boolean</code>
+    * [.abortReason](TrackedJob.md#TrackedJob+abortReason) : <code>null</code> &#124; <code>string</code>
     * [.promise](TrackedJob.md#TrackedJob+promise) : <code>null</code> &#124; <code>Promise</code>
     * [.workerMediator](TrackedJob.md#TrackedJob+workerMediator) : <code>null</code> &#124; <code>[JobWorkerMediator](JobWorkerMediator.md#JobWorkerMediator)</code>
     * [.result](TrackedJob.md#TrackedJob+result) : <code>\*</code>
@@ -27,12 +29,14 @@ Tracks a job that has not yet completed.
     * [.then()](TrackedJob.md#TrackedJob+then) ⇒ <code>Promise</code>
     * [.catch()](TrackedJob.md#TrackedJob+catch) ⇒ <code>Promise</code>
     * [.run()](TrackedJob.md#TrackedJob+run) ⇒ <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>
+    * [.abort([reason])](TrackedJob.md#TrackedJob+abort) ⇒ <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>
     * [.reEmitTo(eventEmitter)](TrackedJob.md#TrackedJob+reEmitTo) ⇒ <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>
     * ["jobStarted"](TrackedJob.md#TrackedJob+event_jobStarted)
     * ["jobForked"](TrackedJob.md#TrackedJob+event_jobForked)
     * ["jobProgress" (progress)](TrackedJob.md#TrackedJob+event_jobProgress)
     * ["jobSuccess" (result)](TrackedJob.md#TrackedJob+event_jobSuccess)
     * ["jobFailure" (error)](TrackedJob.md#TrackedJob+event_jobFailure)
+    * ["jobAbort" (abortReason)](TrackedJob.md#TrackedJob+event_jobAbort)
 
 <a name="new_TrackedJob_new"></a>
 
@@ -101,6 +105,20 @@ Set to `true` once [JobConfig#run](JobConfig.md#JobConfig+run) is called and fal
 Set to `true` once the job succeeds or fails.
 
 **Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
+<a name="TrackedJob+aborted"></a>
+
+### trackedJob.aborted : <code>boolean</code>
+Indicates that [TrackedJob#abort](TrackedJob.md#TrackedJob+abort) has been called, but does not mean the job has actually aborted.
+
+See [TrackedJob#abort](TrackedJob.md#TrackedJob+abort) for detail.
+
+**Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
+<a name="TrackedJob+abortReason"></a>
+
+### trackedJob.abortReason : <code>null</code> &#124; <code>string</code>
+User-specified message for the reason the job was aborted, set by [TrackedJob#abort](TrackedJob.md#TrackedJob+abort).
+
+**Kind**: instance property of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
 <a name="TrackedJob+promise"></a>
 
 ### trackedJob.promise : <code>null</code> &#124; <code>Promise</code>
@@ -150,6 +168,43 @@ Promise-like `catch` method.
 Start the job, if it has not already started.
 
 **Kind**: instance method of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
+<a name="TrackedJob+abort"></a>
+
+### trackedJob.abort([reason]) ⇒ <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>
+Attempt to abort a job. Calling this method does not mean the job will actually be aborted.
+
+The abort will not actually happen if:
+
+* [JobConfig#validate](JobConfig.md#JobConfig+validate) already threw an error for invalid params.
+* [JobConfig#quickRun](JobConfig.md#JobConfig+quickRun) already called [JobRunArg#resolve](JobRunArg.md#JobRunArg+resolve)/[JobRunArg#reject](JobRunArg.md#JobRunArg+reject) or it threw an error.
+* [TrackedJob#workerMediator](TrackedJob.md#TrackedJob+workerMediator) already received a success or error message from the job's worker process.
+
+To determine if a job was actually aborted either:
+
+* If [TrackedJob#isSettled](TrackedJob.md#TrackedJob+isSettled) is `false`,
+add a catch to [TrackedJob#promise](TrackedJob.md#TrackedJob+promise) or listen for the [TrackedJob#event:jobFailure](TrackedJob.md#TrackedJob+event_jobFailure) event, and
+check if the error is an instance of [JobAbortedError](JobAbortedError.md#JobAbortedError).
+
+    – or –
+
+* If [TrackedJob#isSettled](TrackedJob.md#TrackedJob+isSettled) is `true`,
+check if [TrackedJob#error](TrackedJob.md#TrackedJob+error) is an instance of [JobAbortedError](JobAbortedError.md#JobAbortedError).
+
+Calling this method does nothing if either [TrackedJob#isSettled](TrackedJob.md#TrackedJob+isSettled)
+or [TrackedJob#aborted](TrackedJob.md#TrackedJob+aborted) are already `true`.
+
+**Kind**: instance method of <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
+**See**
+
+- [TrackedJob#aborted](TrackedJob.md#TrackedJob+aborted)
+- [TrackedJob#abortReason](TrackedJob.md#TrackedJob+abortReason)
+- [TrackedJob#sendAbortMessage](TrackedJob#sendAbortMessage)
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| [reason] | <code>string</code> | <code>&quot;No reason specified&quot;</code> | Message for why the job was aborted. |
+
 <a name="TrackedJob+reEmitTo"></a>
 
 ### trackedJob.reEmitTo(eventEmitter) ⇒ <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>
@@ -206,4 +261,15 @@ Fires when the tracked job reports failure.
 | Param | Type |
 | --- | --- |
 | error | <code>Error</code> | 
+
+<a name="TrackedJob+event_jobAbort"></a>
+
+### "jobAbort" (abortReason)
+Fires when the tracked job is attempted to be aborted.
+
+**Kind**: event emitted by <code>[TrackedJob](TrackedJob.md#TrackedJob)</code>  
+
+| Param | Type |
+| --- | --- |
+| abortReason | <code>string</code> | 
 

@@ -33,6 +33,7 @@ describe('JobWorkerMediator', function() {
 		};
 		var mediator = new JobWorkerMediator(trackedJob);
 		expect(mediator.trackedJob).toBe(trackedJob, 'Expected JobWorkerMediator#trackedJob %s to be the tracked job');
+		expect(mediator.forked).toBe(false, 'Expected JobWorkerMediator#forked %s to be %s');
 		expect(mediator.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
 		expect(mediator.settled).toBe(false, 'Expected JobWorkerMediator#settled %s to be %s');
 		expect(mediator.exited).toBe(false, 'Expected JobWorkerMediator#exited %s to be %s');
@@ -75,6 +76,16 @@ describe('JobWorkerMediator', function() {
 				if (!(err instanceof Error) || err.message !== 'JobWorkerMediator#terminate is abstract and must be overridden') {
 					throw err;
 				}
+			}),
+			new Promise(function(resolve, reject) {
+				mediator.sendAbortMessage();
+				reject(new Error('Expected to throw error for JobWorkerMediator#sendAbortMessage'))
+			}).then(function() {
+				throw new Error('Expected to not resolve for JobWorkerMediator#sendAbortMessage');
+			}, function(err) {
+				if (!(err instanceof Error) || err.message !== 'JobWorkerMediator#sendAbortMessage is abstract and must be overridden') {
+					throw err;
+				}
 			})
 		]);
 	});
@@ -92,10 +103,12 @@ describe('JobWorkerMediator', function() {
 			JobWorkerMediator.apply(this, arguments);
 			expect.spyOn(this, 'execWorker').andCall(function() {
 				expect(this.initStartupTimeout.calls.length).toBe(1, 'Expected JobWorkerMediator#initStartupTimeout call count %s to be %s');
+				expect(this.forked).toBe(false, 'Expected JobWorkerMediator#forked %s to be %s');
 				expect(this.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
 			});
 			expect.spyOn(this, 'initStartupTimeout').andCall(function() {
 				expect(this.execWorker.calls.length).toBe(0, 'Expected JobWorkerMediator#execWorker call count %s to be %s');
+				expect(this.forked).toBe(false, 'Expected JobWorkerMediator#forked %s to be %s');
 				expect(this.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
 			});
 		});
@@ -105,7 +118,8 @@ describe('JobWorkerMediator', function() {
 			.then(function() {
 				expect(mediator.execWorker.calls.length).toBe(1, 'Expected JobWorkerMediator#execWorker call count %s to be %s');
 				expect(mediator.initStartupTimeout.calls.length).toBe(1, 'Expected JobWorkerMediator#initStartupTimeout call count %s to be %s');
-				expect(mediator.started).toBe(true, 'Expected JobWorkerMediator#started %s to be %s');
+				expect(mediator.forked).toBe(true, 'Expected JobWorkerMediator#forked %s to be %s');
+				expect(mediator.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
 			});
 	});
 
@@ -236,7 +250,9 @@ describe('JobWorkerMediator', function() {
 			});
 
 			mediator.startWorker().then(function() {
+				expect(mediator.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
 				mediator.handleStartupConfirmation();
+				expect(mediator.started).toBe(true, 'Expected JobWorkerMediator#started %s to be %s');
 
 				expect(mediator.settled).toBe(false, 'Expected JobWorkerMediator#settled %s to be %s');
 				expect(mediator.stopMediation.calls.length).toBe(0, 'Expected JobWorkerMediator#stopMediation call count %s to be %s');
@@ -498,7 +514,7 @@ describe('JobWorkerMediator', function() {
 		});
 	});
 
-	it('should clear timeout startup once JobWorkerMediator#handleStartupConfirmation is called', function() {
+	it('should clear startup timeout and set JobWorkerMediator#started once JobWorkerMediator#handleStartupConfirmation is called', function() {
 		var expectedResult = {};
 
 		var trackedJob = {
@@ -528,7 +544,9 @@ describe('JobWorkerMediator', function() {
 				.on(constants.EVENT_JOB_FAILURE, reject);
 			mediator.startWorker().then(function() {
 				setTimeout(function() {
+					expect(mediator.started).toBe(false, 'Expected JobWorkerMediator#started %s to be %s');
 					mediator.handleStartupConfirmation();
+					expect(mediator.started).toBe(true, 'Expected JobWorkerMediator#started %s to be %s');
 				}, 1);
 
 				setTimeout(function() {

@@ -6,7 +6,7 @@
 Manages the lifecycle of jobs.
 
 **Kind**: global class  
-**Emits**: <code>[managerStarted](HubManager.md#HubManager+event_managerStarted)</code>, <code>[jobCreated](HubManager.md#HubManager+event_jobCreated)</code>, <code>[jobStarted](HubManager.md#HubManager+event_jobStarted)</code>, <code>[jobForked](HubManager.md#HubManager+event_jobForked)</code>, <code>[jobProgress](HubManager.md#HubManager+event_jobProgress)</code>, <code>[jobSuccess](HubManager.md#HubManager+event_jobSuccess)</code>, <code>[jobFailure](HubManager.md#HubManager+event_jobFailure)</code>, <code>[jobTerminate](HubManager.md#HubManager+event_jobTerminate)</code>  
+**Emits**: <code>[managerStarted](HubManager.md#HubManager+event_managerStarted)</code>, <code>[jobCreated](HubManager.md#HubManager+event_jobCreated)</code>, <code>[jobStarted](HubManager.md#HubManager+event_jobStarted)</code>, <code>[jobForked](HubManager.md#HubManager+event_jobForked)</code>, <code>[jobProgress](HubManager.md#HubManager+event_jobProgress)</code>, <code>[jobSuccess](HubManager.md#HubManager+event_jobSuccess)</code>, <code>[jobFailure](HubManager.md#HubManager+event_jobFailure)</code>, <code>[jobAbort](HubManager.md#HubManager+event_jobAbort)</code>, <code>[jobTerminate](HubManager.md#HubManager+event_jobTerminate)</code>  
 
 * [HubManager](HubManager.md#HubManager)
     * [new HubManager(options)](HubManager.md#HubManager)
@@ -29,6 +29,7 @@ Manages the lifecycle of jobs.
     * ["jobProgress" (trackedJob, progress)](HubManager.md#HubManager+event_jobProgress)
     * ["jobSuccess" (trackedJob, result)](HubManager.md#HubManager+event_jobSuccess)
     * ["jobFailure" (trackedJob, error)](HubManager.md#HubManager+event_jobFailure)
+    * ["jobAbort" (trackedJob)](HubManager.md#HubManager+event_jobAbort)
 
 <a name="new_HubManager_new"></a>
 
@@ -255,4 +256,15 @@ Fires when a job reports failure.
 | --- | --- |
 | trackedJob | <code>[TrackedJob](TrackedJob.md#TrackedJob)</code> | 
 | error | <code>Error</code> | 
+
+<a name="HubManager+event_jobAbort"></a>
+
+### "jobAbort" (trackedJob)
+Fires when a job is attempted to be aborted.
+
+**Kind**: event emitted by <code>[HubManager](HubManager.md#HubManager)</code>  
+
+| Param | Type |
+| --- | --- |
+| trackedJob | <code>[TrackedJob](TrackedJob.md#TrackedJob)</code> | 
 

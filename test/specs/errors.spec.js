@@ -10,6 +10,7 @@ describe('errors', function() {
 		//'InvalidWorkerPayloadError',
 		'InvalidUniqueKeyError',
 		'JobForkError',
+		'JobAbortedError',
 		'InvalidJobParamError',
 		'UnsupportedMiddlewareTypeError',
 		'JobWorkerHandlerError'
@@ -115,6 +116,16 @@ describe('errors', function() {
 		expect(err.hasOwnProperty('error')).toBe(false);
 		expect(err.hasOwnProperty('code')).toBe(false);
 		expect(err.signal).toBe('FOO');
+	});
+
+	it('should instantiate "JobAbortedError"', function() {
+		var err = new errors.JobAbortedError('foo', 'bar', 'msg');
+		expect(err).toBeA(Error);
+		expect(err.name).toBe('JobAbortedError');
+		expect(err.message).toBe('Job aborted: msg');
+		expect(err.jobName).toBe('foo');
+		expect(err.jobId).toBe('bar');
+		expect(err.abortReason).toBe('msg');
 	});
 
 	it('should instantiate "InvalidJobParamError"', function() {
