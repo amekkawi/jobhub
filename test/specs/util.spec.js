@@ -72,7 +72,7 @@ describe('util', function() {
 				jobsModulePath: 'path/to/worker.js'
 			}, defaultOptions);
 			expect(parsed).toBeA('object');
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(managerOptions);
+			expect(Object.keys(parsed).sort()).toEqual(managerOptions);
 			expect(parsed.jobsModulePath).toBe('path/to/worker.js');
 			expect(parsed.forkModulePath).toBe(defaultOptions.forkModulePath);
 			expect(parsed.initModulePath).toBe(defaultOptions.initModulePath);
@@ -84,7 +84,7 @@ describe('util', function() {
 				someOtherProp: {}
 			}, util.getDefaultManagerOptions());
 			expect(parsed).toBeA('object');
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(managerOptions);
+			expect(Object.keys(parsed).sort()).toEqual(managerOptions);
 		});
 
 		it('should throw a InvalidManagerOptionsError if "jobsModulePath" is not a string', function() {
@@ -216,7 +216,7 @@ describe('util', function() {
 			};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
 			expect(parsed).toBeA(Object);
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(props);
+			expect(Object.keys(parsed).sort()).toEqual(props);
 			expect(parsed.jobName).toBe('FOO');
 			expect(parsed.run).toBe(jobConfig.run);
 			expect(parsed.quickRun).toBe(jobConfig.quickRun);
@@ -233,7 +233,7 @@ describe('util', function() {
 			};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
 			expect(parsed).toBeA(Object);
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(props);
+			expect(Object.keys(parsed).sort()).toEqual(props);
 			expect(parsed.jobName).toBe('FOO');
 			expect(parsed.run).toBe(jobConfig.run);
 			expect(parsed.quickRun).toBe(null);
@@ -263,7 +263,7 @@ describe('util', function() {
 			};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
 			expect(parsed).toBeA(Object);
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(props);
+			expect(Object.keys(parsed).sort()).toEqual(props);
 			expect(parsed.jobName).toBe('FOO');
 			expect(parsed.run).toBe(jobConfig.run);
 			expect(parsed.quickRun).toBe(null);
@@ -276,7 +276,7 @@ describe('util', function() {
 			var jobConfig = function() {};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
 			expect(parsed).toBeA(Object);
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(props);
+			expect(Object.keys(parsed).sort()).toEqual(props);
 			expect(parsed.jobName).toBe('FOO');
 			expect(parsed.run).toBe(jobConfig);
 			expect(parsed.quickRun).toBe(null);
