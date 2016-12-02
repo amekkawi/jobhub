@@ -7,6 +7,7 @@ var errors = require('../../lib/errors');
 describe('util', function() {
 	var exportNames = [
 		'dehydrateError',
+		'extendDefaultOptions',
 		'getDefaultManagerOptions',
 		'getUniqueKey',
 		'objectValues',
@@ -26,6 +27,8 @@ describe('util', function() {
 	var managerOptions = [
 		'forkModulePath',
 		'jobsModulePath',
+		'jobExecutorClass',
+		'jobExecutorOptions',
 		'initModulePath',
 		'terminationSIGTERMTimeout',
 		'terminationSIGKILLTimeout',
@@ -45,6 +48,14 @@ describe('util', function() {
 
 		it('should have "jobsModulePath" default to null', function() {
 			expect(util.getDefaultManagerOptions().jobsModulePath).toBe(null);
+		});
+
+		it('should have "jobExecutorClass" default to null', function() {
+			expect(util.getDefaultManagerOptions().jobExecutorClass).toBe(null);
+		});
+
+		it('should have "jobExecutorOptions" default to null', function() {
+			expect(util.getDefaultManagerOptions().jobExecutorOptions).toBe(null);
 		});
 
 		it('should have "terminationSIGTERMTimeout" default to 60000', function() {
@@ -71,7 +82,7 @@ describe('util', function() {
 				jobsModulePath: 'path/to/worker.js'
 			}, defaultOptions);
 			expect(parsed).toBeA('object');
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(managerOptions);
+			expect(Object.keys(parsed).sort()).toEqual(managerOptions);
 			expect(parsed.jobsModulePath).toBe('path/to/worker.js');
 			expect(parsed.forkModulePath).toBe(defaultOptions.forkModulePath);
 			expect(parsed.initModulePath).toBe(defaultOptions.initModulePath);
@@ -83,7 +94,7 @@ describe('util', function() {
 				someOtherProp: {}
 			}, util.getDefaultManagerOptions());
 			expect(parsed).toBeA('object');
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(managerOptions);
+			expect(Object.keys(parsed).sort()).toEqual(managerOptions);
 		});
 
 		it('should throw a InvalidManagerOptionsError if "jobsModulePath" is not a string', function() {
@@ -135,6 +146,28 @@ describe('util', function() {
 				}, util.getDefaultManagerOptions());
 			}).toThrowWithProps(errors.InvalidManagerOptionsError, {
 				propName: 'initModulePath'
+			});
+		});
+
+		it('should throw a InvalidManagerOptionsError if "jobExecutorClass" is not a function', function() {
+			expect(function() {
+				util.parseManagerOptions({
+					jobsModulePath: 'path/to/module',
+					jobExecutorClass: {}
+				}, util.getDefaultManagerOptions());
+			}).toThrowWithProps(errors.InvalidManagerOptionsError, {
+				propName: 'jobExecutorClass'
+			});
+		});
+
+		it('should throw a InvalidManagerOptionsError if "jobExecutorOptions" is not a function', function() {
+			expect(function() {
+				util.parseManagerOptions({
+					jobsModulePath: 'path/to/module',
+					jobExecutorOptions: 500
+				}, util.getDefaultManagerOptions());
+			}).toThrowWithProps(errors.InvalidManagerOptionsError, {
+				propName: 'jobExecutorOptions'
 			});
 		});
 
@@ -215,7 +248,7 @@ describe('util', function() {
 			};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
 			expect(parsed).toBeA(Object);
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(props);
+			expect(Object.keys(parsed).sort()).toEqual(props);
 			expect(parsed.jobName).toBe('FOO');
 			expect(parsed.run).toBe(jobConfig.run);
 			expect(parsed.quickRun).toBe(jobConfig.quickRun);
@@ -232,7 +265,7 @@ describe('util', function() {
 			};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
 			expect(parsed).toBeA(Object);
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(props);
+			expect(Object.keys(parsed).sort()).toEqual(props);
 			expect(parsed.jobName).toBe('FOO');
 			expect(parsed.run).toBe(jobConfig.run);
 			expect(parsed.quickRun).toBe(null);
@@ -262,7 +295,7 @@ describe('util', function() {
 			};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
 			expect(parsed).toBeA(Object);
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(props);
+			expect(Object.keys(parsed).sort()).toEqual(props);
 			expect(parsed.jobName).toBe('FOO');
 			expect(parsed.run).toBe(jobConfig.run);
 			expect(parsed.quickRun).toBe(null);
@@ -275,7 +308,7 @@ describe('util', function() {
 			var jobConfig = function() {};
 			var parsed = util.parseJobConfig('FOO', jobConfig);
 			expect(parsed).toBeA(Object);
-			expect(Object.getOwnPropertyNames(parsed).sort()).toEqual(props);
+			expect(Object.keys(parsed).sort()).toEqual(props);
 			expect(parsed.jobName).toBe('FOO');
 			expect(parsed.run).toBe(jobConfig);
 			expect(parsed.quickRun).toBe(null);
@@ -857,6 +890,59 @@ describe('util', function() {
 
 			var dehydrated = util.dehydrateError(err);
 			expect(Object.keys(dehydrated)).toEqual(['name', 'message', 'stack', 'foo']);
+		});
+	});
+
+	describe('extendDefaultOptions', function() {
+		it('should include the defaults', function() {
+			var defaults = {
+				foo: 500,
+				bar: 300
+			};
+			var parsed = util.extendDefaultOptions({}, defaults);
+			expect(parsed).toBeA('object');
+			expect(Object.keys(parsed)).toEqual(Object.keys(defaults));
+			expect(parsed.foo).toBe(500);
+			expect(parsed.bar).toBe(300);
+		});
+
+		it('should override defaults and maintain same key order as defaults', function() {
+			var defaults = {
+				foo: 500,
+				bar: 200
+			};
+			var parsed = util.extendDefaultOptions({
+				bar: 200,
+				foo: 600
+			}, defaults);
+			expect(Object.keys(parsed)).toEqual(Object.keys(defaults));
+			expect(parsed.foo).toBe(600);
+			expect(parsed.bar).toBe(200);
+		});
+
+		it('should omit override props not in the defaults', function() {
+			var defaults = {
+				foo: 500
+			};
+			var parsed = util.extendDefaultOptions({
+				bar: 200
+			}, defaults);
+			expect(parsed).toBeA('object');
+			expect(Object.keys(parsed)).toEqual(Object.keys(defaults));
+		});
+
+		it('should omit override props that are not "own"', function() {
+			function Super() {
+				expect(this.foo).toBe(200);
+			}
+			Super.prototype.foo = 200;
+
+			var defaults = {
+				foo: 500
+			};
+
+			var parsed = util.extendDefaultOptions(new Super(), defaults);
+			expect(parsed.foo).toBe(500);
 		});
 	});
 });
