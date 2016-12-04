@@ -21,8 +21,8 @@ receiving configuration and sending events via an IPC messages.
     * [.jobs](JobWorkerIPC.md#JobWorker+jobs) : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
     * [.init()](JobWorkerIPC.md#JobWorkerIPC+init) ⇒ <code>Promise</code>
     * [.requestIPCPayload()](JobWorkerIPC.md#JobWorkerIPC+requestIPCPayload) ⇒ <code>Promise</code>
-    * [.attachIPCChecks()](JobWorkerIPC.md#JobWorkerIPC+attachIPCChecks)
-    * [.detachIPCChecks()](JobWorkerIPC.md#JobWorkerIPC+detachIPCChecks)
+    * [.attachToIPC()](JobWorkerIPC.md#JobWorkerIPC+attachToIPC)
+    * [.detatchFromIPC()](JobWorkerIPC.md#JobWorkerIPC+detatchFromIPC)
     * [.watchUncaughtException()](JobWorkerIPC.md#JobWorkerIPC+watchUncaughtException)
     * [.handleSuccess(result)](JobWorkerIPC.md#JobWorkerIPC+handleSuccess) ⇒ <code>Promise</code>
     * [.handleError(err)](JobWorkerIPC.md#JobWorkerIPC+handleError) ⇒ <code>Promise</code>
@@ -94,7 +94,7 @@ Overrides [JobWorker#init](JobWorker.md#JobWorker+init) to first request the fol
 **Overrides:** <code>[init](JobWorker.md#JobWorker+init)</code>  
 **See**
 
-- [JobWorkerIPC#attachIPCChecks](JobWorkerIPC.md#JobWorkerIPC+attachIPCChecks)
+- [JobWorkerIPC#attachToIPC](JobWorkerIPC.md#JobWorkerIPC+attachToIPC)
 - [JobWorkerIPC#watchUncaughtException](JobWorkerIPC.md#JobWorkerIPC+watchUncaughtException)
 - [JobWorkerIPC#requestIPCPayload](JobWorkerIPC.md#JobWorkerIPC+requestIPCPayload)
 
@@ -110,18 +110,18 @@ Called by [JobWorkerIPC#init](JobWorkerIPC.md#JobWorkerIPC+init).
 **Fulfil**: <code>object</code> Payload data that includes manager options, jobId, jobName and params.  
 **Reject**: <code>Error</code> If timeout specified by [JobWorkerIPC#payloadMessageTimeout](JobWorkerIPC.md#JobWorkerIPC+payloadMessageTimeout) is exceeded  
 **Reject**: <code>Error</code> If failed to send the startup IPC message  
-<a name="JobWorkerIPC+attachIPCChecks"></a>
+<a name="JobWorkerIPC+attachToIPC"></a>
 
-### jobWorkerIPC.attachIPCChecks()
+### jobWorkerIPC.attachToIPC()
 Check that the IPC connection is valid and listen for IPC messages and disconnect.
 
 Called by [JobWorkerIPC#init](JobWorkerIPC.md#JobWorkerIPC+init).
 
 **Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  
 **Access:** protected  
-<a name="JobWorkerIPC+detachIPCChecks"></a>
+<a name="JobWorkerIPC+detatchFromIPC"></a>
 
-### jobWorkerIPC.detachIPCChecks()
+### jobWorkerIPC.detatchFromIPC()
 Remove IPC listeners (i.e. listening for 'disconnect' and 'message').
 
 **Kind**: instance method of <code>[JobWorkerIPC](JobWorkerIPC.md#JobWorkerIPC)</code>  

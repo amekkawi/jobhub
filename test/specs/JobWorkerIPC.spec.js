@@ -31,14 +31,14 @@ describe('JobWorkerIPC', function() {
 		expect(worker.jobs).toBeA(JobConfigStore, 'Expected JobWorkerIPC#jobs %s to be a %s');
 	});
 
-	describe('JobWorkerIPC#detachIPCChecks', function() {
+	describe('JobWorkerIPC#detatchFromIPC', function() {
 		it('should remove disconnect and message listeners', function() {
 			var spyProcessRemoveListener = expect.spyOn(process, 'removeListener').andCall(function() {
 				return this;
 			});
 
 			var worker = new JobWorkerIPC();
-			worker.detachIPCChecks();
+			worker.detatchFromIPC();
 
 			expect(spyProcessRemoveListener.calls.length).toBe(2);
 			expect(spyProcessRemoveListener.calls[0].arguments.length).toBe(2);
@@ -50,7 +50,7 @@ describe('JobWorkerIPC', function() {
 		});
 	});
 
-	describe('JobWorkerIPC#attachIPCChecks', function() {
+	describe('JobWorkerIPC#attachToIPC', function() {
 		it('should call handleError if process.send is not set', function() {
 			var worker = new JobWorkerIPC();
 
@@ -58,7 +58,7 @@ describe('JobWorkerIPC', function() {
 				return Promise.resolve();
 			});
 
-			worker.attachIPCChecks();
+			worker.attachToIPC();
 
 			expect(worker.handleError.calls.length).toBe(1);
 			expect(worker.handleError.calls[0].arguments.length).toBe(1);
@@ -79,7 +79,7 @@ describe('JobWorkerIPC', function() {
 			});
 
 			try {
-				worker.attachIPCChecks();
+				worker.attachToIPC();
 			}
 			catch (err) {
 				delete process.send;
@@ -113,7 +113,7 @@ describe('JobWorkerIPC', function() {
 			});
 
 			try {
-				worker.attachIPCChecks();
+				worker.attachToIPC();
 			}
 			catch (err) {
 				delete process.send;
@@ -249,7 +249,7 @@ describe('JobWorkerIPC', function() {
 
 				var worker = new JobWorkerIPC();
 
-				expect.spyOn(worker, 'detachIPCChecks').andCall(function() {
+				expect.spyOn(worker, 'detatchFromIPC').andCall(function() {
 					expect(processSendSpy.calls.length).toBe(0);
 				});
 
@@ -260,7 +260,7 @@ describe('JobWorkerIPC', function() {
 				delete process.connected;
 
 				expect(promise).toBeA(Promise);
-				expect(worker.detachIPCChecks.calls.length).toBe(opts.willDetatchIPC ? 1 : 0);
+				expect(worker.detatchFromIPC.calls.length).toBe(opts.willDetatchIPC ? 1 : 0);
 				expect(processSendSpy.calls.length).toBe(1);
 				expect(processSendSpy.calls[0].arguments.length).toBe(2);
 				opts.sendMessage(args, processSendSpy.calls[0].arguments[0]);
@@ -284,7 +284,7 @@ describe('JobWorkerIPC', function() {
 
 				var worker = new JobWorkerIPC();
 
-				expect.spyOn(worker, 'detachIPCChecks').andCall(function() {
+				expect.spyOn(worker, 'detatchFromIPC').andCall(function() {
 					expect(processSendSpy.calls.length).toBe(0);
 				});
 
@@ -295,7 +295,7 @@ describe('JobWorkerIPC', function() {
 				delete process.connected;
 
 				expect(promise).toBeA(Promise);
-				expect(worker.detachIPCChecks.calls.length).toBe(opts.willDetatchIPC ? 1 : 0);
+				expect(worker.detatchFromIPC.calls.length).toBe(opts.willDetatchIPC ? 1 : 0);
 				expect(processSendSpy.calls.length).toBe(1);
 				expect(processSendSpy.calls[0].arguments.length).toBe(2);
 				opts.sendMessage(args, processSendSpy.calls[0].arguments[0]);
@@ -320,7 +320,7 @@ describe('JobWorkerIPC', function() {
 
 				var worker = new JobWorkerIPC();
 
-				expect.spyOn(worker, 'detachIPCChecks').andCall(function() {
+				expect.spyOn(worker, 'detatchFromIPC').andCall(function() {
 					expect(processSendSpy.calls.length).toBe(0);
 				});
 
@@ -331,7 +331,7 @@ describe('JobWorkerIPC', function() {
 				delete process.connected;
 
 				expect(promise).toBeA(Promise);
-				expect(worker.detachIPCChecks.calls.length).toBe(opts.willDetatchIPC ? 1 : 0);
+				expect(worker.detatchFromIPC.calls.length).toBe(opts.willDetatchIPC ? 1 : 0);
 				expect(processSendSpy.calls.length).toBe(0);
 
 				return promise;
@@ -536,22 +536,22 @@ describe('JobWorkerIPC', function() {
 			};
 			var worker = new JobWorkerIPC();
 
-			expect.spyOn(worker, 'attachIPCChecks').andCall(function() {
-				expect(worker.attachIPCChecks.calls.length).toBe(1);
+			expect.spyOn(worker, 'attachToIPC').andCall(function() {
+				expect(worker.attachToIPC.calls.length).toBe(1);
 				expect(worker.watchUncaughtException.calls.length).toBe(0);
 				expect(worker.requestIPCPayload.calls.length).toBe(0);
 				expect(arguments.length).toBe(0);
 			});
 
 			expect.spyOn(worker, 'watchUncaughtException').andCall(function() {
-				expect(worker.attachIPCChecks.calls.length).toBe(1);
+				expect(worker.attachToIPC.calls.length).toBe(1);
 				expect(worker.watchUncaughtException.calls.length).toBe(1);
 				expect(worker.requestIPCPayload.calls.length).toBe(0);
 				expect(arguments.length).toBe(0);
 			});
 
 			expect.spyOn(worker, 'requestIPCPayload').andCall(function() {
-				expect(worker.attachIPCChecks.calls.length).toBe(1);
+				expect(worker.attachToIPC.calls.length).toBe(1);
 				expect(worker.watchUncaughtException.calls.length).toBe(1);
 				expect(worker.requestIPCPayload.calls.length).toBe(1);
 				expect(arguments.length).toBe(0);
@@ -572,7 +572,7 @@ describe('JobWorkerIPC', function() {
 			var promise = worker.init();
 			expect(promise).toBeA(Promise);
 
-			expect(worker.attachIPCChecks.calls.length).toBe(1);
+			expect(worker.attachToIPC.calls.length).toBe(1);
 			expect(worker.watchUncaughtException.calls.length).toBe(1);
 			expect(worker.requestIPCPayload.calls.length).toBe(1);
 

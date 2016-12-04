@@ -81,7 +81,7 @@ Overrides [JobWorker#init](JobWorker#init) to first request the following to be 
 **Overrides:** <code>JobWorker#init</code>  
 **See**
 
-- [JobWorkerIPC#attachIPCChecks](JobWorkerIPC#attachIPCChecks)
+- [JobWorkerIPC#attachToIPC](JobWorkerIPC#attachToIPC)
 - [JobWorkerIPC#watchUncaughtException](JobWorkerIPC#watchUncaughtException)
 - [JobWorkerIPC#requestIPCPayload](JobWorkerIPC#requestIPCPayload)
 
