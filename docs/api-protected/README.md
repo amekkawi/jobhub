@@ -111,6 +111,12 @@ while handling the successful or failed result of a job.</p>
 <dt><a href="middleware.md#createJob">createJob(jobId, jobConfig, params, next)</a></dt>
 <dd><p>Intercepts creating a <a href="TrackedJob.md#TrackedJob">TrackedJob</a> instance.</p>
 </dd>
+<dt><a href="middleware.md#workerLoadJob">workerLoadJob(jobs, jobName)</a></dt>
+<dd><p>Intercepts creation of the <a href="JobRunArg.md#JobRunArg">JobRunArg</a> provided to <a href="JobConfig.md#JobConfig+run">JobConfig#run</a>.</p>
+</dd>
+<dt><a href="middleware.md#workerBuildJobArg">workerBuildJobArg(jobId, params, resolve, reject, sendProgress, onAbort)</a> ⇒ <code><a href="JobRunArg.md#JobRunArg">JobRunArg</a></code></dt>
+<dd><p>Intercepts creation of the <a href="JobRunArg.md#JobRunArg">JobRunArg</a> provided to <a href="JobConfig.md#JobConfig+run">JobConfig#run</a>.</p>
+</dd>
 <dt><a href="middleware.md#forkJobProcess">forkJobProcess(forkModulePath, forkArgs, forkOpts, next)</a> ⇒ <code>ChildProcess</code></dt>
 <dd><p>Intercepts forking the local child process using <code>require(&quot;child_process&quot;).fork</code>.</p>
 </dd>

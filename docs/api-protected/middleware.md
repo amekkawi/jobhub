@@ -59,6 +59,70 @@ hub.addSyncMiddleware('createJob', function(jobId, jobConfig, params, next) {
     return trackedJob;
 });
 ```
+<a name="workerLoadJob"></a>
+
+## workerLoadJob(jobs, jobName)
+Intercepts creation of the [JobRunArg](JobRunArg.md#JobRunArg) provided to [JobConfig#run](JobConfig.md#JobConfig+run).
+
+**Kind**: global function  
+**Category**: middleware  
+**this**: <code>[JobWorker](JobWorker.md#JobWorker)</code>  
+**Access:** protected  
+
+| Param | Type |
+| --- | --- |
+| jobs | <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code> | 
+| jobName | <code>string</code> | 
+
+**Example**  
+```javascript
+// Place in script specified by [HubManagerOptions#initModulePath](HubManagerOptions.md#HubManagerOptions+initModulePath)
+exports.initWorker = function(jobWorker) {
+    jobWorker.addSyncMiddleware('workerLoadJob', function(jobs, jobName, next) {
+        if (jobName === 'bigJobDependencies') {
+            // Register just the job needed
+            jobs.registerJob(jobName, require('path/to/bigjob.js'));
+        }
+        else {
+            // Load all jobs like normal
+            next();
+        }
+    });
+};
+```
+<a name="workerBuildJobArg"></a>
+
+## workerBuildJobArg(jobId, params, resolve, reject, sendProgress, onAbort) ⇒ <code>[JobRunArg](JobRunArg.md#JobRunArg)</code>
+Intercepts creation of the [JobRunArg](JobRunArg.md#JobRunArg) provided to [JobConfig#run](JobConfig.md#JobConfig+run).
+
+**Kind**: global function  
+**Category**: middleware  
+**this**: <code>[JobWorker](JobWorker.md#JobWorker)</code>  
+**Access:** protected  
+
+| Param | Type |
+| --- | --- |
+| jobId | <code>string</code> | 
+| params | <code>\*</code> | 
+| resolve | <code>function</code> | 
+| reject | <code>function</code> | 
+| sendProgress | <code>function</code> | 
+| onAbort | <code>function</code> | 
+
+**Example**  
+```javascript
+// Place in script specified by [HubManagerOptions#initModulePath](HubManagerOptions.md#HubManagerOptions+initModulePath)
+exports.initWorker = function(jobWorker) {
+    jobWorker.addSyncMiddleware('createWorkerMediator', function(jobId, params, resolve, reject, sendProgress, onAbort, next) {
+        var jobArg = next(); // or use arguments[arguments.length - 1]();
+
+        // Add custom props
+        jobArg.myCustomOperation = function() { ... };
+
+        return jobArg;
+    });
+};
+```
 <a name="forkJobProcess"></a>
 
 ## forkJobProcess(forkModulePath, forkArgs, forkOpts, next) ⇒ <code>ChildProcess</code>
