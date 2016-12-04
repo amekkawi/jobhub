@@ -1,5 +1,48 @@
 # jobhub Change Log #
 
+## 2.0.0 (December 4, 2016)
+
+### Major changes
+
+* __Added support for aborting jobs.__ Call {{mdLink "TrackedJob#abort"}} method to abort a running job, which will
+  abort the job {{#link "TrackedJob#abort"}}[if possible]({{{url}}}){{/link}} and reject the job with a
+  {{mdLink "JobAbortedError"}}. A job's worker process is notified so that it can gracefully abort and cleanup. (#4)
+* __Added support for controlling concurrently running jobs.__ Adds a base {{mdLink "JobExecutor"}} class for custom
+  logic, but also includes a built-in implementation ({{mdLink "JobExecutorBuiltin"}}) that optionally limits the
+  maximum number of concurrently running jobs. (#5)
+
+### Breaking changes
+
+* Changed {{mdLink "JobWorkerMediator#started"}} to only set to true once the startup confirmation is received. (from #4)
+* Changed {{mdLink "HubManager#queueJob"}} to add created TrackedJob instances to {{mdLink "HubManager#jobExecutor"}}
+  and no longer call {{mdLink "TrackedJob#run"}}. As a result, TrackedJob will be in a pre-run state directly after
+  {{mdLink "HubManager#queueJob"}}. (from #5)
+
+### Breaking changes only if extending jobhub classes
+
+* Added abstract {{mdLink "JobWorkerMediator#sendAbortMessage"}} method. (from #4)
+* Renamed JobWorkerIPC#attachIPCChecks to {{#link "JobWorkerIPC#attachToIPC"}}[attachToIPC]({{{url}}}){{/link}}.
+* Renamed JobWorkerIPC#detatchIPCChecks to {{#link "JobWorkerIPC#detatchFromIPC"}}[detatchFromIPC]({{{url}}}){{/link}}.
+
+### Notable non-breaking changes
+
+* Added {{mdLink "JobWorkerMediator#forked"}} which is set to true on child process fork,
+  replacing the previous behavior of {{mdLink "JobWorkerMediator#started"}}. (from #4)
+* Added {{mdLink "TrackedJob#isSettled"}} to determine if a job succeeded or failed.
+* Added 6th argument to {{mdLink "workerBuildJobArg"}} middleware to add abort listener. (from #4)
+* Added {{mdLink "HubManager#jobExecutor"}} member property which is an instance of a JobExecutor abstract class.
+  TrackedJob instances are added to JobExecutor which is then responsible for calling {{mdLink "TrackedJob#run"}}. (from #5)
+* Added {{#link "HubManagerOptions#jobExecutorClass"}}[jobExecutorClass]({{{url}}}){{/link}} and
+  {{#link "HubManagerOptions#jobExecutorOptions"}}[jobExecutorOptions]({{{url}}}){{/link}} options to HubManager options
+  to specify the constructor to use for
+  {{mdLink "HubManager#jobExecutor"}} and the options to pass to the instance.
+* Changed {{mdLink "TrackedJob#then"}}/{{#link "TrackedJob#catch"}}[catch]({{{url}}}){{/link}} to work before {{mdLink "TrackedJob#run"}} is called.
+  Previously they would return a rejected Promise before the job was run.
+
+### Documentation changes
+
+* Added jsdoc for {{mdLink "workerLoadJob"}} and {{mdLink "workerBuildJobArg"}} middleware.
+
 ## 1.1.0 (November 23, 2016)
 
   * Add {{mdLink "TrackedJob#result"}} that is set to the result on job success
