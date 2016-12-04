@@ -1,0 +1,22 @@
+# jobhub Change Log #
+
+## 1.1.0 (November 23, 2016)
+
+  * Add {{mdLink "TrackedJob#result"}} that is set to the result on job success
+  * Add {{mdLink "TrackedJob#error"}} that is set to the result on job error
+  * Change JobWorker to extend from EventEmitter
+  * Change JobWorkerIPC to listen for IPC messages
+    * Re-emit to JobWorker as `ipc-message::<message.type>`
+    * Add {{mdLink "JobWorkerIPC#handleIPCDisconnect"}} protected method
+    * Add {{mdLink "JobWorkerIPC#handleIPCMessage"}} protected method
+  * Change JobWorkerIPC to move calls to protected methods to {{mdLink "JobWorkerIPC#init"}}
+  * Fix {{mdLink "JobWorkerIPC#requestIPCPayload"}} not clearing timeout
+  * Fix calling next in quickRun should not start "run" stage synchronously
+
+## 1.0.1 (November 16, 2016)
+
+  * Fix {{mdLink "TrackedJob#jobStarted"}} emitted synchronously ([#3](https://github.com/amekkawi/jobhub/issues/3))
+
+## 1.0.0 (November 14, 2016
+
+  * Initial release

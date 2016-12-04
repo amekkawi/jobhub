@@ -7,11 +7,12 @@ var dmd = require('dmd');
 
 var cliArgs = minimist(process.argv.slice(2), {
 	'--': false,
-	boolean: ['readme', 'unified', 'protected', 'private', 'overwrite']
+	boolean: ['unified', 'protected', 'private', 'overwrite'],
+	string: ['readme']
 });
 
 var SYNTAX = 'SYNTAX: node ' + path.relative(process.cwd(), process.argv[1])
-	+ '[--readme|--unified] [--protected|--private] [--overwrite] <output-path>\n';
+	+ '[--readme=("README"|"CHANGELOG")|--unified] [--protected|--private] [--overwrite] <output-path>\n';
 
 var outputPath = cliArgs._[0];
 var overwrite = cliArgs.overwrite;
@@ -26,6 +27,11 @@ var baseOptions = {
 
 if (includePrivate) {
 	baseOptions.private = true;
+}
+
+if (projectREADME && !String(projectREADME).match(/^(README|CHANGELOG)$/)) {
+	process.stderr.write('--readme must be "README" or "CHANGELOG"\n' + SYNTAX);
+	process.exit(1);
 }
 
 if (!outputPath) {
@@ -63,7 +69,7 @@ function main() {
 				.then(filterTemplateData)
 				.then(function(templateData) {
 					if (projectREADME) {
-						return buildProjectREADME(templateData, options);
+						return buildProjectREADME(projectREADME, templateData, options);
 					}
 					else if (unifiedOutput) {
 						return buildUnified(templateData, options);
@@ -148,20 +154,20 @@ function filterTemplateData(templateData) {
 	});
 }
 
-function buildProjectREADME(templateData, options) {
+function buildProjectREADME(prefix, templateData, options) {
 	var additionalOptions = {
 		helper: [
 			path.join(__dirname, 'helpers.js'),
-			path.join(__dirname, 'helpers-readme.js')
+			path.join(__dirname, 'helpers-' + prefix.toLowerCase() + '.js')
 		],
 		partial: [
 			path.join(__dirname, 'partials/*.hbs'),
-			path.join(__dirname, 'partials-readme/*.hbs')
+			path.join(__dirname, 'partials-' + prefix.toLowerCase() + '/*.hbs')
 		]
 	};
 
 	return new Promise(function(resolve, reject) {
-		fs.readFile(path.join(__dirname, 'README.hbs'), { encoding: 'utf8' }, function(err, data) {
+		fs.readFile(path.join(__dirname, prefix + '.hbs'), { encoding: 'utf8' }, function(err, data) {
 			if (err) {
 				reject(err);
 			}

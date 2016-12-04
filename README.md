@@ -52,7 +52,7 @@ hub.start();
 
 ### Defining Jobs ###
 
-Jobs are defined within the module specified by [jobsModulePath](docs/api/HubManagerOptions.md#HubManagerOptions+jobsModulePath)
+Jobs are defined within the module specified by [HubManagerOptions#jobsModulePath](docs/api/HubManagerOptions.md#HubManagerOptions+jobsModulePath)
 with each export following the [JobConfig](docs/api/JobConfig.md#JobConfig) object type definition.
 
 In the [Quick start](#quick-start) above we defined it as `jobs.js`, so let's create that file and define some jobs:

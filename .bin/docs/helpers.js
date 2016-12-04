@@ -18,6 +18,19 @@ exports.link = function(longname, options) {
 	return options.fn(_link(longname, options));
 };
 
+exports.mdLink = function(longname, options) {
+	var linked = handlebars.helpers._identifier(Object.assign({}, options, {
+		longname: longname
+	}));
+
+	if (!linked) {
+		return longname;
+	}
+
+	var link = _link(longname, options);
+	return link.url ? '[' + longname + '](' + link.url + ')' : longname;
+};
+
 exports.inlineLinks = function(text, options) {
 	if (text) {
 		var links = handlebars.helpers.parseLink(text);
@@ -125,7 +138,7 @@ function _link(input, options) {
 			output.url = handlebars.helpers.linkPrefix() + rootMember.name + '.md' + output.url;
 		}
 		else if (rootMember.kind === 'function' && rootMember.category === 'middleware') {
-			output.url = 'middleware.md' + output.url;
+			output.url = handlebars.helpers.linkPrefix() + 'middleware.md' + output.url;
 		}
 		else {
 			throw new Error('Unsupported root kind: ' + rootMember.kind + ' for ' + rootMember.longname);

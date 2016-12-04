@@ -32,7 +32,7 @@ Install the library using NPM into your existing node project:
 npm install jobhub
 ```
 
-At a minimum you need to instantiate and start the {{#link "HubManager"}}[{{{name}}}]({{{url}}}){{/link}}, which we will add to a file named `index.js`.
+At a minimum you need to instantiate and start the {{mdLink "HubManager"}}, which we will add to a file named `index.js`.
 The only required configuration for HubManager is the path to the file which defines your jobs.
 
 ```javascript
@@ -52,8 +52,8 @@ hub.start();
 
 ### Defining Jobs ###
 
-Jobs are defined within the module specified by {{#link "HubManagerOptions#jobsModulePath"}}[{{{name}}}]({{{url}}}){{/link}}
-with each export following the {{#link "JobConfig"}}[{{{name}}}]({{{url}}}){{/link}} object type definition.
+Jobs are defined within the module specified by {{mdLink "HubManagerOptions#jobsModulePath"}}
+with each export following the {{mdLink "JobConfig"}} object type definition.
 
 In the [Quick start](#quick-start) above we defined it as `jobs.js`, so let's create that file and define some jobs:
 
