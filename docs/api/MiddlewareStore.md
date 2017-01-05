@@ -10,14 +10,14 @@ Plugins to customize functionality of jobhub.
 * [MiddlewareStore](MiddlewareStore.md#MiddlewareStore)
     * [.addSupportedSyncTypes(types)](MiddlewareStore.md#MiddlewareStore+addSupportedSyncTypes) ⇒ <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>
     * [.addSupportedAsyncTypes(types)](MiddlewareStore.md#MiddlewareStore+addSupportedAsyncTypes) ⇒ <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>
-    * [.addSyncMiddlware(type, middleware, [priority])](MiddlewareStore.md#MiddlewareStore+addSyncMiddlware)
-    * [.addAsyncMiddlware(type, middleware, [priority])](MiddlewareStore.md#MiddlewareStore+addAsyncMiddlware)
+    * [.addSyncMiddleware(type, middleware, [priority])](MiddlewareStore.md#MiddlewareStore+addSyncMiddleware)
+    * [.addAsyncMiddleware(type, middleware, [priority])](MiddlewareStore.md#MiddlewareStore+addAsyncMiddleware)
     * [.hasSyncSupport(type)](MiddlewareStore.md#MiddlewareStore+hasSyncSupport) ⇒ <code>boolean</code>
     * [.hasAsyncSupport(type)](MiddlewareStore.md#MiddlewareStore+hasAsyncSupport) ⇒ <code>boolean</code>
     * [.getSupportedSyncTypes()](MiddlewareStore.md#MiddlewareStore+getSupportedSyncTypes) ⇒ <code>Array.&lt;string&gt;</code>
     * [.getSupportedAsyncTypes()](MiddlewareStore.md#MiddlewareStore+getSupportedAsyncTypes) ⇒ <code>Array.&lt;string&gt;</code>
-    * [.removeSyncMiddlware(type, middleware)](MiddlewareStore.md#MiddlewareStore+removeSyncMiddlware)
-    * [.removeAsyncMiddlware(type, middleware)](MiddlewareStore.md#MiddlewareStore+removeAsyncMiddlware)
+    * [.removeSyncMiddleware(type, middleware)](MiddlewareStore.md#MiddlewareStore+removeSyncMiddleware)
+    * [.removeAsyncMiddleware(type, middleware)](MiddlewareStore.md#MiddlewareStore+removeAsyncMiddleware)
     * [.runSyncMiddleware(type, context, args, next)](MiddlewareStore.md#MiddlewareStore+runSyncMiddleware) ⇒ <code>\*</code>
     * [.runAsyncMiddleware(type, context, args, next)](MiddlewareStore.md#MiddlewareStore+runAsyncMiddleware) ⇒ <code>Promise</code>
 
@@ -43,9 +43,9 @@ Add supported async middleware types.
 | --- | --- |
 | types | <code>Array.&lt;string&gt;</code> | 
 
-<a name="MiddlewareStore+addSyncMiddlware"></a>
+<a name="MiddlewareStore+addSyncMiddleware"></a>
 
-### middlewareStore.addSyncMiddlware(type, middleware, [priority])
+### middlewareStore.addSyncMiddleware(type, middleware, [priority])
 Add a sync middleware.
 
 **Kind**: instance method of <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>  
@@ -60,9 +60,9 @@ Add a sync middleware.
 | middleware | <code>function</code> |  | 
 | [priority] | <code>number</code> | <code>100</code> | 
 
-<a name="MiddlewareStore+addAsyncMiddlware"></a>
+<a name="MiddlewareStore+addAsyncMiddleware"></a>
 
-### middlewareStore.addAsyncMiddlware(type, middleware, [priority])
+### middlewareStore.addAsyncMiddleware(type, middleware, [priority])
 Add an async middleware.
 
 **Kind**: instance method of <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>  
@@ -111,9 +111,9 @@ Get list of supported sync middleware types.
 Get list of supported async middleware types.
 
 **Kind**: instance method of <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>  
-<a name="MiddlewareStore+removeSyncMiddlware"></a>
+<a name="MiddlewareStore+removeSyncMiddleware"></a>
 
-### middlewareStore.removeSyncMiddlware(type, middleware)
+### middlewareStore.removeSyncMiddleware(type, middleware)
 Remove a sync middleware.
 
 **Kind**: instance method of <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>  
@@ -127,9 +127,9 @@ Remove a sync middleware.
 | type | <code>string</code> | 
 | middleware | <code>function</code> | 
 
-<a name="MiddlewareStore+removeAsyncMiddlware"></a>
+<a name="MiddlewareStore+removeAsyncMiddleware"></a>
 
-### middlewareStore.removeAsyncMiddlware(type, middleware)
+### middlewareStore.removeAsyncMiddleware(type, middleware)
 Remove an async middleware.
 
 **Kind**: instance method of <code>[MiddlewareStore](MiddlewareStore.md#MiddlewareStore)</code>  

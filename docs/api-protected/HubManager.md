@@ -15,7 +15,7 @@ Manages the lifecycle of jobs.
     * [.jobs](HubManager.md#HubManager+jobs) : <code>[JobConfigStore](JobConfigStore.md#JobConfigStore)</code>
     * [.jobExecutor](HubManager.md#HubManager+jobExecutor) : <code>[JobExecutor](JobExecutor.md#JobExecutor)</code>
     * [.start()](HubManager.md#HubManager+start) ⇒ <code>[HubManager](HubManager.md#HubManager)</code>
-    * [.addSyncMiddlware(type, middleware, [priority])](HubManager.md#HubManager+addSyncMiddlware) ⇒ <code>[HubManager](HubManager.md#HubManager)</code>
+    * [.addSyncMiddleware(type, middleware, [priority])](HubManager.md#HubManager+addSyncMiddleware) ⇒ <code>[HubManager](HubManager.md#HubManager)</code>
     * [.getSupportedSyncMiddleware()](HubManager.md#HubManager+getSupportedSyncMiddleware) ⇒ <code>Array.&lt;string&gt;</code>
     * [.getUniqueKey(job, [params])](HubManager.md#HubManager+getUniqueKey) ⇒ <code>string</code> &#124; <code>null</code>
     * [.validateJobParams(job, params)](HubManager.md#HubManager+validateJobParams) ⇒ <code>Promise</code>
@@ -78,12 +78,12 @@ Start the HubManager instance, loading jobs from the module specified by [HubMan
 - <code>[JobAlreadyExistsError](JobAlreadyExistsError.md#JobAlreadyExistsError)</code> 
 - <code>[InvalidJobConfigError](InvalidJobConfigError.md#InvalidJobConfigError)</code> 
 
-<a name="HubManager+addSyncMiddlware"></a>
+<a name="HubManager+addSyncMiddleware"></a>
 
-### hubManager.addSyncMiddlware(type, middleware, [priority]) ⇒ <code>[HubManager](HubManager.md#HubManager)</code>
+### hubManager.addSyncMiddleware(type, middleware, [priority]) ⇒ <code>[HubManager](HubManager.md#HubManager)</code>
 Add a sync middleware.
 
-Shortcut for `hubManager.middleware.addSyncMiddlware` that allows chaining.
+Shortcut for `hubManager.middleware.addSyncMiddleware` that allows chaining.
 
 **Kind**: instance method of <code>[HubManager](HubManager.md#HubManager)</code>  
 **Throws**:
