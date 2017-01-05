@@ -242,7 +242,7 @@ function buildSplit(templateData, options) {
 			if (!templateData.find(function(doclet) {
 				return doclet.kind === 'function' && doclet.category === 'middleware';
 			})) {
-				// Skip middlware file if none were found.
+				// Skip middleware file if none were found.
 				return;
 			}
 

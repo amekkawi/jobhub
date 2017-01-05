@@ -28,14 +28,14 @@ describe('MiddlewareStore', function() {
 
 	it('should throw error if adding middleware without adding support', function() {
 		expect(function() {
-			new MiddlewareStore().addSyncMiddlware('FOO', function(){});
+			new MiddlewareStore().addSyncMiddleware('FOO', function(){});
 		}).toThrowWithProps(errors.UnsupportedMiddlewareTypeError, {
 			isAsync: false,
 			type: 'FOO'
 		});
 
 		expect(function() {
-			new MiddlewareStore().addAsyncMiddlware('FOO', function(){});
+			new MiddlewareStore().addAsyncMiddleware('FOO', function(){});
 		}).toThrowWithProps(errors.UnsupportedMiddlewareTypeError, {
 			isAsync: true,
 			type: 'FOO'
@@ -179,8 +179,8 @@ describe('MiddlewareStore', function() {
 		});
 
 		store.addSupportedSyncTypes(['FOO']);
-		store.addSyncMiddlware('FOO', spyA);
-		store.addSyncMiddlware('FOO', spyB);
+		store.addSyncMiddleware('FOO', spyA);
+		store.addSyncMiddleware('FOO', spyB);
 
 		var ret = store.runSyncMiddleware('FOO', ctx, args, spyLast);
 		expect(ret).toBe('BAR');
@@ -269,8 +269,8 @@ describe('MiddlewareStore', function() {
 		});
 
 		store.addSupportedAsyncTypes(['FOO']);
-		store.addAsyncMiddlware('FOO', spyA);
-		store.addAsyncMiddlware('FOO', spyB);
+		store.addAsyncMiddleware('FOO', spyA);
+		store.addAsyncMiddleware('FOO', spyB);
 
 		var promise = store.runAsyncMiddleware('FOO', ctx, args, spyLast);
 		expect(promise).toBeA(Promise);
@@ -308,8 +308,8 @@ describe('MiddlewareStore', function() {
 		var spyLast = expect.createSpy().andReturn('BAR');
 
 		store.addSupportedSyncTypes(['FOO']);
-		store.addSyncMiddlware('FOO', spyA);
-		store.addSyncMiddlware('FOO', spyB);
+		store.addSyncMiddleware('FOO', spyA);
+		store.addSyncMiddleware('FOO', spyB);
 		var ret = store.runSyncMiddleware('FOO', ctx, args, spyLast);
 
 		expect(ret).toBe('500A');
@@ -337,8 +337,8 @@ describe('MiddlewareStore', function() {
 		var spyLast = expect.createSpy().andReturn('BAR');
 
 		store.addSupportedAsyncTypes(['FOO']);
-		store.addAsyncMiddlware('FOO', spyA);
-		store.addAsyncMiddlware('FOO', spyB);
+		store.addAsyncMiddleware('FOO', spyA);
+		store.addAsyncMiddleware('FOO', spyB);
 
 		var promise = store.runAsyncMiddleware('FOO', ctx, args, spyLast);
 		return promise.then(function(result) {
@@ -359,8 +359,8 @@ describe('MiddlewareStore', function() {
 		var spyLast = expect.createSpy().andReturn('BAR');
 
 		store.addSupportedSyncTypes(['FOO']);
-		store.addSyncMiddlware('FOO', spyA);
-		store.removeSyncMiddlware('FOO', spyA);
+		store.addSyncMiddleware('FOO', spyA);
+		store.removeSyncMiddleware('FOO', spyA);
 		store.runSyncMiddleware('FOO', ctx, args, spyLast);
 
 		expect(spyA.calls.length).toBe(0);
@@ -377,8 +377,8 @@ describe('MiddlewareStore', function() {
 		var spyLast = expect.createSpy().andReturn('BAR');
 
 		store.addSupportedAsyncTypes(['FOO']);
-		store.addAsyncMiddlware('FOO', spyA);
-		store.removeAsyncMiddlware('FOO', spyA);
+		store.addAsyncMiddleware('FOO', spyA);
+		store.removeAsyncMiddleware('FOO', spyA);
 
 		var promise = store.runAsyncMiddleware('FOO', ctx, args, spyLast);
 		return promise.then(function(result) {
@@ -416,8 +416,8 @@ describe('MiddlewareStore', function() {
 		});
 
 		store.addSupportedSyncTypes(['FOO']);
-		store.addSyncMiddlware('FOO', spyB, 100);
-		store.addSyncMiddlware('FOO', spyA, 10);
+		store.addSyncMiddleware('FOO', spyB, 100);
+		store.addSyncMiddleware('FOO', spyA, 10);
 		store.runSyncMiddleware('FOO', ctx, args, spyLast);
 		expect(spyA.calls.length).toBe(1);
 		expect(spyB.calls.length).toBe(1);
@@ -452,8 +452,8 @@ describe('MiddlewareStore', function() {
 		});
 
 		store.addSupportedAsyncTypes(['FOO']);
-		store.addAsyncMiddlware('FOO', spyB, 100);
-		store.addAsyncMiddlware('FOO', spyA, 10);
+		store.addAsyncMiddleware('FOO', spyB, 100);
+		store.addAsyncMiddleware('FOO', spyA, 10);
 
 		var promise = store.runAsyncMiddleware('FOO', ctx, args, spyLast);
 		return promise.then(function(result) {
@@ -504,9 +504,9 @@ describe('MiddlewareStore', function() {
 		});
 
 		store.addSupportedSyncTypes(['FOO']);
-		store.addSyncMiddlware('FOO', spyB);
-		store.addSyncMiddlware('FOO', spyC, 100.0000001);
-		store.addSyncMiddlware('FOO', spyA, 100 - .000001);
+		store.addSyncMiddleware('FOO', spyB);
+		store.addSyncMiddleware('FOO', spyC, 100.0000001);
+		store.addSyncMiddleware('FOO', spyA, 100 - .000001);
 		store.runSyncMiddleware('FOO', ctx, args, spyLast);
 		expect(spyA.calls.length).toBe(1);
 		expect(spyB.calls.length).toBe(1);
@@ -558,9 +558,9 @@ describe('MiddlewareStore', function() {
 		spyLast.namex = 'spyLast';
 
 		store.addSupportedAsyncTypes(['FOO']);
-		store.addAsyncMiddlware('FOO', spyB);
-		store.addAsyncMiddlware('FOO', spyC, 100.0000001);
-		store.addAsyncMiddlware('FOO', spyA, 100 - .000001);
+		store.addAsyncMiddleware('FOO', spyB);
+		store.addAsyncMiddleware('FOO', spyC, 100.0000001);
+		store.addAsyncMiddleware('FOO', spyA, 100 - .000001);
 
 		var promise = store.runAsyncMiddleware('FOO', ctx, args, spyLast);
 		return promise.then(function(result) {

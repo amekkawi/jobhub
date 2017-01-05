@@ -230,7 +230,7 @@ describe('JobWorker', function() {
 				expect(worker.jobs.registerJobs.calls[0].arguments[0]).toBe(jobsModule);
 			});
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				spyWorkerLoadJob
 			);
@@ -255,7 +255,7 @@ describe('JobWorker', function() {
 
 			expect.spyOn(worker.jobs, 'registerJobs');
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function() {
 					throw expectedError;
@@ -379,7 +379,7 @@ describe('JobWorker', function() {
 				return expectedRet;
 			});
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_BUILD_JOB_ARG,
 				spyWorkerBuildJobArg
 			);
@@ -436,7 +436,7 @@ describe('JobWorker', function() {
 
 			expect.spyOn(worker, 'init').andCallThrough();
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function() {
 					// Do not load jobs
@@ -482,7 +482,7 @@ describe('JobWorker', function() {
 
 			var spyRun = expect.createSpy();
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function(jobStore, jobName) {
 					jobStore.registerJob(jobName, {
@@ -520,7 +520,7 @@ describe('JobWorker', function() {
 
 			var spyRun = expect.createSpy();
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function(jobStore, jobName) {
 					jobStore.registerJob(jobName, {
@@ -567,7 +567,7 @@ describe('JobWorker', function() {
 				jobArg.resolve(expectedResult);
 			});
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function(jobStore, jobName) {
 					jobStore.registerJob(jobName, {
@@ -578,7 +578,7 @@ describe('JobWorker', function() {
 				}
 			);
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_BUILD_JOB_ARG,
 				spyBuildJobArg
 			);
@@ -599,7 +599,7 @@ describe('JobWorker', function() {
 
 			var spyRun = expect.createSpy();
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function(jobStore, jobName) {
 					jobStore.registerJob(jobName, {
@@ -608,7 +608,7 @@ describe('JobWorker', function() {
 				}
 			);
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_BUILD_JOB_ARG,
 				function() {
 					throw expectedError;
@@ -637,7 +637,7 @@ describe('JobWorker', function() {
 				throw expectedError;
 			});
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function(jobStore, jobName) {
 					jobStore.registerJob(jobName, {
@@ -664,7 +664,7 @@ describe('JobWorker', function() {
 				jobsModulePath: path.join(__dirname, '../fixtures/jobs.js')
 			});
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function(jobStore, jobName) {
 					jobStore.registerJob(jobName, {
@@ -691,7 +691,7 @@ describe('JobWorker', function() {
 				job.reject(expectedError);
 			});
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function(jobStore, jobName) {
 					jobStore.registerJob(jobName, {
@@ -726,7 +726,7 @@ describe('JobWorker', function() {
 				return Promise.resolve();
 			});
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function(jobStore, jobName) {
 					jobStore.registerJob(jobName, {
@@ -772,7 +772,7 @@ describe('JobWorker', function() {
 				return origRet.then(spyHandleSuccessPromise);
 			});
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function(jobStore, jobName) {
 					jobStore.registerJob(jobName, {
@@ -805,7 +805,7 @@ describe('JobWorker', function() {
 
 			var promise = worker.start();
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function() {
 					throw expectedError;
@@ -861,7 +861,7 @@ describe('JobWorker', function() {
 				return Promise.reject(expectedError);
 			});
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function(jobStore, jobName) {
 					jobStore.registerJob(jobName, {
@@ -895,7 +895,7 @@ describe('JobWorker', function() {
 
 			var promise = worker.start();
 
-			worker.middleware.addSyncMiddlware(
+			worker.middleware.addSyncMiddleware(
 				constants.MIDDLEWARE_WORKER_LOAD_JOB,
 				function() {
 					throw expectedOrigError;

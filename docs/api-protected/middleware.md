@@ -168,7 +168,7 @@ Intercepts creation of args provided to [forkJobProcess](middleware.md#forkJobPr
 hub.addSyncMiddleware('buildForkArgs', function(trackedJob, next) {
     return next().concat([
         '--my-custom-flag'
-    ];
+    ]);
 });
 ```
 <a name="buildForkOpts"></a>
@@ -190,10 +190,10 @@ Intercepts creation of opts provided to [forkJobProcess](middleware.md#forkJobPr
 ```javascript
 hub.addSyncMiddleware('buildForkOpts', function(trackedJob, next) {
     return Object.assign(next(), {
-        env: [
+        env: {
             CUSTOM_ENV: 'my-value'
-        ]
-    ];
+        }
+    });
 });
 ```
 <a name="createWorkerMediator"></a>

@@ -179,7 +179,7 @@ describe('HubManager', function() {
 			return origRet;
 		});
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			spyLoadJobsMiddleware
 		);
@@ -195,7 +195,7 @@ describe('HubManager', function() {
 
 		var manager = new HubManager(options);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJobs({
@@ -253,7 +253,7 @@ describe('HubManager', function() {
 		};
 
 		var manager = new HubManager(options);
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				// Register no jobs
@@ -280,7 +280,7 @@ describe('HubManager', function() {
 		};
 
 		var manager = new HubManager(options);
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJob('foo', {
@@ -314,7 +314,7 @@ describe('HubManager', function() {
 		};
 
 		var manager = new HubManager(options);
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJobs({
@@ -402,7 +402,7 @@ describe('HubManager', function() {
 		};
 
 		var manager = new HubManager(options);
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				// Register no jobs
@@ -425,7 +425,7 @@ describe('HubManager', function() {
 		};
 
 		var manager = new HubManager(options);
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				// Register no jobs
@@ -469,7 +469,7 @@ describe('HubManager', function() {
 			expect(arguments[0]).toBe(trackedJob);
 		});
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJob('foo', {
@@ -484,7 +484,7 @@ describe('HubManager', function() {
 			}
 		);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_JOB,
 			function() {
 				expect(this).toBe(manager);
@@ -540,7 +540,7 @@ describe('HubManager', function() {
 
 		var manager = new HubManager(options);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJob('foo', {
@@ -554,7 +554,7 @@ describe('HubManager', function() {
 			}
 		);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_JOB,
 			function() {
 				var trackedJob = arguments[3](); // Next
@@ -586,7 +586,7 @@ describe('HubManager', function() {
 
 		var trackedJob;
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJob('foo', {
@@ -597,7 +597,7 @@ describe('HubManager', function() {
 			}
 		);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_JOB,
 			function() {
 				trackedJob = arguments[3](); // Next
@@ -629,7 +629,7 @@ describe('HubManager', function() {
 
 		var trackedJob;
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJob('foo', {
@@ -641,7 +641,7 @@ describe('HubManager', function() {
 			}
 		);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_JOB,
 			function() {
 				trackedJob = arguments[3](); // Next
@@ -669,7 +669,7 @@ describe('HubManager', function() {
 
 		var manager = new HubManager(options);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJob('foo', {
@@ -683,7 +683,7 @@ describe('HubManager', function() {
 			}
 		);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_JOB,
 			function() {
 				var trackedJob = arguments[3](); // Next
@@ -726,7 +726,7 @@ describe('HubManager', function() {
 
 		var manager = new HubManager(options);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJob('foo', {
@@ -747,7 +747,7 @@ describe('HubManager', function() {
 			}
 		);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_JOB,
 			function() {
 				var trackedJob = arguments[3](); // Next
@@ -786,7 +786,7 @@ describe('HubManager', function() {
 
 		var manager = new HubManager(options);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJob('foo', {
@@ -817,7 +817,7 @@ describe('HubManager', function() {
 
 		var manager = new HubManager(options);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJob('foo', {
@@ -856,7 +856,7 @@ describe('HubManager', function() {
 
 		var manager = new HubManager(options);
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_LOAD_JOBS,
 			function(jobStore) {
 				jobStore.registerJob('foo', {

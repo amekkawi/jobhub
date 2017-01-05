@@ -1011,7 +1011,7 @@ describe('TrackedJob', function() {
 				return workerMediator;
 			});
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			spyCreateMediator
 		);
@@ -1048,7 +1048,7 @@ describe('TrackedJob', function() {
 		var manager = createManagerFixture();
 		var expectedError = new Error();
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			function() {
 				return createJobWorkerMediatorFixture(this, {
@@ -1093,7 +1093,7 @@ describe('TrackedJob', function() {
 		var manager = createManagerFixture();
 		var expectedResult = {};
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			function() {
 				return createJobWorkerMediatorFixture(this, {
@@ -1141,7 +1141,7 @@ describe('TrackedJob', function() {
 		var manager = createManagerFixture();
 		var expectedError = new Error();
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			function() {
 				return createJobWorkerMediatorFixture(this, {
@@ -1181,7 +1181,7 @@ describe('TrackedJob', function() {
 		var manager = createManagerFixture();
 		var expectedResult = {};
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			function() {
 				return createJobWorkerMediatorFixture(this, {
@@ -1220,7 +1220,7 @@ describe('TrackedJob', function() {
 		var manager = createManagerFixture();
 		var expectedError = new Error();
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			function() {
 				return createJobWorkerMediatorFixture(this, {
@@ -1264,7 +1264,7 @@ describe('TrackedJob', function() {
 	it('should send abort message after worker forked', function() {
 		var manager = createManagerFixture();
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			function() {
 				return createJobWorkerMediatorFixture(this, {
@@ -1378,7 +1378,7 @@ describe('TrackedJob', function() {
 		var progressObj = {};
 		var manager = createManagerFixture();
 
-		manager.middleware.addSyncMiddlware(
+		manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_CREATE_WORKER_MEDIATOR,
 			function() {
 				return createJobWorkerMediatorFixture(this, {
