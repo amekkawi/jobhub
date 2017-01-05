@@ -1,5 +1,15 @@
 # jobhub Change Log #
 
+## 2.0.1 (January 4, 2017)
+
+* Fix "Middleware" misspelled in method names ([#6](https://github.com/amekkawi/jobhub/issues/6))
+   * Fix HubManager#addSyncMiddleware misspelled as addSyncMiddlware
+   * Fix MiddlewareStore#addSyncMiddleware misspelled as addSyncMiddlware
+   * Fix MiddlewareStore#addAsyncMiddleware misspelled as addAsyncMiddlware
+   * Fix MiddlewareStore#removeSyncMiddleware misspelled as removeSyncMiddlware
+   * Fix MiddlewareStore#removeAsyncMiddleware misspelled as removeAsyncMiddlware
+* Fix syntax errors in middleware JSDoc examples
+
 ## 2.0.0 (December 4, 2016)
 
 ### Major changes
