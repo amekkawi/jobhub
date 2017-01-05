@@ -141,17 +141,17 @@ describe('JobWorkerIPCMediator', function() {
 			return childProcess = createChildProcessFixture();
 		});
 
-		trackedJob.manager.middleware.addSyncMiddlware(
+		trackedJob.manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_BUILD_FORK_ARGS,
 			spyArgs
 		);
 
-		trackedJob.manager.middleware.addSyncMiddlware(
+		trackedJob.manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_BUILD_FORK_OPTS,
 			spyOpts
 		);
 
-		trackedJob.manager.middleware.addSyncMiddlware(
+		trackedJob.manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_FORK_JOB_PROCESS,
 			spyFork
 		);
@@ -624,7 +624,7 @@ describe('JobWorkerIPCMediator', function() {
 
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 
-		trackedJob.manager.middleware.addSyncMiddlware(
+		trackedJob.manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_FORK_JOB_PROCESS,
 			function() {
 				return childProcess;
@@ -669,7 +669,7 @@ describe('JobWorkerIPCMediator', function() {
 
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 
-		trackedJob.manager.middleware.addSyncMiddlware(
+		trackedJob.manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_FORK_JOB_PROCESS,
 			function() {
 				return childProcess;
@@ -708,7 +708,7 @@ describe('JobWorkerIPCMediator', function() {
 
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 
-		trackedJob.manager.middleware.addSyncMiddlware(
+		trackedJob.manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_FORK_JOB_PROCESS,
 			function() {
 				return childProcess;
