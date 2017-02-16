@@ -624,6 +624,8 @@ describe('JobWorkerIPCMediator', function() {
 
 		var mediator = new JobWorkerIPCMediator(trackedJob);
 
+		expect.spyOn(mediator, 'handleStartupConfirmation').andCallThrough();
+
 		trackedJob.manager.middleware.addSyncMiddleware(
 			constants.MIDDLEWARE_FORK_JOB_PROCESS,
 			function() {
@@ -631,7 +633,7 @@ describe('JobWorkerIPCMediator', function() {
 			}
 		);
 
-		mediator.startWorker().then(function() {
+		return mediator.startWorker().then(function() {
 			expect(mediator.started).toBe(false, 'Expected JobWorkerIPCMediator#started %s to be %s');
 			expect(mediator.handleStartupConfirmation.calls.length).toBe(0, 'Expected JobWorkerIPCMediator#handleStartupConfirmation call count %s to be %s');
 
@@ -676,18 +678,18 @@ describe('JobWorkerIPCMediator', function() {
 			}
 		);
 
-		mediator.startWorker().then(function() {
+		return mediator.startWorker().then(function() {
 			mediator.handleStartupConfirmation();
-			expect(childProcess.send.calls.length).toBe(0, 'Expected childProcess#send call count %s to be %s');
+			expect(childProcess.send.calls.length).toBe(1, 'Expected childProcess#send call count %s to be %s');
 			expect(mediator.started).toBe(true, 'Expected JobWorkerIPCMediator#started %s to be %s');
 
 			mediator.sendAbortMessage();
 
-			expect(childProcess.send.calls.length).toBe(1, 'Expected childProcess#send call count %s to be %s');
-			expect(childProcess.send.calls[0].arguments.length).toBe(1);
-			expect(childProcess.send.calls[0].arguments[0]).toBeA(Object);
-			expect(Object.keys(childProcess.send.calls[0].arguments[0])).toEqual(['type']);
-			expect(childProcess.send.calls[0].arguments[0].type).toBe(constants.JOB_MESSAGE_ABORT);
+			expect(childProcess.send.calls.length).toBe(2, 'Expected childProcess#send call count %s to be %s');
+			expect(childProcess.send.calls[1].arguments.length).toBe(1);
+			expect(childProcess.send.calls[1].arguments[0]).toBeA(Object);
+			expect(Object.keys(childProcess.send.calls[1].arguments[0])).toEqual(['type']);
+			expect(childProcess.send.calls[1].arguments[0].type).toBe(constants.JOB_MESSAGE_ABORT);
 		});
 	});
 
@@ -715,15 +717,15 @@ describe('JobWorkerIPCMediator', function() {
 			}
 		);
 
-		mediator.startWorker().then(function() {
+		return mediator.startWorker().then(function() {
 			mediator.handleStartupConfirmation();
-			expect(childProcess.send.calls.length).toBe(0, 'Expected childProcess#send call count %s to be %s');
+			expect(childProcess.send.calls.length).toBe(1, 'Expected childProcess#send call count %s to be %s');
 			expect(mediator.started).toBe(true, 'Expected JobWorkerIPCMediator#started %s to be %s');
 
 			childProcess.connected = false;
 
 			mediator.sendAbortMessage();
-			expect(childProcess.send.calls.length).toBe(0, 'Expected childProcess#send call count %s to be %s');
+			expect(childProcess.send.calls.length).toBe(1, 'Expected childProcess#send call count %s to be %s');
 		});
 	});
 });
