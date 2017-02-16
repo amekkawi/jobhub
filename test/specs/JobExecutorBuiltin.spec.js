@@ -117,6 +117,10 @@ describe('JobExecutorBuiltin', function() {
 						reject(new Error());
 					}.bind(this));
 				}.bind(this));
+
+				// Catch to avoid unhandled rejection errors
+				this.promise.catch(function() {});
+
 				return this;
 			})
 		});
