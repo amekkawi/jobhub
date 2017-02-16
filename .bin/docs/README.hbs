@@ -2,6 +2,8 @@
 
 Move your heavy workloads into fully managed child processes.
 
+[![Build Status](https://travis-ci.org/amekkawi/jobhub.svg?branch=master)](https://travis-ci.org/amekkawi/jobhub)
+
 ## Features ##
 
 * Jobs run in child processes and terminate when they are complete.
